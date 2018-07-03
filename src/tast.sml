@@ -85,7 +85,7 @@ structure TAST :> TAST = struct
       | typeOf (TSlotAccess (_, _, t)) = t
       | typeOf (TFuncall (_, _, t)) = t
 
-    datatype context = Context of Function.stack * Type.tenv * Function.fenv * Type.renv
+    datatype context = Context of Function.stack * Type.tenv * Function.fenv
 
     fun mkContext s t f r = Context (s, t, f, r)
 
