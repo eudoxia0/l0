@@ -1,0 +1,32 @@
+;; -*- mode: lisp -*-
+;; Compile with:
+;;   interim sqlite3.int sqlite3.c
+;; Compile that with:
+;;   clang -lsqlite3 sqlite3.c -o sqldemo
+(c/include "sqlite3.h")
+
+(defun die ((msg str)) unit
+  (println msg)
+  (c/call "exit" unit -1))
+
+(defun main () i32
+  (let ((null (c/nullptr u64))
+        (db null))
+    (c/call "sqlite3_open" i32 ":memory:" (c/address-of db))
+    (if (= db null)
+        (die "Failed to open database")
+        (progn
+          (println "Opened database!")
+          (println "Creating table...")
+          (let ((rc (c/call "sqlite3_exec"
+                            i32
+                            db
+                            "CREATE TABLE pairs (x INTEGER PRIMARY KEY, y INTEGER);"
+                            0
+                            0
+                            0)))
+            (if (<> rc (c/embed i32 "SQLITE_OK"))
+                (die "Failed to create table, code: ")
+                (progn
+                  (println "Successfully created table!")))))))
+  0)

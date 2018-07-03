@@ -1,0 +1,58 @@
+Library
+  signature SYMTAB
+  structure SymTab
+  signature SET
+  structure Set
+  signature PARSER
+  structure Parser
+  signature TYPE
+  structure Type
+  signature FUNCTION
+  structure Function
+  signature AST
+  structure AST
+  signature TAST
+  structure TAST
+  signature BACKEND
+  structure Backend
+  signature COMPILER
+  structure Compiler
+  signature INTERIM
+  structure Interim
+is
+  vendor/parsimony/parsimony.cm
+
+  src/util.sig
+  src/util.sml
+
+  src/symtab.sig
+  src/symtab.sml
+
+  src/set.sig
+  src/set.sml
+
+  src/parser.sig
+  src/parser.sml
+
+  src/type.sig
+  src/type.sml
+
+  src/func.sig
+  src/func.sml
+
+  src/ast.sig
+  src/ast.sml
+
+  src/tast.sig
+  src/tast.sml
+
+  src/backend.sig
+  src/backend.sml
+
+  src/compiler.sig
+  src/compiler.sml
+
+  src/interim.sig
+  src/interim.sml
+
+  $/basis.cm
