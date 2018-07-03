@@ -39,7 +39,12 @@ structure Function :> FUNCTION = struct
 
   fun funcRT (Function (_, _, r)) = r
 
-
+  fun matchParams params argtypes =
+    if (length params <> length args) then
+        raise Fail "Wrong parameter count"
+    else
+        ListPair.all (fn (pt, at) => pt = at)
+                     (map (fn (Function.Param (n,t)) => t) params, argtypes)
 
   fun toStack (Function (_, params, _)) =
     let fun toStack' (Param (n,t)::rest) acc = bind (n, Binding (n, forciblyConcretizeType t, Immutable))
