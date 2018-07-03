@@ -1,20 +1,20 @@
 (*
     Copyright 2018 Fernando Borretti <fernando@borretti.me>
 
-    This file is part of Interim.
+    This file is part of L0.
 
-    Interim is free software: you can redistribute it and/or modify
+    L0 is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Interim is distributed in the hope that it will be useful,
+    L0 is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Interim.  If not, see <http://www.gnu.org/licenses/>.
+    along with L0.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
 structure Type :> TYPE = struct
@@ -96,14 +96,14 @@ structure Type :> TYPE = struct
       | parseTypeSpecifier (Symbol "u64") _ = Int (Unsigned, Word64)
       | parseTypeSpecifier (Symbol "i64") _ = Int (Signed, Word64)
       | parseTypeSpecifier (Symbol "str") _ = Str
-      | parseTypeSpecifier (SList [Symbol "rawptr", t]) e = RawPointer (parseTypeSpecifier t e)
+      | parseTypeSpecifier (List [Symbol "rawptr", t]) e = RawPointer (parseTypeSpecifier t e)
       | parseTypeSpecifier (Symbol s) e = lookup s e
       | parseTypeSpecifier _ _ = raise Fail "Bad type specifier"
 
-    fun parseParamTypeSpecifier (SList [Symbol "region", Symbol p]) _ = RegionParam p
-      | parseParamTypeSpecifier (SList [Symbol "pointer", ty, Symbol p]) e =
+    fun parseParamTypeSpecifier (List [Symbol "region", Symbol p]) _ = RegionParam p
+      | parseParamTypeSpecifier (List [Symbol "pointer", ty, Symbol p]) e =
         PRegionPointer (parseParamTypeSpecifier ty e, p)
-      | parseParamTypeSpecifier (SList [Symbol "nullable", ty, Symbol p]) e =
+      | parseParamTypeSpecifier (List [Symbol "nullable", ty, Symbol p]) e =
         PNullablePointer (parseParamTypeSpecifier ty e, p)
       | parseParamTypeSpecifier f e = toParamType (parseTypeSpecifier f e)
   end
