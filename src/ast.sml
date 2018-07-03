@@ -63,8 +63,7 @@ structure AST :> AST = struct
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
                | While of ast * ast
-               | LetRegion of Type.region * ast
-               | Allocate of string * ast
+               | Allocate of ast
                | NullableCase of ast * string * ast * ast
                | MakeRecord of string * (string * ast) list
                | SlotAccess of ast * string
