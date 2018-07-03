@@ -21,7 +21,7 @@ structure Function :> FUNCTION = struct
   open SymTab
   open Type
 
-  datatype param = Param of string * pty
+  datatype param = Param of string * ty
   datatype conc_param = ConcParam of string * Type.ty
   datatype func = Function of string * param list * ty
 
