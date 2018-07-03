@@ -44,14 +44,14 @@ structure Function :> FUNCTION = struct
         raise Fail "Wrong parameter count"
     else
         ListPair.all (fn (pt, at) => pt = at)
-                     (map (fn (Function.Param (n,t)) => t) params, argtypes)
+                     (map (fn (Param (n,t)) => t) params, argtypes)
 
   fun toStack (Function (_, params, _)) =
-    let fun toStack' (Param (n,t)::rest) acc = bind (n, Binding (n, forciblyConcretizeType t, Immutable))
-                                                        (toStack' rest acc)
-          | toStack' nil acc = acc
+    let fun innerToStack (Param (n,t)::rest) acc = bind (n, Binding (n, t, Immutable))
+                                                        (innerToStack rest acc)
+          | innerToStack nil acc = acc
 
     in
-        toStack' params empty
+        innerToStack params empty
     end
 end
