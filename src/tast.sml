@@ -89,10 +89,9 @@ structure TAST :> TAST = struct
 
     fun mkContext s t f r = Context (s, t, f, r)
 
-    fun ctxStack (Context (s, _, _, _)) = s
-    fun ctxTenv (Context (_, t, _, _)) = t
-    fun ctxFenv (Context (_, _, f, _)) = f
-    fun ctxRenv (Context (_, _, _, r)) = r
+    fun ctxStack (Context (s, _, _)) = s
+    fun ctxTenv (Context (_, t, _)) = t
+    fun ctxRenv (Context (_, _, _)) = r
 
     local
       open AST
