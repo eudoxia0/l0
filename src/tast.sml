@@ -86,7 +86,7 @@ structure TAST :> TAST = struct
 
     datatype context = Context of Function.stack * Type.tenv * Function.fenv
 
-    fun mkContext s t f r = Context (s, t, f, r)
+    fun mkContext s t f = Context (s, t, f)
 
     fun ctxStack (Context (s, _, _)) = s
     fun ctxTenv (Context (_, t, _)) = t
@@ -144,7 +144,7 @@ structure TAST :> TAST = struct
               in
                   TLet (name,
                         v',
-                        augment body (mkContext s' (ctxTenv c) (ctxFenv c) (ctxRenv c)))
+                        augment body (mkContext s' (ctxTenv c) (ctxFenv c)))
               end
           end
         | augment (Assign (var, v)) c =
