@@ -26,13 +26,9 @@ structure Type :> TYPE = struct
               | Str
               | RawPointer of ty
               | Record of string * slot list
-              | RegionType of region
-              | RegionPointer of ty * region
-              | NullablePointer of ty * region
        and signedness = Signed | Unsigned
        and bit_width = Word8 | Word16 | Word32 | Word64
        and slot = Slot of string * ty
-       and region = Region of int * string
 
   fun isEquatable (Record _) = false
     | isEquatable _ = true
@@ -49,9 +45,6 @@ structure Type :> TYPE = struct
     | tyToString Str = "str"
     | tyToString (RawPointer t) = "(rawptr " ^ (tyToString t) ^ ")"
     | tyToString (Record (name, _)) = name
-    | tyToString (RegionType (Region (_, name))) = "(region " ^ name ^ ")"
-    | tyToString (RegionPointer (ty, (Region (_, name)))) = "(pointer " ^ (tyToString ty) ^ " " ^ name ^ ")"
-    | tyToString (NullablePointer (ty, (Region (_, name)))) = "(nullable " ^ (tyToString ty) ^ " " ^ name ^ ")"
   and signednessStr Signed = "i"
     | signednessStr Unsigned = "u"
   and widthStr Word8 = "8"
@@ -59,28 +52,7 @@ structure Type :> TYPE = struct
     | widthStr Word32 = "32"
     | widthStr Word64 = "64"
 
-  datatype pty = PUnit
-               | PBool
-               | PInt of signedness * bit_width
-               | PStr
-               | PRawPointer of pty
-               | PRecord of string * slot list
-               | RegionParam of string
-               | PRegionPointer of pty * string
-               | PNullablePointer of pty * string
-
-  fun toParamType Unit = PUnit
-    | toParamType Bool = PBool
-    | toParamType (Int i) = PInt i
-    | toParamType Str = PStr
-    | toParamType (RawPointer t) = PRawPointer (toParamType t)
-    | toParamType (Record d) = PRecord d
-    | toParamType (RegionType _) = raise Fail "Can't do this"
-    | toParamType (RegionPointer _)  = raise Fail "Can't do this"
-    | toParamType (NullablePointer _)  = raise Fail "Can't do this"
-
   type tenv = ty symtab
-  type renv = region SymTab.symtab
 
   local
     open Parser
@@ -99,12 +71,5 @@ structure Type :> TYPE = struct
       | parseTypeSpecifier (List [Symbol "rawptr", t]) e = RawPointer (parseTypeSpecifier t e)
       | parseTypeSpecifier (Symbol s) e = lookup s e
       | parseTypeSpecifier _ _ = raise Fail "Bad type specifier"
-
-    fun parseParamTypeSpecifier (List [Symbol "region", Symbol p]) _ = RegionParam p
-      | parseParamTypeSpecifier (List [Symbol "pointer", ty, Symbol p]) e =
-        PRegionPointer (parseParamTypeSpecifier ty e, p)
-      | parseParamTypeSpecifier (List [Symbol "nullable", ty, Symbol p]) e =
-        PNullablePointer (parseParamTypeSpecifier ty e, p)
-      | parseParamTypeSpecifier f e = toParamType (parseTypeSpecifier f e)
   end
 end
