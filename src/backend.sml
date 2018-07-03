@@ -29,7 +29,6 @@ structure Backend :> BACKEND = struct
                  | Int64
                  | Pointer of ctype
                  | Struct of string
-                 | RegionType
 
   datatype cparam = CParam of string * ctype
 
@@ -99,19 +98,6 @@ structure Backend :> BACKEND = struct
     | convertType (Type.Str) = Pointer UInt8
     | convertType (Type.RawPointer t) = Pointer (convertType t)
     | convertType (Type.Record (n, _)) = Struct (escapeIdent n)
-    | convertType (Type.RegionType _) = RegionType
-    | convertType (Type.RegionPointer (t, _)) = Pointer (convertType t)
-    | convertType (Type.NullablePointer (t, _)) = Pointer (convertType t)
-
-  fun convertParamType (Type.PUnit) = Bool
-    | convertParamType (Type.PBool) = Bool
-    | convertParamType (Type.PInt (s, w)) = convertIntType s w
-    | convertParamType (Type.PStr) = Pointer UInt8
-    | convertParamType (Type.PRawPointer t) = Pointer (convertParamType t)
-    | convertParamType (Type.PRecord (n, _)) = Struct (escapeIdent n)
-    | convertParamType (Type.RegionParam _) = RegionType
-    | convertParamType (Type.PRegionPointer (t, _)) = Pointer (convertParamType t)
-    | convertParamType (Type.PNullablePointer (t, _)) = Pointer (convertParamType t)
 
   val unitConstant = CConstBool false
 
@@ -136,11 +122,8 @@ structure Backend :> BACKEND = struct
       | newline AST.NoNewline = ""
   end
 
-  fun regionName (Type.Region (id, name)) =
-    "region_" ^ (escapeIdent name) ^ "_" ^ (Int.toString id)
-
   local
-      open TAST
+    open TAST
   in
     fun convert TConstUnit = (CSeq [], unitConstant)
       | convert (TConstBool b) = (CSeq [], CConstBool b)
@@ -280,54 +263,8 @@ structure Backend :> BACKEND = struct
         in
             (CSeq [tblock, CWhile (tval, bblock)], unitConstant)
         end
-      | convert (TLetRegion (r, b)) =
-        let val (bblock, bval) = convert b
-        in
-            let val name = regionName r
-            in
-                (CSeq [CDeclare (RegionType, name),
-                       CFuncall (NONE, "interim_region_create", [CAddressOf (CVar name)]),
-                       bblock,
-                       CFuncall (NONE, "interim_region_free", [CAddressOf (CVar name)])],
-                 bval)
-            end
-        end
-      | convert (TAllocate (r, v)) =
-        let val (vblock, vval) = convert v
-            and cr = CAddressOf (CVar (regionName r))
-            and res = freshVar ()
-            and cty = Pointer (convertType (typeOf v))
-        in
-            (CSeq [vblock,
-                   CDeclare (cty, res),
-                   CFuncall (SOME res, "interim_region_allocate", [cr, CSizeOf cty]),
-                   CAssign (CDeref (CVar res), vval)],
-             CVar res)
-        end
-      | convert (TNullableCase (p, var, nnc, nc, t)) =
-        let val (pblock, pval) = convert p
-            and (nncblock, nncval) = convert nnc
-            and (ncblock, ncval) = convert nc
-            and result = freshVar ()
-            and resType = convertType t
-        in
-            (CSeq [
-                  pblock,
-                  CDeclare (resType, result),
-                  CCond (CBinop (AST.NEq, pval, CConstNull),
-                         CBlock [
-                             CDeclare (convertType (typeOf p), escapeIdent var),
-                             CAssign (CVar var, pval),
-                             nncblock,
-                             CAssign (CVar result, nncval)
-                         ],
-                         CBlock [
-                             ncblock,
-                             CAssign (CVar result, ncval)
-                        ])
-              ],
-             CVar result)
-        end
+      | convert (TAllocate (v)) =
+        raise Fail "NOT IMPLEMENTED YET"
       | convert (TMakeRecord (ty, name, slots)) =
         let val args = map (fn (_, e) => convert e) slots
             and slot_names = map (fn (n, _) => n) slots
@@ -360,7 +297,7 @@ structure Backend :> BACKEND = struct
       let val (block, retval) = convert tast
       in
           CFunction (name,
-                     map (fn (Function.Param (n,t)) => CParam (n, convertParamType t)) params,
+                     map (fn (Function.Param (n,t)) => CParam (n, convertType t)) params,
                      convertType rt,
                      block,
                      retval)
@@ -396,7 +333,6 @@ structure Backend :> BACKEND = struct
     | renderType Int64 = "int64_t"
     | renderType (Pointer t) = (renderType t) ^ "*"
     | renderType (Struct n) = n
-    | renderType RegionType = "interim_region_t"
 
   local
       open Substring
