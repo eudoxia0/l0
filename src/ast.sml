@@ -129,9 +129,7 @@ structure AST :> AST = struct
       | parseL "c/embed" [t, String s] _ = CEmbed (t, s)
       | parseL "c/call" (String n :: t :: args) e = CCall (n, t, mparse args e)
       | parseL "while" (t :: body) e = While (parse t e, Progn (mparse body e))
-      | parseL "letregion" (Symbol name :: rest) e =
-        LetRegion (Type.Region (freshRegionId (), name), Progn (mparse rest e))
-      | parseL "allocate" [Symbol r, v] e = Allocate (r, parse v e)
+      | parseL "allocate" [v] e = Allocate (parse v e)
       | parseL "case" [p,
                        List (List [Symbol "not-null", Symbol var] :: nnc),
                        List (Symbol "null" :: nc)] e =
