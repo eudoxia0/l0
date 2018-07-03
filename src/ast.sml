@@ -75,14 +75,6 @@ structure AST :> AST = struct
                    | Defrecord of string * (string * Type.ty) list
                    | CInclude of string
 
-  val count = ref 0
-  fun freshRegionId () =
-    let
-    in
-        count := !count + 1;
-        !count
-    end
-
   local
     open Parser
   in
