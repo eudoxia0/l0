@@ -64,7 +64,6 @@ structure AST :> AST = struct
                | CCall of string * Parser.sexp * ast list
                | While of ast * ast
                | Allocate of ast
-               | NullableCase of ast * string * ast * ast
                | MakeRecord of string * (string * ast) list
                | SlotAccess of ast * string
                | Funcall of string * ast list
@@ -122,10 +121,6 @@ structure AST :> AST = struct
       | parseL "c/call" (String n :: t :: args) e = CCall (n, t, mparse args e)
       | parseL "while" (t :: body) e = While (parse t e, Progn (mparse body e))
       | parseL "allocate" [v] e = Allocate (parse v e)
-      | parseL "case" [p,
-                       List (List [Symbol "not-null", Symbol var] :: nnc),
-                       List (Symbol "null" :: nc)] e =
-        NullableCase (parse p e, var, Progn (mparse nnc e), Progn (mparse nc e))
       | parseL "not" [v] e = Funcall ("interim_not", [parse v e])
       | parseL "record" (Symbol name :: slots) e = MakeRecord (name, map (parseSlot e) slots)
       | parseL "slot" [r, Symbol slot] e = SlotAccess (parse r e, slot)

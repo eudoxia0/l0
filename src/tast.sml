@@ -42,7 +42,6 @@ structure TAST :> TAST = struct
                 | TCCall of string * Type.ty * tast list
                 | TWhile of tast * tast
                 | TAllocate of tast
-                | TNullableCase of tast * string * tast * tast * Type.ty
                 | TMakeRecord of Type.ty * string * (string * tast) list
                 | TSlotAccess of tast * string * Type.ty
                 | TFuncall of string * tast list * Type.ty
@@ -239,39 +238,7 @@ structure TAST :> TAST = struct
                   TWhile (test', body')
           end
         | augment (Allocate (v)) c =
-          let val r = lookup name (ctxRenv c)
-          in
-              TAllocate (augment v c)
-          end
-        | augment (NullableCase (p, var, nnc, nc)) c =
-          let val p' = augment p c
-          in
-              case (typeOf p') of
-                  NullablePointer (ty, r) => let val stack = bind (var, Binding (var,
-                                                                                 RegionPointer (ty, r),
-                                                                                 Immutable))
-                                                                  (ctxStack c)
-                                             in
-                                                 let val nnc' = augment nnc (mkContext stack
-                                                                                       (ctxTenv c)
-                                                                                       (ctxFenv c))
-                                                     and nc' = augment nc c
-                                                 in
-                                                     let val nnct = typeOf nnc'
-                                                         and nct = typeOf nc'
-                                                     in
-                                                         if nnct = nct then
-                                                             TNullableCase (p', var, nnc', nc', nnct)
-                                                         else
-                                                             raise Fail ("The types of both branches in a case must be equal. Here, the type of the not-null branch is "
-                                                                         ^ (tyToString nnct)
-                                                                         ^ " and the type of the null branch is "
-                                                                         ^ (tyToString nct))
-                                                     end
-                                                 end
-                                             end
-                | _ => raise Fail ("case: not a nullable pointer: " ^ (tyToString (typeOf p')))
-          end
+          TAllocate (augment v c)
         | augment (MakeRecord (name, slots)) c =
           let val ty = lookup name (ctxTenv c)
           in

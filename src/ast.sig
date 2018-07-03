@@ -53,7 +53,6 @@ signature AST = sig
                | CCall of string * Parser.sexp * ast list
                | While of ast * ast
                | Allocate of ast
-               | NullableCase of ast * string * ast * ast
                | MakeRecord of string * (string * ast) list
                | SlotAccess of ast * string
                | Funcall of string * ast list
