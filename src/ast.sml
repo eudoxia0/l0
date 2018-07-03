@@ -142,7 +142,7 @@ structure AST :> AST = struct
     and parseSlot e (List [Symbol name, exp]) = (name, parse exp e)
       | parseSlot e _ = raise Fail "Bad slot"
 
-    fun parseParam (List [Symbol n, t]) e = Function.Param (n, Type.parseParamTypeSpecifier t e)
+    fun parseParam (List [Symbol n, t]) e = Function.Param (n, Type.parseTypeSpecifier t e)
       | parseParam _ _ = raise Fail "Bad parameter"
 
     fun parseToplevel (List (Symbol f :: rest)) e = parseTopL f rest e
