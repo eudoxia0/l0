@@ -39,8 +39,7 @@ signature TAST = sig
                 | TCEmbed of Type.ty * string
                 | TCCall of string * Type.ty * tast list
                 | TWhile of tast * tast
-                | TLetRegion of Type.region * tast
-                | TAllocate of Type.region * tast
+                | TAllocate of tast
                 | TNullableCase of tast * string * tast * tast * Type.ty
                 | TMakeRecord of Type.ty * string * (string * tast) list
                 | TSlotAccess of tast * string * Type.ty
