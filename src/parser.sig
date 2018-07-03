@@ -1,27 +1,27 @@
 (*
     Copyright 2018 Fernando Borretti <fernando@borretti.me>
 
-    This file is part of Interim.
+    This file is part of L0.
 
-    Interim is free software: you can redistribute it and/or modify
+    L0 is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Interim is distributed in the hope that it will be useful,
+    L0 is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Interim.  If not, see <http://www.gnu.org/licenses/>.
+    along with L0.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
 signature PARSER = sig
   datatype sexp = Integer of int
                 | String of string
                 | Symbol of string
-                | SList of sexp list
+                | List of sexp list
 
   val parseString : string -> sexp * ParsimonyStringInput.input
 end
