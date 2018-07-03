@@ -24,34 +24,16 @@ signature TYPE = sig
               | Str
               | RawPointer of ty
               | Record of string * slot list
-              | RegionType of region
-              | RegionPointer of ty * region
-              | NullablePointer of ty * region
        and signedness = Signed | Unsigned
        and bit_width = Word8 | Word16 | Word32 | Word64
        and slot = Slot of string * ty
-       and region = Region of int * string
 
   val isEquatable : ty -> bool
   val isNumeric : ty -> bool
   val isPrintable : ty -> bool
   val tyToString : ty -> string
 
-  datatype pty = PUnit
-               | PBool
-               | PInt of signedness * bit_width
-               | PStr
-               | PRawPointer of pty
-               | PRecord of string * slot list
-               | RegionParam of string
-               | PRegionPointer of pty * string
-               | PNullablePointer of pty * string
-
-  val toParamType : ty -> pty
-
   type tenv = ty SymTab.symtab
-  type renv = region SymTab.symtab
 
   val parseTypeSpecifier : Parser.sexp -> tenv -> ty
-  val parseParamTypeSpecifier : Parser.sexp -> tenv -> pty
 end
