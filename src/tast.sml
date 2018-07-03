@@ -78,7 +78,6 @@ structure TAST :> TAST = struct
       | typeOf (TCCall (_, t, _)) = t
       | typeOf (TWhile _) = Unit
       | typeOf (TAllocate (v)) = RawPointer (typeOf v)
-      | typeOf (TNullableCase (_, _, _, _, t)) = t
       | typeOf (TMakeRecord (t, _, _)) = t
       | typeOf (TSlotAccess (_, _, t)) = t
       | typeOf (TFuncall (_, _, t)) = t
@@ -259,14 +258,10 @@ structure TAST :> TAST = struct
           let val (Function (_, params, rt)) = lookup name (ctxFenv c)
               and targs = (map (fn e => augment e c) args)
           in
-              let val cparams = Function.matchParams params (map typeOf targs)
-              in
-                  if ListPair.all (fn (ConcParam (_, t), t') => t = t')
-                                  (cparams, (map typeOf targs)) then
-                      TFuncall (name, targs, rt)
-                  else
-                      raise Fail "Argument types don't match"
-              end
+              if (Function.matchParams params (map typeOf targs)) then
+                  TFuncall (name, targs, rt)
+              else
+                  raise Fail "Argument types don't match"
           end
       and augmentArithOp oper a b ctx =
           let val a' = augment a ctx
