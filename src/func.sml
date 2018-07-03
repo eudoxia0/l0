@@ -40,7 +40,7 @@ structure Function :> FUNCTION = struct
   fun funcRT (Function (_, _, r)) = r
 
   fun matchParams params argtypes =
-    if (length params <> length args) then
+    if (length params <> length argtypes) then
         raise Fail "Wrong parameter count"
     else
         ListPair.all (fn (pt, at) => pt = at)
