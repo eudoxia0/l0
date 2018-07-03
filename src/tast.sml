@@ -78,8 +78,7 @@ structure TAST :> TAST = struct
       | typeOf (TCEmbed (t, _)) = t
       | typeOf (TCCall (_, t, _)) = t
       | typeOf (TWhile _) = Unit
-      | typeOf (TLetRegion (_, e)) = typeOf e
-      | typeOf (TAllocate (r, v)) = NullablePointer (typeOf v, r)
+      | typeOf (TAllocate (v)) = RawPointer (typeOf v)
       | typeOf (TNullableCase (_, _, _, _, t)) = t
       | typeOf (TMakeRecord (t, _, _)) = t
       | typeOf (TSlotAccess (_, _, t)) = t
@@ -91,7 +90,7 @@ structure TAST :> TAST = struct
 
     fun ctxStack (Context (s, _, _)) = s
     fun ctxTenv (Context (_, t, _)) = t
-    fun ctxRenv (Context (_, _, _)) = r
+    fun ctxFenv (Context (_, _, f)) = f
 
     local
       open AST
@@ -174,7 +173,6 @@ structure TAST :> TAST = struct
           in
               case (typeOf e') of
                   RawPointer t => TLoad (e', t)
-                | RegionPointer (t, _) => TLoad (e', t)
                 | _ => raise Fail "load: not a pointer"
           end
         | augment (Store (p, v)) c =
@@ -191,7 +189,6 @@ structure TAST :> TAST = struct
               in
                   case (typeOf p') of
                       RawPointer t => mkStore t
-                    | RegionPointer (t, _) => mkStore t
                     | _ => raise Fail "store: first argument must be a pointer"
               end
           end
@@ -241,26 +238,10 @@ structure TAST :> TAST = struct
               else
                   TWhile (test', body')
           end
-        | augment (LetRegion (Region (id, name), body)) c =
-          let val r = Region (id, name) in
-              let val stack = bind (name, (Binding (name, RegionType r, Immutable)))
-                                   (ctxStack c)
-                  and renv = bind (name, r)
-                                  (ctxRenv c)
-              in
-                  let val body' = augment body (mkContext stack
-                                                          (ctxTenv c)
-                                                          (ctxFenv c)
-                                                          renv)
-                  in
-                      TLetRegion (r, body')
-                  end
-              end
-          end
-        | augment (Allocate (name, v)) c =
+        | augment (Allocate (v)) c =
           let val r = lookup name (ctxRenv c)
           in
-              TAllocate (r, augment v c)
+              TAllocate (augment v c)
           end
         | augment (NullableCase (p, var, nnc, nc)) c =
           let val p' = augment p c
@@ -273,8 +254,7 @@ structure TAST :> TAST = struct
                                              in
                                                  let val nnc' = augment nnc (mkContext stack
                                                                                        (ctxTenv c)
-                                                                                       (ctxFenv c)
-                                                                                       (ctxRenv c))
+                                                                                       (ctxFenv c))
                                                      and nc' = augment nc c
                                                  in
                                                      let val nnct = typeOf nnc'
