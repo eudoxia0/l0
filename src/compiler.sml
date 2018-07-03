@@ -20,7 +20,7 @@
 structure Compiler :> COMPILER = struct
   open SymTab
 
-  datatype compiler = Compiler of Type.tenv * Function.fenv * Type.renv * string
+  datatype compiler = Compiler of Type.tenv * Function.fenv * string
 
   val prelude = String.concatWith "\n" [
           "#include <stdbool.h>",
@@ -86,16 +86,16 @@ structure Compiler :> COMPILER = struct
     open Type
   in
     val emptyCompiler =
-        let val interim_not = Function ("interim_not", [Param ("v", PBool)], Bool)
+        let val interim_not = Function ("interim_not", [Param ("v", Bool)], Bool)
         in
-            Compiler (empty, bind ("interim_not", interim_not) empty, empty, prelude)
+            Compiler (empty, bind ("interim_not", interim_not) empty, prelude)
         end
   end
 
-  fun compilerTypeEnv (Compiler (t, _, _, _)) = t
-  fun compilerCode (Compiler (_, _, _, c)) = c
+  fun compilerTypeEnv (Compiler (t, _, _)) = t
+  fun compilerCode (Compiler (_, _, c)) = c
 
-  fun compileAST (Compiler (tenv, fenv, renv, code)) ast =
+  fun compileAST (Compiler (tenv, fenv, code)) ast =
     (case ast of
          (AST.Defun (func, ast)) =>
          let val fenv' = bind (Function.funcName func, func) fenv
@@ -103,15 +103,14 @@ structure Compiler :> COMPILER = struct
              let val tast = TAST.augment ast
                                          (TAST.mkContext (Function.toStack func)
                                                          tenv
-                                                         fenv'
-                                                         renv)
+                                                         fenv')
              in
                  if (TAST.typeOf tast) <> Function.funcRT func then
                      raise Fail "Return type does not match type of body"
                  else
                      let val code' = Backend.defineFunction func tast
                      in
-                         Compiler (tenv, fenv', renv, code ^ (Backend.renderTop code'))
+                         Compiler (tenv, fenv', code ^ (Backend.renderTop code'))
                      end
              end
          end
@@ -124,7 +123,7 @@ structure Compiler :> COMPILER = struct
                  in
                      let val typedef = Backend.defineStruct name slots
                      in
-                         Compiler (tenv', fenv, renv, code ^ (Backend.renderTop typedef))
+                         Compiler (tenv', fenv, code ^ (Backend.renderTop typedef))
                      end
                  end
              end
@@ -132,7 +131,7 @@ structure Compiler :> COMPILER = struct
        | (AST.CInclude s) =>
          let val incl = "\n#include <" ^ s ^ ">\n\n"
          in
-             Compiler (tenv, fenv, renv, code ^ incl)
+             Compiler (tenv, fenv, code ^ incl)
          end)
 
   fun compileString c s =
