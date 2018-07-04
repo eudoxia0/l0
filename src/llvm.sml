@@ -46,19 +46,38 @@ structure LLVM :> LLVM = struct
 
   (* Registers *)
 
-  datatype reg = Register of int
+  datatype register = Register of int
 
-  val registerCount = ref 0
-  fun freshRegisterId () =
-    let
+  datatype register_names = RegisterNames of int
+
+  fun freshRegister (RegisterNames i) =
+    let val i' = i + 1
     in
-        registerCount := !registerCount + 1;
-        !registerCount
+        (Register i', RegisterNames i')
     end
 
-  fun freshRegister () =
-    Register (freshRegisterId ())
+  fun renderRegister (Register i) = "%" ^ (Int.toString i)
 
-  fun renderRegister (Register i) =
-    "%" ^ (Int.toString i)
+  (* Labels *)
+
+  datatype label = Label of int
+
+  val labelCount = ref 0
+  fun freshLabelId () =
+    let
+    in
+        labelCount := !labelCount + 1;
+        !labelCount
+    end
+
+  fun freshLabel () =
+    Label (freshLabelId ())
+
+  fun renderLabel (Label i) = "L" ^ (Int.toString i) ^ ":"
+
+  (* Instructions *)
+
+  datatype operand = RegisterOp of register
+                   | IntConstant of string
+
 end
