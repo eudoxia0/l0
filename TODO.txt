@@ -2,6 +2,9 @@ TODO:
 
 - Implement tuple creation
 - Implement tuple access
+- Bind tuple contents
+- Linear types
+- Count appearances of linear variables
 - LLVM backend
 
 DONE:
