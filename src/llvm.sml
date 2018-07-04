@@ -86,6 +86,7 @@ structure LLVM :> LLVM = struct
   datatype instruction = UnconditionalBranch of label
                        | ConditionalBranch of operand * label * label
                        | Assignment of register * operation
+                       | Return of ty * operand
 
   fun renderOperand (RegisterOp r) = renderRegister r
     | renderOperand (IntConstant s) = s
@@ -97,10 +98,14 @@ structure LLVM :> LLVM = struct
     | renderOperation (SDiv (t, l, r)) = renderArithOp "sdiv" t l r
   and renderArithOp oper t l r = oper ^ " " ^ (renderType t) ^ " " ^ (renderOperand l) ^ ", " ^ (renderOperand r)
 
-  fun renderInstruction (UnconditionalBranch l) = "br label " ^ (renderLabel l)
+  fun renderInstruction (UnconditionalBranch l) =
+      "br label " ^ (renderLabel l)
     | renderInstruction (ConditionalBranch (c, t, f)) =
       "br i1 " ^ (renderOperand c) ^ ", label " ^ (renderLabel t) ^ ", label " ^ (renderLabel f)
-    | renderInstruction (Assignment (r, oper)) = (renderRegister r) ^ " = " ^ (renderOperation oper)
+    | renderInstruction (Assignment (r, oper)) =
+      (renderRegister r) ^ " = " ^ (renderOperation oper)
+    | renderInstruction (Return (t, v)) =
+      "ret " ^ (renderType t) ^ " " ^ (renderOperand v)
 
 
 end
