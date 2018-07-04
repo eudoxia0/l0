@@ -20,21 +20,26 @@
 structure LLVM :> LLVM = struct
   (* LLVM Types *)
 
-  datatype ty = Int of bit_width
-              | Float of float_width
+  datatype ty = Bool
+              | Int8
+              | Int16
+              | Int32
+              | Int64
+              | SingleFloat
+              | DoubleFloat
               | Pointer of ty
               | FuncPointer of ty * ty list
               | Struct of ty list
        and bit_width = Word1 | Word8 | Word16 | Word32 | Word64
        and float_width = Single | Double
 
-  fun renderType (Int Word1) = "i1"
-    | renderType (Int Word8) = "i8"
-    | renderType (Int Word16) = "i16"
-    | renderType (Int Word32) = "i32"
-    | renderType (Int Word64) = "i64"
-    | renderType (Float Single) = "float"
-    | renderType (Float Double) = "double"
+  fun renderType Bool = "i1"
+    | renderType Int8 = "i8"
+    | renderType Int16 = "i16"
+    | renderType Int32 = "i32"
+    | renderType Int64 = "i64"
+    | renderType SingleFloat = "float"
+    | renderType DoubleFloat = "double"
     | renderType (Pointer t) = (renderType t) ^ "*"
     | renderType (FuncPointer (rt, ts)) =
       let val rt' = renderType rt
@@ -77,7 +82,8 @@ structure LLVM :> LLVM = struct
   datatype operand = RegisterOp of register
                    | IntConstant of string
 
-  datatype operation = Add of ty * operand * operand
+  datatype operation = Copy of ty * operand
+                     | Add of ty * operand * operand
                      | Sub of ty * operand * operand
                      | Mul of ty * operand * operand
                      | UDiv of ty * operand * operand
@@ -93,7 +99,8 @@ structure LLVM :> LLVM = struct
   fun renderOperand (RegisterOp r) = renderRegister r
     | renderOperand (IntConstant s) = s
 
-  fun renderOperation (Add (t, l, r)) = renderArithOp "add" t l r
+  fun renderOperation (Copy (t, v)) = (renderType t) ^ " " ^ (renderOperand v)
+    | renderOperation (Add (t, l, r)) = renderArithOp "add" t l r
     | renderOperation (Sub (t, l, r)) = renderArithOp "sub" t l r
     | renderOperation (Mul (t, l, r)) = renderArithOp "mul" t l r
     | renderOperation (UDiv (t, l, r)) = renderArithOp "udiv" t l r
@@ -130,7 +137,7 @@ structure LLVM :> LLVM = struct
     | renderToplevel (FunctionDeclaration (name, rt, params)) =
       "declare " ^ (renderType rt) ^ " @" ^ name ^ "(" ^ (String.concatWith ", " (map renderParamDecl params)) ^ ")"
     | renderToplevel (FunctionDefinition (name, rt, params, insts)) =
-      "define " ^ (renderType rt) ^ " @" ^ name ^ "(" ^ (String.concatWith ", " (map renderParam params)) ^ ") {" ^ (String.concatWith "\n  " (map renderInstruction insts)) ^ "\n}"
+      "define " ^ (renderType rt) ^ " @" ^ name ^ "(" ^ (String.concatWith ", " (map renderParam params)) ^ ") {\n  " ^ (String.concatWith "\n  " (map renderInstruction insts)) ^ "\n}"
   and renderParamDecl (ParamDecl t) = renderType t
   and renderParam (Param (name, t)) = name ^ (renderType t)
 end
