@@ -46,11 +46,19 @@ structure LLVM :> LLVM = struct
 
   (* Registers *)
 
+  datatype reg = Register of int
+
   val registerCount = ref 0
-  fun freshRegisterId s =
+  fun freshRegisterId () =
     let
     in
         registerCount := !registerCount + 1;
         !registerCount
     end
+
+  fun freshRegister () =
+    Register (freshRegisterId ())
+
+  fun renderRegister (Register i) =
+    "%" ^ (Int.toString i)
 end
