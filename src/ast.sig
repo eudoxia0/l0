@@ -61,7 +61,6 @@ signature AST = sig
 
   datatype top_ast = Defun of Function.func * ast
                    | Defrecord of string * (string * Type.ty) list
-                   | CInclude of string
 
   val parse : Parser.sexp -> Type.tenv -> ast
   val parseToplevel : Parser.sexp -> Type.tenv -> top_ast

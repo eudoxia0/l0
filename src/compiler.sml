@@ -69,11 +69,6 @@ structure Compiler :> COMPILER = struct
                      end
                  end
              end
-         end
-       | (AST.CInclude s) =>
-         let val incl = "\n#include <" ^ s ^ ">\n\n"
-         in
-             Compiler (tenv, fenv)
          end)
 
   fun compileString c s =

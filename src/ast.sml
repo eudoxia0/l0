@@ -72,7 +72,6 @@ structure AST :> AST = struct
 
   datatype top_ast = Defun of Function.func * ast
                    | Defrecord of string * (string * Type.ty) list
-                   | CInclude of string
 
   local
     open Parser
@@ -141,7 +140,6 @@ structure AST :> AST = struct
                parse (List (Symbol "progn" :: body)) e)
       | parseTopL "defrecord" (Symbol name :: slots) e =
         Defrecord (name, (map (parseSlot e) slots))
-      | parseTopL "c/include" [String s] _ = CInclude s
       | parseTopL f _ _ = raise Fail ("Bad toplevel definition '" ^ f ^ "'")
     and parseSlot e (List [Symbol name, tys]) = (name, Type.parseTypeSpecifier tys e)
       | parseSlot e _ = raise Fail "Bad defrecord slot"
