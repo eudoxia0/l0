@@ -2,10 +2,10 @@ SML := sml
 SMLFLAGS := -Cprint.depth=10
 MLTON := mlton
 
-BIN := interim
+BIN := l0
 
-CM_FILE := interim.cm
-MLB_FILE := interim.mlb
+CM_FILE := l0.cm
+MLB_FILE := l0.mlb
 
 VENDOR_DIR := vendor
 PARSIMONY := $(VENDOR_DIR)/parsimony
