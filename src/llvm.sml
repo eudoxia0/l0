@@ -24,5 +24,5 @@ structure LLVM :> LLVM = struct
               | FuncPointer of ty * ty list
               | Struct of ty list
        and bit_width = Word1 | Word8 | Word16 | Word32 | Word64
-       and float_width = Single | Float
+       and float_width = Single | Double
 end
