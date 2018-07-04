@@ -20,66 +20,7 @@
 structure Compiler :> COMPILER = struct
   open SymTab
 
-  datatype compiler = Compiler of Type.tenv * Function.fenv * string
-
-  val prelude = String.concatWith "\n" [
-          "#include <stdbool.h>",
-          "#include <inttypes.h>",
-          "#include <stdio.h>",
-          "#include <stdlib.h>",
-          "",
-          "#define INTERIM_GROW 8",
-          "",
-          "typedef struct { void** data; size_t size; size_t cap; } interim_region_t;",
-          "",
-          "void interim_region_create(interim_region_t* r) {",
-          "  r->data = malloc(sizeof(void*) * INTERIM_GROW);",
-          "  if (r->data == NULL) {",
-          "    exit(-1);",
-          "  }",
-          "  r->size = 0;",
-          "  r->cap  = INTERIM_GROW;",
-          "}",
-          "",
-          "void* interim_region_allocate(interim_region_t* r, size_t size) {",
-          "  if (r->size == r->cap) {",
-          "    r->cap += INTERIM_GROW;",
-          "    r->data = realloc(r->data, r->cap);",
-          "    if (r->data == NULL) {",
-          "      exit(-1);",
-          "    }",
-          "  }",
-          "  void* datum = malloc(size);",
-          "  if (datum == NULL) {",
-          "    exit(-1);",
-          "  }",
-          "  r->data[r->size] = datum;",
-          "  r->size++;",
-          "  return datum;",
-          "}",
-          "",
-          "void interim_region_free(interim_region_t* r) {",
-          "  for (size_t i = 0; i < r->size; i++) {",
-          "    free(r->data[i]);",
-          "  }",
-          "  free(r->data);",
-          "  r->size = 0;",
-          "  r->cap  = 0;",
-          "}",
-          "",
-          "int interim_print_bool(bool v, bool nl) {",
-          "  if (nl) {",
-          "    return printf(v ? \"true\\n\" : \"false\\n\");",
-          "  } else {",
-          "    return printf(v ? \"true\" : \"false\");",
-          "  }",
-          "}",
-          "",
-          "bool interim_not(bool v) {",
-          "  return !v;",
-          "}",
-          ""
-      ]
+  datatype compiler = Compiler of Type.tenv * Function.fenv
 
   local
     open Function
@@ -88,14 +29,13 @@ structure Compiler :> COMPILER = struct
     val emptyCompiler =
         let val interim_not = Function ("interim_not", [Param ("v", Bool)], Bool)
         in
-            Compiler (empty, bind ("interim_not", interim_not) empty, prelude)
+            Compiler (empty, bind ("interim_not", interim_not) empty)
         end
   end
 
-  fun compilerTypeEnv (Compiler (t, _, _)) = t
-  fun compilerCode (Compiler (_, _, c)) = c
+  fun compilerTypeEnv (Compiler (t, _)) = t
 
-  fun compileAST (Compiler (tenv, fenv, code)) ast =
+  fun compileAST (Compiler (tenv, fenv)) ast =
     (case ast of
          (AST.Defun (func, ast)) =>
          let val fenv' = bind (Function.funcName func, func) fenv
@@ -108,9 +48,10 @@ structure Compiler :> COMPILER = struct
                  if (TAST.typeOf tast) <> Function.funcRT func then
                      raise Fail "Return type does not match type of body"
                  else
-                     let val code' = Backend.defineFunction func tast
+                     let
                      in
-                         Compiler (tenv, fenv', code ^ (Backend.renderTop code'))
+                         print (";; Define function " ^ (Function.funcName func));
+                         Compiler (tenv, fenv')
                      end
              end
          end
@@ -121,9 +62,10 @@ structure Compiler :> COMPILER = struct
              in
                  let val tenv' = bind (name, ty) tenv
                  in
-                     let val typedef = Backend.defineStruct name slots
+                     let
                      in
-                         Compiler (tenv', fenv, code ^ (Backend.renderTop typedef))
+                         print (";; Define record " ^ name);
+                         Compiler (tenv', fenv)
                      end
                  end
              end
@@ -131,7 +73,7 @@ structure Compiler :> COMPILER = struct
        | (AST.CInclude s) =>
          let val incl = "\n#include <" ^ s ^ ">\n\n"
          in
-             Compiler (tenv, fenv, code ^ incl)
+             Compiler (tenv, fenv)
          end)
 
   fun compileString c s =
