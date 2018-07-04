@@ -77,6 +77,13 @@ structure LLVM :> LLVM = struct
   datatype operand = RegisterOp of register
                    | IntConstant of string
 
+  datatype operation = Add of ty * operand * operand
+                     | Sub of ty * operand * operand
+                     | Mul of ty * operand * operand
+                     | UDiv of ty * operand * operand
+                     | SDiv of ty * operand * operand
+
   datatype instruction = UnconditionalBranch of label
                        | ConditionalBranch of register * label * label
+                       | Assignment of register * operation
 end
