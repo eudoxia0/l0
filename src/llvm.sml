@@ -82,6 +82,8 @@ structure LLVM :> LLVM = struct
                      | Mul of ty * operand * operand
                      | UDiv of ty * operand * operand
                      | SDiv of ty * operand * operand
+                     | ExtractValue of ty * operand * int
+                     | InsertValue of ty * operand * ty * operand * int
 
   datatype instruction = UnconditionalBranch of label
                        | ConditionalBranch of operand * label * label
@@ -96,6 +98,12 @@ structure LLVM :> LLVM = struct
     | renderOperation (Mul (t, l, r)) = renderArithOp "mul" t l r
     | renderOperation (UDiv (t, l, r)) = renderArithOp "udiv" t l r
     | renderOperation (SDiv (t, l, r)) = renderArithOp "sdiv" t l r
+    | renderOperation (ExtractValue (t, v, idx)) =
+      "extractvalue " ^ (renderType t) ^ " " ^ (renderOperand v) ^ ", " ^ (Int.toString idx)
+    | renderOperation (InsertValue (t, v, elemt, elemv, idx)) =
+      "insertvalue " ^ (renderType t) ^ " " ^ (renderOperand v)
+      ^ ", " ^ (renderType elemt) ^ " " ^ (renderOperand v)
+      ^ ", " ^ (Int.toString idx)
   and renderArithOp oper t l r = oper ^ " " ^ (renderType t) ^ " " ^ (renderOperand l) ^ ", " ^ (renderOperand r)
 
   fun renderInstruction (UnconditionalBranch l) =
