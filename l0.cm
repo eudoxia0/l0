@@ -13,6 +13,8 @@ Library
   structure AST
   signature TAST
   structure TAST
+  signature LLVM
+  structure LLVM
   signature COMPILER
   structure Compiler
   signature L0
