@@ -18,4 +18,11 @@
 *)
 
 structure LLVM :> LLVM = struct
+  datatype ty = Int of bit_width
+              | Float of float_width
+              | Pointer of ty
+              | FuncPointer of ty * ty list
+              | Struct of ty list
+       and bit_width = Word1 | Word8 | Word16 | Word32 | Word64
+       and float_width = Single | Float
 end
