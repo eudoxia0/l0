@@ -115,5 +115,13 @@ structure LLVM :> LLVM = struct
     | renderInstruction (Return (t, v)) =
       "ret " ^ (renderType t) ^ " " ^ (renderOperand v)
 
+  (* Toplevel *)
 
+  type global_var = string
+
+  datatype toplevel = StringConstant of global_var * string
+                    | FunctionDeclaration of string * ty * param_decl list
+                    | FunctionDefinition of string * ty * param list * instruction list
+       and param_decl = ParamDecl of ty
+       and param = Param of string * ty
 end
