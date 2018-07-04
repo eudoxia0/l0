@@ -62,16 +62,13 @@ structure LLVM :> LLVM = struct
 
   datatype label = Label of int
 
-  val labelCount = ref 0
-  fun freshLabelId () =
-    let
-    in
-        labelCount := !labelCount + 1;
-        !labelCount
-    end
+  datatype label_names = LabelNames of int
 
-  fun freshLabel () =
-    Label (freshLabelId ())
+  fun freshLabel (LabelNames i) =
+    let val i' = i + 1
+    in
+        (Label i', LabelNames i')
+    end
 
   fun renderLabel (Label i) = "L" ^ (Int.toString i) ^ ":"
 
@@ -80,4 +77,6 @@ structure LLVM :> LLVM = struct
   datatype operand = RegisterOp of register
                    | IntConstant of string
 
+  datatype instruction = UnconditionalBranch of label
+                       | ConditionalBranch of register * label * label
 end
