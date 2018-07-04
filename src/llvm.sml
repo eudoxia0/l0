@@ -25,4 +25,20 @@ structure LLVM :> LLVM = struct
               | Struct of ty list
        and bit_width = Word1 | Word8 | Word16 | Word32 | Word64
        and float_width = Single | Double
+
+  fun renderType (Int Word1) = "i1"
+    | renderType (Int Word8) = "i8"
+    | renderType (Int Word16) = "i16"
+    | renderType (Int Word32) = "i32"
+    | renderType (Int Word64) = "i64"
+    | renderType (Float Single) = "float"
+    | renderType (Float Double) = "double"
+    | renderType (Pointer t) = (renderType t) ^ "*"
+    | renderType (FuncPointer (rt, ts)) =
+      let val rt' = renderType rt
+          and ts' = String.concatWith " " (map renderType ts)
+      in
+          rt' ^ " (" ^ ts' ^ ")*"
+      end
+    | renderType (Struct ts) = "{" ^ (String.concatWith ", " (map renderType ts)) ^ "}"
 end
