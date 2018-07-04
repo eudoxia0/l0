@@ -25,6 +25,7 @@ structure Type :> TYPE = struct
               | Int of signedness * bit_width
               | Str
               | RawPointer of ty
+              | Tuple of ty list
               | Record of string * slot list
        and signedness = Signed | Unsigned
        and bit_width = Word8 | Word16 | Word32 | Word64
