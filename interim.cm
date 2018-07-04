@@ -13,8 +13,6 @@ Library
   structure AST
   signature TAST
   structure TAST
-  signature BACKEND
-  structure Backend
   signature COMPILER
   structure Compiler
   signature INTERIM
@@ -45,9 +43,6 @@ is
 
   src/tast.sig
   src/tast.sml
-
-  src/backend.sig
-  src/backend.sml
 
   src/compiler.sig
   src/compiler.sml
