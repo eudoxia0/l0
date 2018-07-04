@@ -17,7 +17,7 @@
     along with L0.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure L0 :> INTERIM = struct
+structure L0 :> L0 = struct
   open SymTab
 
   fun readUntilBlank () =

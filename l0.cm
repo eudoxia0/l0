@@ -15,8 +15,8 @@ Library
   structure TAST
   signature COMPILER
   structure Compiler
-  signature INTERIM
-  structure Interim
+  signature L0
+  structure L0
 is
   vendor/parsimony/parsimony.cm
 

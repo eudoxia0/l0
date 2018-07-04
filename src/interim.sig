@@ -17,6 +17,6 @@
     along with L0.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-signature INTERIM = sig
+signature L0 = sig
   val repl : unit -> unit
 end
