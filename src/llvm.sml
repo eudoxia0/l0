@@ -18,6 +18,8 @@
 *)
 
 structure LLVM :> LLVM = struct
+  (* LLVM Types *)
+
   datatype ty = Int of bit_width
               | Float of float_width
               | Pointer of ty
@@ -41,4 +43,14 @@ structure LLVM :> LLVM = struct
           rt' ^ " (" ^ ts' ^ ")*"
       end
     | renderType (Struct ts) = "{ " ^ (String.concatWith ", " (map renderType ts)) ^ " }"
+
+  (* Registers *)
+
+  val registerCount = ref 0
+  fun freshRegisterId s =
+    let
+    in
+        registerCount := !registerCount + 1;
+        !registerCount
+    end
 end
