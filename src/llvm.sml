@@ -124,4 +124,13 @@ structure LLVM :> LLVM = struct
                     | FunctionDefinition of string * ty * param list * instruction list
        and param_decl = ParamDecl of ty
        and param = Param of string * ty
+
+  fun renderToplevel (StringConstant (name, str)) =
+      "@" ^ name ^ " = private unnamed_addr constant [" ^ (Int.toString (String.size str + 1)) ^ " x i8] c\"" ^ str ^ "\\00\""
+    | renderToplevel (FunctionDeclaration (name, rt, params)) =
+      "declare " ^ (renderType rt) ^ " @" ^ name ^ "(" ^ (String.concatWith ", " (map renderParamDecl params)) ^ ")"
+    | renderToplevel (FunctionDefinition (name, rt, params, insts)) =
+      "define " ^ (renderType rt) ^ " @" ^ name ^ "(" ^ (String.concatWith ", " (map renderParam params)) ^ ") {" ^ (String.concatWith "\n  " (map renderInstruction insts)) ^ "\n}"
+  and renderParamDecl (ParamDecl t) = renderType t
+  and renderParam (Param (name, t)) = name ^ (renderType t)
 end
