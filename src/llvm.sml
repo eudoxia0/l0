@@ -135,9 +135,16 @@ structure LLVM :> LLVM = struct
   fun renderToplevel (StringConstant (name, str)) =
       "@" ^ name ^ " = private unnamed_addr constant [" ^ (Int.toString (String.size str + 1)) ^ " x i8] c\"" ^ str ^ "\\00\""
     | renderToplevel (FunctionDeclaration (name, rt, params)) =
-      "declare " ^ (renderType rt) ^ " @" ^ name ^ "(" ^ (String.concatWith ", " (map renderParamDecl params)) ^ ")"
+      let val params' = String.concatWith ", " (map renderParamDecl params)
+      in
+          "declare " ^ (renderType rt) ^ " @" ^ name ^ "(" ^ params' ^ ")"
+      end
     | renderToplevel (FunctionDefinition (name, rt, params, insts)) =
-      "define " ^ (renderType rt) ^ " @" ^ name ^ "(" ^ (String.concatWith ", " (map renderParam params)) ^ ") {\n  " ^ (String.concatWith "\n  " (map renderInstruction insts)) ^ "\n}"
+      let val params' = String.concatWith ", " (map renderParam params)
+          and body = String.concatWith "\n  " (map renderInstruction insts)
+      in
+          "define " ^ (renderType rt) ^ " @" ^ name ^ "(" ^ params' ^ ") {\n  " ^ body ^ "\n}"
+      end
   and renderParamDecl (ParamDecl t) = renderType t
   and renderParam (Param (name, t)) = name ^ (renderType t)
 end
