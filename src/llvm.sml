@@ -93,6 +93,8 @@ structure LLVM :> LLVM = struct
                    | SignedLT
                    | SignedLEq
 
+  datatype phi_pred = PhiPred of operand * label
+
   datatype operation = Add of ty * operand * operand
                      | Sub of ty * operand * operand
                      | Mul of ty * operand * operand
@@ -102,6 +104,7 @@ structure LLVM :> LLVM = struct
                      | InsertValue of ty * operand * ty * operand * int
                      | Load of ty * operand (* ty is the type of the result, not the pointer *)
                      | IntegerCompare of comp_op * ty * operand * operand
+                     | Phi of ty * phi_pred list
 
   datatype instruction = UnconditionalBranch of label
                        | ConditionalBranch of operand * label * label
@@ -114,6 +117,9 @@ structure LLVM :> LLVM = struct
 
   fun renderOperand (RegisterOp r) = renderRegister r
     | renderOperand (IntConstant s) = s
+
+  fun renderPhi (PhiPred (oper, l)) =
+    (renderOperand oper) ^ ", " ^ (renderLabel l)
 
   fun renderCompOp Eq = "eq"
     | renderCompOp NotEq = "ne"
@@ -142,6 +148,8 @@ structure LLVM :> LLVM = struct
     | renderOperation (IntegerCompare (oper, t, l, r)) =
       "icmp " ^ (renderCompOp oper) ^ " " ^ (renderType t) ^ " " ^ (renderOperand l)
       ^ ", " ^ (renderOperand r)
+    | renderOperation (Phi (t, preds)) =
+      "phi " ^ (renderType t) ^ " " ^ (String.concatWith ", " (map renderPhi preds))
   and renderArithOp oper t l r =
       oper ^ " " ^ (renderType t) ^ " " ^ (renderOperand l) ^ ", " ^ (renderOperand r)
 
