@@ -82,8 +82,7 @@ structure LLVM :> LLVM = struct
   datatype operand = RegisterOp of register
                    | IntConstant of string
 
-  datatype operation = Copy of ty * operand
-                     | Add of ty * operand * operand
+  datatype operation = Add of ty * operand * operand
                      | Sub of ty * operand * operand
                      | Mul of ty * operand * operand
                      | UDiv of ty * operand * operand
@@ -99,8 +98,7 @@ structure LLVM :> LLVM = struct
   fun renderOperand (RegisterOp r) = renderRegister r
     | renderOperand (IntConstant s) = s
 
-  fun renderOperation (Copy (t, v)) = (renderType t) ^ " " ^ (renderOperand v)
-    | renderOperation (Add (t, l, r)) = renderArithOp "add" t l r
+  fun renderOperation (Add (t, l, r)) = renderArithOp "add" t l r
     | renderOperation (Sub (t, l, r)) = renderArithOp "sub" t l r
     | renderOperation (Mul (t, l, r)) = renderArithOp "mul" t l r
     | renderOperation (UDiv (t, l, r)) = renderArithOp "udiv" t l r
