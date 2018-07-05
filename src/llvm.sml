@@ -52,7 +52,7 @@ structure LLVM :> LLVM = struct
       in
           rt' ^ " (" ^ ts' ^ ")*"
       end
-    | renderType (Struct ts) = "{ " ^ (String.concatWith ", " (map renderType ts)) ^ " }"
+    | renderType (Struct ts) = "{ " ^ (commaSep renderType ts) ^ " }"
 
   (* Registers *)
 
