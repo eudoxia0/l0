@@ -161,7 +161,7 @@ structure LLVM :> LLVM = struct
       "icmp " ^ (renderCompOp oper) ^ " " ^ (renderType t) ^ " " ^ (renderOperand l)
       ^ ", " ^ (renderOperand r)
     | renderOperation (Phi (t, preds)) =
-      "phi " ^ (renderType t) ^ " " ^ (String.concatWith ", " (map renderPhi preds))
+      "phi " ^ (renderType t) ^ " " ^ (commaSep renderPhi preds)
     | renderOperation (DirectCall (name, rt, args)) =
       "call " ^ (renderType rt) ^ " @" ^ name ^ "(" ^ (commaSep renderArg args) ^ ")"
   and renderArithOp oper t l r =
@@ -196,12 +196,12 @@ structure LLVM :> LLVM = struct
           "@" ^ name ^ " = private unnamed_addr constant [" ^ size ^ " x i8] c" ^ str'
       end
     | renderToplevel (FunctionDeclaration (name, rt, params)) =
-      let val params' = String.concatWith ", " (map renderParamDecl params)
+      let val params' = commaSep renderParamDecl params
       in
           "declare " ^ (renderType rt) ^ " @" ^ name ^ "(" ^ params' ^ ")"
       end
     | renderToplevel (FunctionDefinition (name, rt, params, insts)) =
-      let val params' = String.concatWith ", " (map renderParam params)
+      let val params' = commaSep renderParam params
           and body = String.concatWith "\n  " (map renderInstruction insts)
       in
           "define " ^ (renderType rt) ^ " @" ^ name ^ "(" ^ params' ^ ") {\n  " ^ body ^ "\n}"
