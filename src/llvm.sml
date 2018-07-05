@@ -82,6 +82,17 @@ structure LLVM :> LLVM = struct
   datatype operand = RegisterOp of register
                    | IntConstant of string
 
+  datatype comp_op = Eq
+                   | NotEq
+                   | UnsignedGT
+                   | UnsignedGEq
+                   | UnsignedLT
+                   | UnsignedLEq
+                   | SignedGT
+                   | SignedGEq
+                   | SignedLT
+                   | SignedLEq
+
   datatype operation = Add of ty * operand * operand
                      | Sub of ty * operand * operand
                      | Mul of ty * operand * operand
@@ -89,14 +100,31 @@ structure LLVM :> LLVM = struct
                      | SDiv of ty * operand * operand
                      | ExtractValue of ty * operand * int
                      | InsertValue of ty * operand * ty * operand * int
+                     | Load of ty * operand (* ty is the type of the result, not the pointer *)
+                     | IntegerCompare of comp_op * ty * operand * operand
 
   datatype instruction = UnconditionalBranch of label
                        | ConditionalBranch of operand * label * label
                        | Assignment of register * operation
                        | Return of ty * operand
+                       (* below: ty is the type of the result, not the
+                          pointer. the first operand is the value, the second is
+                          the location. *)
+                       | Store of ty * operand * operand
 
   fun renderOperand (RegisterOp r) = renderRegister r
     | renderOperand (IntConstant s) = s
+
+  fun renderCompOp Eq = "eq"
+    | renderCompOp NotEq = "ne"
+    | renderCompOp UnsignedGT = "ugt"
+    | renderCompOp UnsignedGEq = "uge"
+    | renderCompOp UnsignedLT = "ult"
+    | renderCompOp UnsignedLEq = "ule"
+    | renderCompOp SignedGT = "sgt"
+    | renderCompOp SignedGEq = "sge"
+    | renderCompOp SignedLT = "slt"
+    | renderCompOp SignedLEq = "sle"
 
   fun renderOperation (Add (t, l, r)) = renderArithOp "add" t l r
     | renderOperation (Sub (t, l, r)) = renderArithOp "sub" t l r
@@ -109,7 +137,13 @@ structure LLVM :> LLVM = struct
       "insertvalue " ^ (renderType t) ^ " " ^ (renderOperand v)
       ^ ", " ^ (renderType elemt) ^ " " ^ (renderOperand v)
       ^ ", " ^ (Int.toString idx)
-  and renderArithOp oper t l r = oper ^ " " ^ (renderType t) ^ " " ^ (renderOperand l) ^ ", " ^ (renderOperand r)
+    | renderOperation (Load (t, ptr)) =
+      "load " ^ (renderType t) ^ ", " ^ (renderType (Pointer t)) ^ " " ^ (renderOperand ptr)
+    | renderOperation (IntegerCompare (oper, t, l, r)) =
+      "icmp " ^ (renderCompOp oper) ^ " " ^ (renderType t) ^ " " ^ (renderOperand l)
+      ^ ", " ^ (renderOperand r)
+  and renderArithOp oper t l r =
+      oper ^ " " ^ (renderType t) ^ " " ^ (renderOperand l) ^ ", " ^ (renderOperand r)
 
   fun renderInstruction (UnconditionalBranch l) =
       "br label " ^ (renderLabel l)
@@ -119,6 +153,9 @@ structure LLVM :> LLVM = struct
       (renderRegister r) ^ " = " ^ (renderOperation oper)
     | renderInstruction (Return (t, v)) =
       "ret " ^ (renderType t) ^ " " ^ (renderOperand v)
+    | renderInstruction (Store (t, v, ptr)) =
+      "store " ^ (renderType t) ^ " " ^ (renderOperand v)
+      ^ ", " ^ (renderType (Pointer t)) ^ " " ^ (renderOperand ptr)
 
   (* Toplevel *)
 
