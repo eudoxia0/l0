@@ -133,7 +133,11 @@ structure LLVM :> LLVM = struct
        and param = Param of string * ty
 
   fun renderToplevel (StringConstant (name, str)) =
-      "@" ^ name ^ " = private unnamed_addr constant [" ^ (Int.toString (String.size str + 1)) ^ " x i8] c\"" ^ str ^ "\\00\""
+      let val size = Int.toString (String.size str + 1)
+          and str' = "\"" ^ str ^ "\\00\""
+      in
+          "@" ^ name ^ " = private unnamed_addr constant [" ^ size ^ " x i8] c" ^ str'
+      end
     | renderToplevel (FunctionDeclaration (name, rt, params)) =
       let val params' = String.concatWith ", " (map renderParamDecl params)
       in
