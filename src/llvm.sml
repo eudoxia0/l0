@@ -18,6 +18,11 @@
 *)
 
 structure LLVM :> LLVM = struct
+  (* Rendering utils *)
+
+  fun commaSep f l =
+    String.concatWith ", " (map f l)
+
   (* LLVM Types *)
 
   datatype ty = Bool
@@ -95,6 +100,8 @@ structure LLVM :> LLVM = struct
 
   datatype phi_pred = PhiPred of operand * label
 
+  datatype arg = Argument of ty * operand
+
   datatype operation = Add of ty * operand * operand
                      | Sub of ty * operand * operand
                      | Mul of ty * operand * operand
@@ -105,6 +112,8 @@ structure LLVM :> LLVM = struct
                      | Load of ty * operand (* ty is the type of the result, not the pointer *)
                      | IntegerCompare of comp_op * ty * operand * operand
                      | Phi of ty * phi_pred list
+                     | DirectCall of string * ty * arg list
+
 
   datatype instruction = UnconditionalBranch of label
                        | ConditionalBranch of operand * label * label
@@ -120,6 +129,9 @@ structure LLVM :> LLVM = struct
 
   fun renderPhi (PhiPred (oper, l)) =
     (renderOperand oper) ^ ", " ^ (renderLabel l)
+
+  fun renderArg (Argument (t, oper)) =
+    (renderType t) ^ ", " ^ (renderOperand oper)
 
   fun renderCompOp Eq = "eq"
     | renderCompOp NotEq = "ne"
@@ -150,6 +162,8 @@ structure LLVM :> LLVM = struct
       ^ ", " ^ (renderOperand r)
     | renderOperation (Phi (t, preds)) =
       "phi " ^ (renderType t) ^ " " ^ (String.concatWith ", " (map renderPhi preds))
+    | renderOperation (DirectCall (name, rt, args)) =
+      "call " ^ (renderType rt) ^ " @" ^ name ^ "(" ^ (commaSep renderArg args) ^ ")"
   and renderArithOp oper t l r =
       oper ^ " " ^ (renderType t) ^ " " ^ (renderOperand l) ^ ", " ^ (renderOperand r)
 
