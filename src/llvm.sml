@@ -113,7 +113,7 @@ structure LLVM :> LLVM = struct
                      | IntegerCompare of comp_op * ty * operand * operand
                      | Phi of ty * phi_pred list
                      | DirectCall of string * ty * arg list
-
+                     | Alloca of ty
 
   datatype instruction = UnconditionalBranch of label
                        | ConditionalBranch of operand * label * label
@@ -164,6 +164,8 @@ structure LLVM :> LLVM = struct
       "phi " ^ (renderType t) ^ " " ^ (commaSep renderPhi preds)
     | renderOperation (DirectCall (name, rt, args)) =
       "call " ^ (renderType rt) ^ " @" ^ name ^ "(" ^ (commaSep renderArg args) ^ ")"
+    | renderOperation (Alloca t) =
+      "alloca " ^ (renderType t)
   and renderArithOp oper t l r =
       oper ^ " " ^ (renderType t) ^ " " ^ (renderOperand l) ^ ", " ^ (renderOperand r)
 
