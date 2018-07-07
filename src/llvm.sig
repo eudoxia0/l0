@@ -19,5 +19,6 @@
 
 signature LLVM = sig
   type context
+
   val emptyContext : context
 end
