@@ -208,4 +208,10 @@ structure LLVM :> LLVM = struct
       end
   and renderParamDecl (ParamDecl t) = renderType t
   and renderParam (Param (name, t)) = name ^ (renderType t)
+
+  (* Context *)
+
+  datatype context = Context of toplevel list
+
+  val emptyContext = Context []
 end
