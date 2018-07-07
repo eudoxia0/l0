@@ -214,4 +214,11 @@ structure LLVM :> LLVM = struct
   datatype context = Context of toplevel list * register_names * label_names
 
   val emptyContext = Context ([], RegisterNames 1, LabelNames 1)
+
+  local
+    open TAST
+  in
+    fun compileExp TConstUnit rn ln = ([], IntConstant "0", rn, ln)
+      | compileExp _ _ _ = raise Fail "Not implemented"
+  end
 end
