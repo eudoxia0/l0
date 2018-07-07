@@ -219,6 +219,8 @@ structure LLVM :> LLVM = struct
     open TAST
   in
     fun compileExp TConstUnit rn ln = ([], IntConstant "0", rn, ln)
+      | compileExp (TConstBool false) rn ln = ([], IntConstant "false", rn, ln)
+      | compileExp (TConstBool true) rn ln = ([], IntConstant "true", rn, ln)
       | compileExp _ _ _ = raise Fail "Not implemented"
   end
 end
