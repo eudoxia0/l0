@@ -71,4 +71,13 @@ structure ARAST :> ARAST = struct
               (Binop (b, l', r'), s'', n'')
           end
       end
+  and renameList (head::tail) s n =
+      let val (head', s', n') = rename head s n
+      in
+          let val (list, s'', n'') = (renameList tail s' n')
+          in
+              (head' :: list, s'', n'')
+          end
+      end
+    | renameList nil s n = (nil, s, n)
 end
