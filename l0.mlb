@@ -22,6 +22,9 @@ src/func.sml
 src/ast.sig
 src/ast.sml
 
+src/arast.sig
+src/arast.sml
+
 src/tast.sig
 src/tast.sml
 
