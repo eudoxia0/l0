@@ -35,7 +35,7 @@ signature TAST = sig
                 | TMalloc of Type.ty * tast
                 | TFree of tast
                 | TAddressOf of string * Type.ty
-                | TPrint of tast * AST.newline
+                | TPrint of tast
                 | TCEmbed of Type.ty * string
                 | TCCall of string * Type.ty * tast list
                 | TWhile of tast * tast

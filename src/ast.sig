@@ -48,7 +48,7 @@ signature AST = sig
                | Malloc of Parser.sexp * ast
                | Free of ast
                | AddressOf of string
-               | Print of ast * newline
+               | Print of ast
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
                | While of ast * ast
@@ -56,8 +56,6 @@ signature AST = sig
                | MakeRecord of string * (string * ast) list
                | SlotAccess of ast * string
                | Funcall of string * ast list
-       and newline = Newline
-                   | NoNewline
 
   datatype top_ast = Defun of Function.func * ast
                    | Defrecord of string * (string * Type.ty) list

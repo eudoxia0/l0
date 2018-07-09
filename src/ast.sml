@@ -59,7 +59,7 @@ structure AST :> AST = struct
                | Malloc of Parser.sexp * ast
                | Free of ast
                | AddressOf of string
-               | Print of ast * newline
+               | Print of ast
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
                | While of ast * ast
@@ -67,8 +67,6 @@ structure AST :> AST = struct
                | MakeRecord of string * (string * ast) list
                | SlotAccess of ast * string
                | Funcall of string * ast list
-       and newline = Newline
-                   | NoNewline
 
   datatype top_ast = Defun of Function.func * ast
                    | Defrecord of string * (string * Type.ty) list
@@ -114,8 +112,7 @@ structure AST :> AST = struct
       | parseL "c/malloc" [t, c] e = Malloc (t, parse c e)
       | parseL "c/free" [p] e = Free (parse p e)
       | parseL "c/address-of" [Symbol v] _ = AddressOf v
-      | parseL "print" [v] e = Print (parse v e, NoNewline)
-      | parseL "println" [v] e = Print (parse v e, Newline)
+      | parseL "print" [v] e = Print (parse v e)
       | parseL "c/embed" [t, String s] _ = CEmbed (t, s)
       | parseL "c/call" (String n :: t :: args) e = CCall (n, t, mparse args e)
       | parseL "while" (t :: body) e = While (parse t e, Progn (mparse body e))

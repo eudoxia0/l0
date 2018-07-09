@@ -37,7 +37,7 @@ structure TAST :> TAST = struct
                 | TMalloc of Type.ty * tast
                 | TFree of tast
                 | TAddressOf of string * Type.ty
-                | TPrint of tast * AST.newline
+                | TPrint of tast
                 | TCEmbed of Type.ty * string
                 | TCCall of string * Type.ty * tast list
                 | TWhile of tast * tast
@@ -211,11 +211,11 @@ structure TAST :> TAST = struct
           in
               TAddressOf (v, ty)
           end
-        | augment (Print (v, n)) c =
+        | augment (Print v) c =
           let val v' = augment v c
           in
               if isPrintable (typeOf v') then
-                  TPrint (v', n)
+                  TPrint v'
               else
                   raise Fail "Type cannot be printed"
           end
