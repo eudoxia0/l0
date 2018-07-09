@@ -53,7 +53,12 @@ structure ARAST :> ARAST = struct
 
   type stack = bind SymTab.symtab
 
-  fun alphaRename ast = rename ast SymTab.empty (NameGen 1)
+  fun alphaRename ast =
+    let val (ast', _, _) = rename ast SymTab.empty (NameGen 1)
+    in
+        ast'
+    end
   and rename AST.ConstUnit s n = (ConstUnit, s, n)
     | rename (AST.ConstBool b) s n = (ConstBool b, s, n)
+    | rename (AST.ConstInt i) s n = (ConstInt i, s, n)
 end
