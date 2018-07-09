@@ -22,12 +22,12 @@ signature OAST = sig
                | ConstBool of bool
                | ConstInt of int
                | ConstString of string
-               | Var of string
+               | Var of int
                | Binop of binop * ast * ast
                | Cond of ast * ast * ast
                | Cast of Type.ty * ast
                | Progn of ast list
-               | Let of string * ast * ast
+               | Let of int * ast * ast
                | Assign of string * ast
                | NullPtr of Parser.sexp
                | Load of ast
