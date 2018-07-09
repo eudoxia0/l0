@@ -13,6 +13,8 @@ Library
   structure AST
   signature ARAST
   structure ARAST
+  signature OAST
+  structure OAST
   signature TAST
   structure TAST
   signature LLVM
@@ -47,6 +49,9 @@ is
 
   src/arast.sig
   src/arast.sml
+
+  src/oast.sig
+  src/oast.sml
 
   src/tast.sig
   src/tast.sml
