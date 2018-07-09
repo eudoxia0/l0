@@ -15,8 +15,6 @@ Library
   structure ARAST
   signature OAST
   structure OAST
-  signature TAST
-  structure TAST
   signature LLVM
   structure LLVM
   signature COMPILER
@@ -52,9 +50,6 @@ is
 
   src/oast.sig
   src/oast.sml
-
-  src/tast.sig
-  src/tast.sml
 
   src/llvm.sig
   src/llvm.sml
