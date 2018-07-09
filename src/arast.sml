@@ -47,7 +47,7 @@ structure ARAST :> ARAST = struct
   datatype namegen = NameGen of int
 
   fun freshName (NameGen i) =
-    (i + 1, NameGen i + 1)
+    (i + 1, NameGen (i + 1))
 
   datatype bind = Binding of string * int
 
