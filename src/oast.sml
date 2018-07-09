@@ -17,7 +17,7 @@
     along with L0.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure OAST :> OAST = sig
+structure OAST :> OAST = struct
   datatype ast = ConstUnit
                | ConstBool of bool
                | ConstInt of int
