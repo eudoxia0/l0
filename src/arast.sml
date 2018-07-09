@@ -61,4 +61,14 @@ structure ARAST :> ARAST = struct
   and rename AST.ConstUnit s n = (ConstUnit, s, n)
     | rename (AST.ConstBool b) s n = (ConstBool b, s, n)
     | rename (AST.ConstInt i) s n = (ConstInt i, s, n)
+    | rename (AST.ConstString str) s n = (ConstString str, s, n)
+    | rename (AST.Var name) s n = (Var (SymTab.lookup name s), s, n)
+    | rename (AST.Binop (b, l, r)) s n =
+      let val (l', s', n') = rename l s n
+      in
+          let val (r', s'', n'') = rename r s' n'
+          in
+              (Binop (b, l', r'), s'', n'')
+          end
+      end
 end
