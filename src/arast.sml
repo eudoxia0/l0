@@ -23,26 +23,13 @@ structure ARAST :> ARAST = struct
                | ConstInt of int
                | ConstString of string
                | Var of int
-               | Binop of AST.binop * ast * ast
-               | Cond of ast * ast * ast
                | Cast of Type.ty * ast
-               | Progn of ast list
-               | Let of string * ast * ast
-               | Assign of string * ast
+               | Let of int * ast * ast
                | NullPtr of Parser.sexp
-               | Load of ast
-               | Store of ast * ast
                | Malloc of Parser.sexp * ast
-               | Free of ast
-               | AddressOf of string
-               | Print of ast
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
-               | While of ast * ast
-               | Allocate of ast
-               | MakeRecord of string * (string * ast) list
-               | SlotAccess of ast * string
-               | Funcall of string * ast list
+               | Operation of string * ast list
 
   datatype namegen = NameGen of int
 
