@@ -64,12 +64,28 @@ structure ARAST :> ARAST = struct
     | rename (AST.ConstString str) s n = (ConstString str, s, n)
     | rename (AST.Var name) s n = (Var (SymTab.lookup name s), s, n)
     | rename (AST.Binop (b, l, r)) s n =
-      let val (l', s', n') = rename l s n
+      let val (args', s', n') = renameList [l, r] s n
       in
-          let val (r', s'', n'') = rename r s' n'
-          in
-              (Binop (b, l', r'), s'', n'')
-          end
+          case args' of
+              [l', r'] => (Binop (b, l', r'), s', n')
+            | _ => raise Fail "Bad rename list"
+      end
+    | rename (AST.Cond (t, c, a)) s n =
+      let val (args', s', n') = renameList [t, c, a] s n
+      in
+          case args' of
+              [t', c', a'] => (Cond (t', c', a'), s', n')
+            | _ => raise Fail "Bad rename list"
+      end
+    | rename (AST.Cast (t, a)) s n =
+      let val (a', s', n') = rename a s n
+      in
+          (Cast (t, a'), s', n')
+      end
+    | rename (AST.Progn l) s n =
+      let val (args', s', n') = renameList l s n
+      in
+          (Progn args', s', n')
       end
   and renameList (head::tail) s n =
       let val (head', s', n') = rename head s n
