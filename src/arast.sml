@@ -43,4 +43,17 @@ structure ARAST :> ARAST = struct
                | MakeRecord of string * (string * ast) list
                | SlotAccess of ast * string
                | Funcall of string * ast list
+
+  datatype namegen = NameGen of int
+
+  fun freshName (NameGen i) =
+    (i + 1, Namegen i + 1)
+
+  datatype bind = Binding of string * int
+
+  type stack = bind SymTab.symtab
+
+  fun alphaRename ast = rename ast SymTab.empty (NameGen 1)
+  and rename AST.ConstUnit s n = (ConstUnit, s, n)
+    | rename (AST.ConstBool b) s n = (ConstBool b, s, n)
 end

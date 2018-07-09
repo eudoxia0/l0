@@ -43,4 +43,6 @@ signature ARAST = sig
                | MakeRecord of string * (string * ast) list
                | SlotAccess of ast * string
                | Funcall of string * ast list
+
+  val alphaRename : AST.ast -> ast
 end
