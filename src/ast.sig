@@ -42,6 +42,7 @@ signature AST = sig
                | Malloc of Parser.sexp * ast
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
+               | Operation of string * ast list
 
   datatype top_ast = Defun of Function.func * ast
                    | Defrecord of string * (string * Type.ty) list
