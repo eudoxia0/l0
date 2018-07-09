@@ -11,6 +11,8 @@ Library
   structure Function
   signature AST
   structure AST
+  signature ARAST
+  structure ARAST
   signature TAST
   structure TAST
   signature LLVM
