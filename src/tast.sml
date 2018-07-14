@@ -213,7 +213,9 @@ structure TAST :> TAST = struct
                 | _ => raise Fail "Can't free a non-pointer"
           end
         | augment (AddressOf v) c =
-          let val (Binding (ty, _)) = lookup v (ctxStack c)
+          let val (Binding (ty, _)) = case Map.get (ctxStack c) v of
+                                          SOME b => b
+                                        | NONE => raise Fail "Cannot find variable"
           in
               TAddressOf (v, ty)
           end
