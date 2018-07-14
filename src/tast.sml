@@ -30,7 +30,7 @@ structure TAST :> TAST = struct
                 | TCast of Type.ty * tast
                 | TProgn of tast list
                 | TLet of int * tast * tast
-                | TAssign of string * tast
+                | TAssign of int * tast
                 | TNullPtr of Type.ty
                 | TLoad of tast * Type.ty
                 | TStore of tast * tast
@@ -141,8 +141,8 @@ structure TAST :> TAST = struct
         | augment (Let (name, v, body)) c =
           let val v' = augment v c
           in
-              let val s' = bind (name, (Binding (name, typeOf v', Mutable)))
-                                (ctxStack c)
+              let val s' = Map.iadd (ctxStack c)
+                                    (name, (Binding (typeOf v', Mutable)))
               in
                   TLet (name,
                         v',
@@ -152,7 +152,9 @@ structure TAST :> TAST = struct
         | augment (Assign (var, v)) c =
           let val v' = augment v c
           in
-              let val (Binding (_, ty, m)) = lookup var (ctxStack c)
+              let val (Binding (ty, m)) = case (Map.get (ctxStack c) var) of
+                                              SOME bind => bind
+                                            | NONE => raise Fail "No such variable"
               in
                   if m = Mutable then
                       if typeOf v' = ty then
