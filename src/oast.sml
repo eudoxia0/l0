@@ -28,7 +28,7 @@ structure OAST :> OAST = struct
                | Cast of Type.ty * ast
                | Progn of ast list
                | Let of int * ast * ast
-               | Assign of string * ast
+               | Assign of int * ast
                | NullPtr of Parser.sexp
                | Load of ast
                | Store of ast * ast
