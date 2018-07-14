@@ -3,6 +3,8 @@ Library
   structure SymTab
   signature SET
   structure Set
+  signature MAP
+  structure Map
   signature PARSER
   structure Parser
   signature TYPE
