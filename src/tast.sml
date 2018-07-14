@@ -25,7 +25,7 @@ structure TAST :> TAST = struct
                 | TConstInt of int * Type.ty
                 | TConstString of string
                 | TVar of string * Type.ty
-                | TBinop of AST.binop * tast * tast * Type.ty
+                | TBinop of Binop.binop * tast * tast * Type.ty
                 | TCond of tast * tast * tast * Type.ty
                 | TCast of Type.ty * tast
                 | TProgn of tast list
