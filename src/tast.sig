@@ -22,19 +22,19 @@ signature TAST = sig
                 | TConstBool of bool
                 | TConstInt of int * Type.ty
                 | TConstString of string
-                | TVar of int * Type.ty
+                | TVar of NameGen.name * Type.ty
                 | TBinop of Binop.binop * tast * tast * Type.ty
                 | TCond of tast * tast * tast * Type.ty
                 | TCast of Type.ty * tast
                 | TProgn of tast list
-                | TLet of int * tast * tast
-                | TAssign of int * tast
+                | TLet of NameGen.name * tast * tast
+                | TAssign of NameGen.name * tast
                 | TNullPtr of Type.ty
                 | TLoad of tast * Type.ty
                 | TStore of tast * tast
                 | TMalloc of Type.ty * tast
                 | TFree of tast
-                | TAddressOf of int * Type.ty
+                | TAddressOf of NameGen.name * Type.ty
                 | TPrint of tast
                 | TCEmbed of Type.ty * string
                 | TCCall of string * Type.ty * tast list
