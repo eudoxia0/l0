@@ -66,13 +66,11 @@ structure Function :> FUNCTION = struct
         end
 
     fun toStack (Function (_, params, _)) =
+      let val ng = NameGen 1
       in
-          let val ng = NameGen 1
+          let val (params', ng') = alphaRenameParams params ng
           in
-              let val (params', ng') = alphaRenameParams params ng
-              in
-                  Map.map params (fn (k, ParamInt (_, t)) => (t, Immutable))
-              end
+              Map.map params (fn (k, ParamInt (_, t)) => (t, Immutable))
           end
       end
   end
