@@ -18,19 +18,6 @@
 *)
 
 signature AST = sig
-  datatype binop = Add
-                 | Sub
-                 | Mul
-                 | Div
-                 | Eq
-                 | NEq
-                 | LT
-                 | LEq
-                 | GT
-                 | GEq
-
-  val binopName : binop -> string
-
   datatype ast = ConstUnit
                | ConstBool of bool
                | ConstInt of int
