@@ -161,13 +161,13 @@ structure TAST :> TAST = struct
                           TAssign (var, v')
                       else
                           raise Fail ("Cannot assign to variable '"
-                                      ^ var
+                                      ^ (Int.toString var)
                                       ^ "': the type of the variable is "
                                       ^ (tyToString ty)
                                       ^ ", while the type of the expression is "
                                       ^ (tyToString (typeOf v')))
                   else
-                      raise Fail ("Cannot assign to immutable variable '" ^ var ^ "'")
+                      raise Fail ("Cannot assign to immutable variable '" ^ (Int.toString var) ^ "'")
               end
           end
         | augment (NullPtr t) c =
@@ -213,7 +213,7 @@ structure TAST :> TAST = struct
                 | _ => raise Fail "Can't free a non-pointer"
           end
         | augment (AddressOf v) c =
-          let val (Binding (_, ty, _)) = lookup v (ctxStack c)
+          let val (Binding (ty, _)) = lookup v (ctxStack c)
           in
               TAddressOf (v, ty)
           end
