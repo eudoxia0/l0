@@ -55,6 +55,26 @@ structure ARAST :> ARAST = struct
       in
           (Cast (t, a'), s', n')
       end
+    | rename (AST.Let (name, exp, body)) s n =
+      let val (exp', s', n') = rename exp s n
+      in
+          let val (body', s'', n'') = rename body s'' n''
+          in
+              (Let (name, exp', body'), s'', n'')
+          end
+      end
+    | rename (AST.NullPtr t) s n = (NullPtr t, s, n)
+    | rename (AST.Malloc (t, e)) s n =
+      let val (e', s', n') = rename e s n
+      in
+          (Malloc (t, e'), s', n')
+      end
+    | rename (AST.CEmbed (t, e)) s n = (CEmbed (t, e), s, n)
+    | rename (AST.CCall (name, ty, l)) s n =
+      let val (args', s', n') = renameList l s n
+      in
+          (CCall (name, ty, args'), s', n')
+      end
     | rename (AST.Operation (oper, l)) s n =
       let val (args', s', n') = renameList l s n
       in
