@@ -70,7 +70,7 @@ structure Function :> FUNCTION = struct
       in
           let val (params', ng') = alphaRenameParams params ng
           in
-              Map.map params (fn (k, ParamInt (_, t)) => (t, Immutable))
+              Map.kvmap params (fn (k, ParamInt (_, t)) => (t, Immutable))
           end
       end
   end
