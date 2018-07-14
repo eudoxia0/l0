@@ -18,7 +18,8 @@
 *)
 
 signature NAMEGEN = sig
-  datatype namegen = NameGen of int
+  type namegen
 
+  val freshGenerator : () -> namegen
   val freshName : namegen -> int * namegen
 end

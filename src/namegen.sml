@@ -20,6 +20,8 @@
 structure NameGen :> NAMEGEN = struct
   datatype namegen = NameGen of int
 
+  fun freshGenerator () = NameGen 1
+
   fun freshName (NameGen i) =
     (i + 1, NameGen (i + 1))
 end
