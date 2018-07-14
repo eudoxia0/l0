@@ -23,7 +23,7 @@ structure OAST :> OAST = struct
                | ConstInt of int
                | ConstString of string
                | Var of int
-               | Binop of binop * ast * ast
+               | Binop of Binop.binop * ast * ast
                | Cond of ast * ast * ast
                | Cast of Type.ty * ast
                | Progn of ast list
