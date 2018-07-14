@@ -49,8 +49,24 @@ structure Function :> FUNCTION = struct
   local
     open NameGen
   in
+    datatype param_int = ParamInt of int * ty
+
+    fun alphaRenameParams (head::tail) ng =
+      let val (head', ng') = alphaRenameParam head ng
+      in
+          let val (list, ng'') = (alphaRenameParams tail ng')
+          in
+              (head' :: list, ng'')
+          end
+      end
+    and alphaRenameParam (Param (_, ty)) ng =
+        let val (i, ng') = freshName ng
+        in
+            (ParamInt (i, ty), ng')
+        end
+
     fun toStack (Function (_, params, _)) =
-      let fun innerToStack (Param (n,t)::rest) acc ng = let val (rest, ng') = innerToStack rest acc
+      let fun innerToStack (Param (n, t)::rest) acc ng = let val (rest, ng') = innerToStack rest acc
                                                         in
                                                             (Map.add (n, Binding (t, Immutable)) rest, ng')
                                                         end
@@ -58,7 +74,7 @@ structure Function :> FUNCTION = struct
       in
           let val ng = NameGen 1
           in
-              innerToStack params empty ng
+              innerToStack params Map.empty ng
           end
       end
   end
