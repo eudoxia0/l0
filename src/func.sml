@@ -30,10 +30,10 @@ structure Function :> FUNCTION = struct
   datatype mutability = Mutable
                       | Immutable
 
-  datatype binding = Binding of string * ty * mutability
-  type stack = binding SymTab.symtab
+  datatype binding = Binding of Type.ty * mutability
+  type stack = (int, binding) Map.map
 
-  fun bindType (Binding (s, t, _)) = t
+  fun bindType (Binding (t, _)) = t
 
   fun funcName (Function (n, _, _)) = n
 
@@ -47,11 +47,16 @@ structure Function :> FUNCTION = struct
                      (map (fn (Param (n,t)) => t) params, argtypes)
 
   fun toStack (Function (_, params, _)) =
-    let fun innerToStack (Param (n,t)::rest) acc = bind (n, Binding (n, t, Immutable))
-                                                        (innerToStack rest acc)
-          | innerToStack nil acc = acc
+    let fun innerToStack (Param (n,t)::rest) acc ng = let val (rest, ng') = innerToStack rest acc
+                                                      in
+                                                          (Map.add (n, Binding (t, Immutable)) rest, ng')
+                                                      end
+          | innerToStack nil acc ng = (acc, ng)
 
     in
-        innerToStack params empty
+        let val ng = ARAST.NameGen 1
+        in
+            innerToStack params empty ng
+        end
     end
 end
