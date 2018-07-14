@@ -17,7 +17,7 @@
     along with L0.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure NameGen :> NAMEGEN = struct
+structure NameGen : NAMEGEN = struct
   datatype namegen = NameGen of int
 
   datatype name = Name of int
