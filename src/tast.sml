@@ -98,7 +98,10 @@ structure TAST :> TAST = struct
         | augment (ConstBool b) _ = TConstBool b
         | augment (ConstInt i) _ = TConstInt (i, defaultIntType)
         | augment (ConstString s) _ = TConstString s
-        | augment (Var s) c = TVar (s, bindType (lookup s (ctxStack c)))
+        | augment (Var i) c =
+          (case (Map.get (ctxStack c) i) of
+               SOME bind => TVar (i, bindType bind)
+             | NONE => raise Fail "No such variable")
         | augment (Binop (Add, a, b)) c = augmentArithOp Add a b c
         | augment (Binop (Sub, a, b)) c = augmentArithOp Sub a b c
         | augment (Binop (Mul, a, b)) c = augmentArithOp Mul a b c
