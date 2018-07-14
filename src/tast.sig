@@ -22,12 +22,12 @@ signature TAST = sig
                 | TConstBool of bool
                 | TConstInt of int * Type.ty
                 | TConstString of string
-                | TVar of string * Type.ty
+                | TVar of int * Type.ty
                 | TBinop of Binop.binop * tast * tast * Type.ty
                 | TCond of tast * tast * tast * Type.ty
                 | TCast of Type.ty * tast
                 | TProgn of tast list
-                | TLet of string * tast * tast
+                | TLet of int * tast * tast
                 | TAssign of string * tast
                 | TNullPtr of Type.ty
                 | TLoad of tast * Type.ty
