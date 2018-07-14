@@ -31,11 +31,6 @@ structure ARAST :> ARAST = struct
                | CCall of string * Parser.sexp * ast list
                | Operation of string * ast list
 
-  datatype namegen = NameGen of int
-
-  fun freshName (NameGen i) =
-    (i + 1, NameGen (i + 1))
-
   datatype bind = Binding of string * int
 
   type stack = bind SymTab.symtab

@@ -17,19 +17,9 @@
     along with L0.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-signature ARAST = sig
-  datatype ast = ConstUnit
-               | ConstBool of bool
-               | ConstInt of int
-               | ConstString of string
-               | Var of int
-               | Cast of Type.ty * ast
-               | Let of int * ast * ast
-               | NullPtr of Parser.sexp
-               | Malloc of Parser.sexp * ast
-               | CEmbed of Parser.sexp * string
-               | CCall of string * Parser.sexp * ast list
-               | Operation of string * ast list
+structure NameGen :> NAMEGEN = struct
+  datatype namegen = NameGen of int
 
-  val alphaRename : AST.ast -> ast
+  fun freshName (NameGen i) =
+    (i + 1, NameGen (i + 1))
 end
