@@ -34,7 +34,7 @@ structure OAST :> OAST = struct
                | Store of ast * ast
                | Malloc of Parser.sexp * ast
                | Free of ast
-               | AddressOf of string
+               | AddressOf of int
                | Print of ast
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
