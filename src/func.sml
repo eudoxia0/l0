@@ -59,6 +59,7 @@ structure Function :> FUNCTION = struct
               (head' :: list, ng'')
           end
       end
+      | alphaRenameParams nil ng = (nil, ng)
     and alphaRenameParam (Param (_, ty)) ng =
         let val (i, ng') = freshName ng
         in
