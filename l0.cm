@@ -13,6 +13,8 @@ Library
   structure AST
   signature ARAST
   structure ARAST
+  signature BINOP
+  structure Binop
   signature OAST
   structure OAST
   signature TAST
@@ -45,6 +47,9 @@ is
 
   src/arast.sig
   src/arast.sml
+
+  src/binop.sig
+  src/binop.sml
 
   src/oast.sig
   src/oast.sml
