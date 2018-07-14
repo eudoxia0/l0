@@ -70,7 +70,11 @@ structure Function :> FUNCTION = struct
       in
           let val (params', ng') = alphaRenameParams params ng
           in
-              Map.kvmap params (fn (k, ParamInt (_, t)) => (t, Immutable))
+              let fun inner ((ParamInt (_, t))::tail) acc = Map.iadd acc (i, Binding (t, Immutable))
+                    | inner nil acc = acc
+              in
+                  (inner params' Map.empty, ng')
+              end
           end
       end
   end
