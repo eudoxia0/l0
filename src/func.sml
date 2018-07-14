@@ -67,7 +67,7 @@ structure Function :> FUNCTION = struct
         end
 
     fun toStack (Function (_, params, _)) =
-      let val ng = NameGen 1
+      let val ng = freshGenerator ()
       in
           let val (params', ng') = alphaRenameParams params ng
           in
