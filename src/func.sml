@@ -46,17 +46,20 @@ structure Function :> FUNCTION = struct
         ListPair.all (fn (pt, at) => pt = at)
                      (map (fn (Param (n,t)) => t) params, argtypes)
 
-  fun toStack (Function (_, params, _)) =
-    let fun innerToStack (Param (n,t)::rest) acc ng = let val (rest, ng') = innerToStack rest acc
-                                                      in
-                                                          (Map.add (n, Binding (t, Immutable)) rest, ng')
-                                                      end
-          | innerToStack nil acc ng = (acc, ng)
-
-    in
-        let val ng = ARAST.NameGen 1
-        in
-            innerToStack params empty ng
-        end
-    end
+  local
+    open NameGen
+  in
+    fun toStack (Function (_, params, _)) =
+      let fun innerToStack (Param (n,t)::rest) acc ng = let val (rest, ng') = innerToStack rest acc
+                                                        in
+                                                            (Map.add (n, Binding (t, Immutable)) rest, ng')
+                                                        end
+            | innerToStack nil acc ng = (acc, ng)
+      in
+          let val ng = NameGen 1
+          in
+              innerToStack params empty ng
+          end
+      end
+  end
 end
