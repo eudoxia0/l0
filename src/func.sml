@@ -31,7 +31,7 @@ structure Function :> FUNCTION = struct
                       | Immutable
 
   datatype binding = Binding of Type.ty * mutability
-  type stack = (int, binding) Map.map
+  type stack = (NameGen.name, binding) Map.map
 
   fun bindType (Binding (t, _)) = t
 
@@ -49,7 +49,7 @@ structure Function :> FUNCTION = struct
   local
     open NameGen
   in
-    datatype param_int = ParamInt of int * ty
+    datatype param_name = ParamName of NameGen.name * ty
 
     fun alphaRenameParams (head::tail) ng =
       let val (head', ng') = alphaRenameParam head ng
@@ -63,7 +63,7 @@ structure Function :> FUNCTION = struct
     and alphaRenameParam (Param (_, ty)) ng =
         let val (i, ng') = freshName ng
         in
-            (ParamInt (i, ty), ng')
+            (ParamName (i, ty), ng')
         end
 
     fun toStack (Function (_, params, _)) =
@@ -71,7 +71,7 @@ structure Function :> FUNCTION = struct
       in
           let val (params', ng') = alphaRenameParams params ng
           in
-              let fun inner ((ParamInt (i, t))::tail) acc = Map.iadd acc (i, Binding (t, Immutable))
+              let fun inner ((ParamName (n, t))::tail) acc = Map.iadd acc (n, Binding (t, Immutable))
                     | inner nil acc = acc
               in
                   (inner params' Map.empty, ng')

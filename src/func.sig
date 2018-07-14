@@ -28,7 +28,7 @@ signature FUNCTION = sig
                       | Immutable
 
   datatype binding = Binding of Type.ty * mutability
-  type stack = (int, binding) Map.map
+  type stack = (NameGen.name, binding) Map.map
 
   val bindType : binding -> Type.ty
 
