@@ -33,7 +33,7 @@ structure ARAST :> ARAST = struct
                | CCall of string * Parser.sexp * ast list
                | Operation of string * ast list
 
-  datatype bind = Binding of string * int
+  datatype bind = Binding of string * NameGen.name
 
   type stack = bind SymTab.symtab
 
