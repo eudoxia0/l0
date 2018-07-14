@@ -39,6 +39,6 @@ structure Map :> MAP = struct
 
   fun size (Map m) = length m
 
-  fun map (Map (head::tail)) f = iadd (map tail) (f head)
-    | map (Map nil) _ = Map nil
+  fun kvmap (Map (head::tail)) f = iadd (kvmap tail f) (f head)
+    | kvmap (Map nil) _ = Map nil
 end
