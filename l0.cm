@@ -5,6 +5,8 @@ Library
   structure Set
   signature MAP
   structure Map
+  signature NAMEGEN
+  structure NameGen
   signature PARSER
   structure Parser
   signature TYPE
@@ -37,6 +39,9 @@ is
 
   src/map.sig
   src/map.sml
+
+  src/namegen.sig
+  src/namegen.sml
 
   src/parser.sig
   src/parser.sml
