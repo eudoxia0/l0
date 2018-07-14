@@ -38,4 +38,7 @@ structure Map :> MAP = struct
       | NONE => Map ((k, v) :: (mapl m))
 
   fun size (Map m) = length m
+
+  fun map (Map (head::tail)) f = iadd (map tail) (f head)
+    | map (Map nil) _ = Map nil
 end

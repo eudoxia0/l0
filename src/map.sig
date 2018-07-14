@@ -25,4 +25,5 @@ signature MAP = sig
   val add : (''k, 'v) map -> (''k * 'v) -> (''k, 'v) map option
   val iadd : (''k, 'v) map -> (''k * 'v) -> (''k, 'v) map
   val size : (''k, 'v) map -> int
+  val map : (''k, 'v) -> ((''k * 'v) -> (''nk * 'nv)) -> (''nk, 'nv)
 end
