@@ -58,9 +58,9 @@ structure ARAST :> ARAST = struct
     | rename (AST.Let (name, exp, body)) s n =
       let val (exp', s', n') = rename exp s n
       in
-          let val (body', s'', n'') = rename body s'' n''
+          let val (body', s'', n'') = rename body s' n'
           in
-              (Let (name, exp', body'), s'', n'')
+              (Let (SymTab.lookup name s, exp', body'), s'', n'')
           end
       end
     | rename (AST.NullPtr t) s n = (NullPtr t, s, n)
