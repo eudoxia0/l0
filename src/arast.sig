@@ -22,9 +22,9 @@ signature ARAST = sig
                | ConstBool of bool
                | ConstInt of int
                | ConstString of string
-               | Var of int
+               | Var of NameGen.name
                | Cast of Type.ty * ast
-               | Let of int * ast * ast
+               | Let of NameGen.name * ast * ast
                | NullPtr of Parser.sexp
                | Malloc of Parser.sexp * ast
                | CEmbed of Parser.sexp * string
