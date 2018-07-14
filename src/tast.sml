@@ -212,12 +212,12 @@ structure TAST :> TAST = struct
                   (RawPointer _) => TFree p'
                 | _ => raise Fail "Can't free a non-pointer"
           end
-        | augment (AddressOf v) c =
-          let val (Binding (ty, _)) = case Map.get (ctxStack c) v of
+        | augment (AddressOf n) c =
+          let val (Binding (ty, _)) = case Map.get (ctxStack c) n of
                                           SOME b => b
                                         | NONE => raise Fail "Cannot find variable"
           in
-              TAddressOf (v, ty)
+              TAddressOf (n, ty)
           end
         | augment (Print v) c =
           let val v' = augment v c
