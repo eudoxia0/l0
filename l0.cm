@@ -35,6 +35,9 @@ is
   src/set.sig
   src/set.sml
 
+  src/map.sig
+  src/map.sml
+
   src/parser.sig
   src/parser.sml
 
