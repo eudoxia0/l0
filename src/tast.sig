@@ -49,5 +49,5 @@ signature TAST = sig
   type context
   val mkContext : Function.stack -> Type.tenv -> Function.fenv -> context
 
-  val augment : AST.ast -> context -> tast
+  val augment : OAST.ast -> context -> tast
 end

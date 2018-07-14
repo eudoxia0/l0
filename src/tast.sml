@@ -91,7 +91,7 @@ structure TAST :> TAST = struct
     fun ctxFenv (Context (_, _, f)) = f
 
     local
-      open AST
+      open Binop
     in
       fun augment ConstUnit _ = TConstUnit
         | augment (ConstBool b) _ = TConstBool b
