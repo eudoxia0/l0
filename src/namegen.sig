@@ -20,6 +20,6 @@
 signature NAMEGEN = sig
   type namegen
 
-  val freshGenerator : () -> namegen
+  val freshGenerator : unit -> namegen
   val freshName : namegen -> int * namegen
 end
