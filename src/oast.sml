@@ -22,19 +22,19 @@ structure OAST :> OAST = struct
                | ConstBool of bool
                | ConstInt of int
                | ConstString of string
-               | Var of int
+               | Var of NameGen.name
                | Binop of Binop.binop * ast * ast
                | Cond of ast * ast * ast
                | Cast of Type.ty * ast
                | Progn of ast list
-               | Let of int * ast * ast
-               | Assign of int * ast
+               | Let of NameGen.name * ast * ast
+               | Assign of NameGen.name * ast
                | NullPtr of Parser.sexp
                | Load of ast
                | Store of ast * ast
                | Malloc of Parser.sexp * ast
                | Free of ast
-               | AddressOf of int
+               | AddressOf of NameGen.name
                | Print of ast
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
