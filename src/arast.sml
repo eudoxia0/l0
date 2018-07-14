@@ -18,6 +18,8 @@
 *)
 
 structure ARAST :> ARAST = struct
+  open NameGen
+
   datatype ast = ConstUnit
                | ConstBool of bool
                | ConstInt of int
