@@ -287,7 +287,7 @@ structure TAST :> TAST = struct
               in
                   if ta <> tb then
                       raise Fail ("Both operands to "
-                                  ^ (binopName oper)
+                                  ^ (Binop.binopName oper)
                                   ^ " must be of the same type. Types: "
                                   ^ (tyToString ta)
                                   ^ " and "
