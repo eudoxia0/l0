@@ -66,10 +66,10 @@ structure Function :> FUNCTION = struct
         end
 
     fun toStack (Function (_, params, _)) =
-      let fun innerToStack (Param (n, t)::rest) acc ng = let val (rest, ng') = innerToStack rest acc
-                                                        in
-                                                            (Map.add (n, Binding (t, Immutable)) rest, ng')
-                                                        end
+      let fun innerToStack (ParamInt (i, t)::rest) acc ng = let val (rest, ng') = innerToStack rest acc
+                                                            in
+                                                                (Map.add (i, Binding (t, Immutable)) rest, ng')
+                                                            end
             | innerToStack nil acc ng = (acc, ng)
       in
           let val ng = NameGen 1
