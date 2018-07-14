@@ -17,10 +17,6 @@ Library
   structure OAST
   signature LLVM
   structure LLVM
-  signature COMPILER
-  structure Compiler
-  signature L0
-  structure L0
 is
   vendor/parsimony/parsimony.cm
 
@@ -53,11 +49,5 @@ is
 
   src/llvm.sig
   src/llvm.sml
-
-  src/compiler.sig
-  src/compiler.sml
-
-  src/l0.sig
-  src/l0.sml
 
   $/basis.cm
