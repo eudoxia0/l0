@@ -50,4 +50,9 @@ structure OAST :> OAST = struct
     | augment (ARAST.ConstString s) = ConstString s
     | augment (ARAST.Var n) = Var n
     | augment (ARAST.Cast (t, e)) = Cast (t, augment e)
+    | augment (ARAST.Let (n, e, b)) = Let (n, augment e, augment b)
+    | augment (ARAST.NullPtr e) = NullPtr (augment e)
+    | augment (ARAST.Malloc (t, e)) = Malloc (t, augment e)
+    | augment (ARAST.CEmbed (t, s)) = CEmbed (t, s)
+    | augment (ARAST.CCall (n, t, es)) = CCall (n, t, map augment es)
 end
