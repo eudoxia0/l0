@@ -63,6 +63,12 @@ structure OAST :> OAST = struct
     | augmentOp "-" [l, r] = Binop (Binop.Sub, l, r)
     | augmentOp "*" [l, r] = Binop (Binop.Mul, l, r)
     | augmentOp "/" [l, r] = Binop (Binop.Div, l, r)
+    | augmentOp "=" [l, r] = Binop (Binop.Eq, l, r)
+    | augmentOp "<>" [l, r] = Binop (Binop.NEq, l, r)
+    | augmentOp "<" [l, r] = Binop (Binop.LT, l, r)
+    | augmentOp "<=" [l, r] = Binop (Binop.LEq, l, r)
+    | augmentOp ">" [l, r] = Binop (Binop.GT, l, r)
+    | augmentOp ">=" [l, r] = Binop (Binop.GEq, l, r)
     | augmentOp "progn" args = Progn args
     | augmentOp "load" [e] = Load e
     | augmentOp "load" _ = raise Fail "Bad load form"
