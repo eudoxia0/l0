@@ -43,4 +43,8 @@ structure OAST :> OAST = struct
                | MakeRecord of string * (string * ast) list
                | SlotAccess of ast * string
                | Funcall of string * ast list
+
+  fun augment ARAST.ConstUnit = ConstUnit
+    | augment (ARAST.ConstBool b) = ConstBool b
+    | augment (ARAST.ConstInt i) = ConstInt i
 end
