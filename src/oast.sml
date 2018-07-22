@@ -47,4 +47,7 @@ structure OAST :> OAST = struct
   fun augment ARAST.ConstUnit = ConstUnit
     | augment (ARAST.ConstBool b) = ConstBool b
     | augment (ARAST.ConstInt i) = ConstInt i
+    | augment (ARAST.ConstString s) = ConstString s
+    | augment (ARAST.Var n) = Var n
+    | augment (ARAST.Cast (t, e)) = Cast (t, augment e)
 end
