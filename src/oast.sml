@@ -54,5 +54,7 @@ structure OAST :> OAST = struct
     | augment (ARAST.NullPtr t) = NullPtr t
     | augment (ARAST.Malloc (t, e)) = Malloc (t, augment e)
     | augment (ARAST.CEmbed (t, s)) = CEmbed (t, s)
-    | augment (ARAST.CCall (n, t, es)) = CCall (n, t, map augment es)
+    | augment (ARAST.CCall (n, t, args)) = CCall (n, t, map augment args)
+    | augment (ARAST.Operation (name, args)) = augmentOp name (map augment args)
+  and augmentOp name args = Funcall (name, args)
 end
