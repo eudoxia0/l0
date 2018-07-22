@@ -62,6 +62,7 @@ structure AST :> AST = struct
         Operation ("progn", mparse body e)
       | parseL "c/nullptr" [t] _ = NullPtr t
       | parseL "c/malloc" [t, c] e = Malloc (t, parse c e)
+      | parseL "c/address-of" [Symbol s] _ = AddressOf s
       | parseL "c/embed" [t, String s] _ = CEmbed (t, s)
       | parseL "c/call" (String n :: t :: args) e = CCall (n, t, mparse args e)
       | parseL f rest e = Operation (f, mparse rest e)
