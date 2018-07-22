@@ -70,5 +70,7 @@ structure OAST :> OAST = struct
     | augmentOp "print" _ = raise Fail "Bad print form"
     | augmentOp "while" (t::body) = While (t, Progn body)
     | augmentOp "while" _ = raise Fail "Bad while form"
+    | augmentOp "allocate" [v] = Allocate v
+    | augmentOp "allocate" _ = raise Fail "Bad allocate form"
     | augmentOp name args = Funcall (name, args)
 end
