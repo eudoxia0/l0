@@ -58,5 +58,6 @@ structure OAST :> OAST = struct
     | augment (ARAST.Operation (name, args)) = augmentOp name (map augment args)
   and augmentOp "if" [t, c, e] = Cond (t, c, e)
     | augmentOp "if" _ = raise Fail "Bad if form"
+    | augmentOp "progn" args = Progn args
     | augmentOp name args = Funcall (name, args)
 end
