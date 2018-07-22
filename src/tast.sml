@@ -41,7 +41,6 @@ structure TAST :> TAST = struct
                 | TCEmbed of Type.ty * string
                 | TCCall of string * Type.ty * tast list
                 | TWhile of tast * tast
-                | TAllocate of tast
                 | TMakeRecord of Type.ty * string * (string * tast) list
                 | TSlotAccess of tast * string * Type.ty
                 | TFuncall of string * tast list * Type.ty
@@ -77,7 +76,6 @@ structure TAST :> TAST = struct
       | typeOf (TCEmbed (t, _)) = t
       | typeOf (TCCall (_, t, _)) = t
       | typeOf (TWhile _) = Unit
-      | typeOf (TAllocate (v)) = RawPointer (typeOf v)
       | typeOf (TMakeRecord (t, _, _)) = t
       | typeOf (TSlotAccess (_, _, t)) = t
       | typeOf (TFuncall (_, _, t)) = t
@@ -246,8 +244,6 @@ structure TAST :> TAST = struct
               else
                   TWhile (test', body')
           end
-        | augment (Allocate (v)) c =
-          TAllocate (augment v c)
         | augment (MakeRecord (name, slots)) c =
           let val ty = lookup name (ctxTenv c)
           in

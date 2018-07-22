@@ -39,7 +39,6 @@ structure OAST :> OAST = struct
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
                | While of ast * ast
-               | Allocate of ast
                | MakeRecord of string * (string * ast) list
                | SlotAccess of ast * string
                | Funcall of string * ast list
@@ -80,7 +79,5 @@ structure OAST :> OAST = struct
     | augmentOp "print" _ = raise Fail "Bad print form"
     | augmentOp "while" (t::body) = While (t, Progn body)
     | augmentOp "while" _ = raise Fail "Bad while form"
-    | augmentOp "allocate" [v] = Allocate v
-    | augmentOp "allocate" _ = raise Fail "Bad allocate form"
     | augmentOp name args = Funcall (name, args)
 end
