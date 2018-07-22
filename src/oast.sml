@@ -63,5 +63,11 @@ structure OAST :> OAST = struct
     | augmentOp "load" _ = raise Fail "Bad load form"
     | augmentOp "store" [p, v] = Store (p, v)
     | augmentOp "store" _ = raise Fail "Bad store form"
+    | augmentOp "free" [p] = Free p
+    | augmentOp "free" _ = raise Fail "Bad free form"
+    | augmentOp "print" [v] = Print v
+    | augmentOp "print" _ = raise Fail "Bad print form"
+    | augmentOp "while" (t::body) = While (t, Progn body)
+    | augmentOp "while" _ = raise Fail "Bad while form"
     | augmentOp name args = Funcall (name, args)
 end
