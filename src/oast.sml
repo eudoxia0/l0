@@ -53,6 +53,7 @@ structure OAST :> OAST = struct
     | augment (ARAST.Let (n, e, b)) = Let (n, augment e, augment b)
     | augment (ARAST.NullPtr t) = NullPtr t
     | augment (ARAST.Malloc (t, e)) = Malloc (t, augment e)
+    | augment (ARAST.AddressOf n) = AddressOf n
     | augment (ARAST.CEmbed (t, s)) = CEmbed (t, s)
     | augment (ARAST.CCall (n, t, args)) = CCall (n, t, map augment args)
     | augment (ARAST.Operation (name, args)) = augmentOp name (map augment args)
