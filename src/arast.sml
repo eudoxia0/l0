@@ -29,6 +29,7 @@ structure ARAST :> ARAST = struct
                | Let of NameGen.name * ast * ast
                | NullPtr of Parser.sexp
                | Malloc of Parser.sexp * ast
+               | AddressOf of string
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
                | Operation of string * ast list
