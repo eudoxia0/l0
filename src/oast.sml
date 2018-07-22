@@ -59,5 +59,9 @@ structure OAST :> OAST = struct
   and augmentOp "if" [t, c, e] = Cond (t, c, e)
     | augmentOp "if" _ = raise Fail "Bad if form"
     | augmentOp "progn" args = Progn args
+    | augmentOp "load" [e] = Load e
+    | augmentOp "load" _ = raise Fail "Bad load form"
+    | augmentOp "store" [p, v] = Store (p, v)
+    | augmentOp "store" _ = raise Fail "Bad store form"
     | augmentOp name args = Funcall (name, args)
 end
