@@ -27,6 +27,7 @@ signature AST = sig
                | Let of string * ast * ast
                | NullPtr of Parser.sexp
                | Malloc of Parser.sexp * ast
+               | AddressOf of string
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
                | Operation of string * ast list
