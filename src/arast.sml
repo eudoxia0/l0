@@ -29,7 +29,7 @@ structure ARAST :> ARAST = struct
                | Let of NameGen.name * ast * ast
                | NullPtr of Parser.sexp
                | Malloc of Parser.sexp * ast
-               | AddressOf of string
+               | AddressOf of NameGen.name
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
                | Operation of string * ast list
@@ -73,6 +73,7 @@ structure ARAST :> ARAST = struct
       in
           (Malloc (t, e'), s', n')
       end
+    | rename (AST.AddressOf name) s n = (AddressOf (SymTab.lookup name s), s, n)
     | rename (AST.CEmbed (t, e)) s n = (CEmbed (t, e), s, n)
     | rename (AST.CCall (name, ty, l)) s n =
       let val (args', s', n') = renameList l s n

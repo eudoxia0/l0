@@ -27,7 +27,7 @@ signature ARAST = sig
                | Let of NameGen.name * ast * ast
                | NullPtr of Parser.sexp
                | Malloc of Parser.sexp * ast
-               | AddressOf of string
+               | AddressOf of NameGen.name
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
                | Operation of string * ast list
