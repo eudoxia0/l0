@@ -56,5 +56,7 @@ structure OAST :> OAST = struct
     | augment (ARAST.CEmbed (t, s)) = CEmbed (t, s)
     | augment (ARAST.CCall (n, t, args)) = CCall (n, t, map augment args)
     | augment (ARAST.Operation (name, args)) = augmentOp name (map augment args)
-  and augmentOp name args = Funcall (name, args)
+  and augmentOp "if" [t, c, e] = Cond (t, c, e)
+    | augmentOp "if" _ = raise Fail "Bad if form"
+    | augmentOp name args = Funcall (name, args)
 end
