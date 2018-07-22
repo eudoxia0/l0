@@ -43,4 +43,6 @@ signature OAST = sig
                | MakeRecord of string * (string * ast) list
                | SlotAccess of ast * string
                | Funcall of string * ast list
+
+  val augment : ARAST.ast -> ast
 end
