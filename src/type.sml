@@ -31,6 +31,7 @@ structure Type :> TYPE = struct
        and slot = Slot of string * ty
 
   fun isEquatable (Tuple _) = false
+    | isEquatable (RawPointer _) = false
     | isEquatable _ = true
 
   fun isNumeric (Int _) = true
