@@ -39,8 +39,6 @@ signature OAST = sig
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
                | While of ast * ast
-               | MakeRecord of string * (string * ast) list
-               | SlotAccess of ast * string
                | Funcall of string * ast list
 
   val augment : ARAST.ast -> ast

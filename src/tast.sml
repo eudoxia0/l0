@@ -41,8 +41,6 @@ structure TAST :> TAST = struct
                 | TCEmbed of Type.ty * string
                 | TCCall of string * Type.ty * tast list
                 | TWhile of tast * tast
-                | TMakeRecord of Type.ty * string * (string * tast) list
-                | TSlotAccess of tast * string * Type.ty
                 | TFuncall of string * tast list * Type.ty
 
   local
@@ -76,8 +74,6 @@ structure TAST :> TAST = struct
       | typeOf (TCEmbed (t, _)) = t
       | typeOf (TCCall (_, t, _)) = t
       | typeOf (TWhile _) = Unit
-      | typeOf (TMakeRecord (t, _, _)) = t
-      | typeOf (TSlotAccess (_, _, t)) = t
       | typeOf (TFuncall (_, _, t)) = t
 
     datatype context = Context of Function.stack * Type.tenv * Function.fenv
@@ -243,22 +239,6 @@ structure TAST :> TAST = struct
                   raise Fail "The test of a while loop must be a boolean expression"
               else
                   TWhile (test', body')
-          end
-        | augment (MakeRecord (name, slots)) c =
-          let val ty = lookup name (ctxTenv c)
-          in
-              case ty of
-                  (Record (name, _)) => TMakeRecord (ty, name, map (fn (n,e) => (n, augment e c)) slots)
-                | _ => raise Fail "Type does not name a record"
-          end
-        | augment (SlotAccess (r, slot)) c =
-          let val r' = augment r c
-          in
-              case typeOf r' of
-                  (Record (name, slots)) => (case List.find (fn (Slot (n, _)) => slot = n) slots of
-                                                 SOME (Slot (n, ty)) => TSlotAccess (r', slot, ty)
-                                               | NONE => raise Fail "No slot with this name")
-                | _ => raise Fail "Not a record"
           end
         | augment (Funcall (name, args)) c =
           let val (Function (_, params, rt)) = lookup name (ctxFenv c)
