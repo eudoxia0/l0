@@ -26,18 +26,17 @@ structure Type :> TYPE = struct
               | Str
               | RawPointer of ty
               | Tuple of ty list
-              | Record of string * slot list
        and signedness = Signed | Unsigned
        and bit_width = Word8 | Word16 | Word32 | Word64
        and slot = Slot of string * ty
 
-  fun isEquatable (Record _) = false
+  fun isEquatable (Tuple _) = false
     | isEquatable _ = true
 
   fun isNumeric (Int _) = true
     | isNumeric _ = false
 
-  fun isPrintable (Record _) = false
+  fun isPrintable (Tuple _) = false
     | isPrintable _ = true
 
   fun tyToString Unit = "unit"
@@ -46,7 +45,6 @@ structure Type :> TYPE = struct
     | tyToString Str = "str"
     | tyToString (RawPointer t) = "(rawptr " ^ (tyToString t) ^ ")"
     | tyToString (Tuple l) = "(tuple " ^ (String.concatWith " " (map tyToString l)) ^ ")"
-    | tyToString (Record (name, _)) = name
   and signednessStr Signed = "i"
     | signednessStr Unsigned = "u"
   and widthStr Word8 = "8"

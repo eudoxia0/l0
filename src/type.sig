@@ -24,7 +24,6 @@ signature TYPE = sig
               | Str
               | RawPointer of ty
               | Tuple of ty list
-              | Record of string * slot list
        and signedness = Signed | Unsigned
        and bit_width = Word8 | Word16 | Word32 | Word64
        and slot = Slot of string * ty
