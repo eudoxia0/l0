@@ -232,7 +232,7 @@ structure LLVM :> LLVM = struct
       | compileExp (TConstBool true) rn ln = ([], IntConstant "true", rn, ln)
       | compileExp (TConstInt (i, _)) rn ln = ([], IntConstant (Int.toString i), rn, ln)
       | compileExp (TConstString _) _ _ = raise Fail "String support not implemented yet"
-      | compileExp (TVar (name, ty)) rn ln = ([], RegisterOp (variableRegister name), rn, ln)
+      | compileExp (TVar (name, ty)) rn ln = ([], NamedRegister (variableRegister name), rn, ln)
       | compileExp _ _ _ = raise Fail "Not implemented"
   end
 end
