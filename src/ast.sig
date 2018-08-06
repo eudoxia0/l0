@@ -33,7 +33,6 @@ signature AST = sig
                | Operation of string * ast list
 
   datatype top_ast = Defun of Function.func * ast
-                   | Defrecord of string * (string * Type.ty) list
 
   val parse : Parser.sexp -> Type.tenv -> ast
   val parseToplevel : Parser.sexp -> Type.tenv -> top_ast

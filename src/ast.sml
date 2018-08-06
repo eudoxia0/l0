@@ -35,7 +35,6 @@ structure AST :> AST = struct
                | Operation of string * ast list
 
   datatype top_ast = Defun of Function.func * ast
-                   | Defrecord of string * (string * Type.ty) list
 
   local
     open Parser
@@ -67,8 +66,6 @@ structure AST :> AST = struct
       | parseL "c/call" (String n :: t :: args) e = CCall (n, t, mparse args e)
       | parseL f rest e = Operation (f, mparse rest e)
     and mparse l e = map (fn elem => parse elem e) l
-    and parseSlot e (List [Symbol name, exp]) = (name, parse exp e)
-      | parseSlot e _ = raise Fail "Bad slot"
 
     fun parseParam (List [Symbol n, t]) e = Function.Param (n, Type.parseTypeSpecifier t e)
       | parseParam _ _ = raise Fail "Bad parameter"
@@ -80,10 +77,6 @@ structure AST :> AST = struct
                                   map (fn p => parseParam p e) params,
                                   Type.parseTypeSpecifier rt e),
                parse (List (Symbol "progn" :: body)) e)
-      | parseTopL "defrecord" (Symbol name :: slots) e =
-        Defrecord (name, (map (parseSlot e) slots))
       | parseTopL f _ _ = raise Fail ("Bad toplevel definition '" ^ f ^ "'")
-    and parseSlot e (List [Symbol name, tys]) = (name, Type.parseTypeSpecifier tys e)
-      | parseSlot e _ = raise Fail "Bad defrecord slot"
   end
 end
