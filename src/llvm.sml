@@ -251,6 +251,8 @@ structure LLVM :> LLVM = struct
       | compileExp (TBinop (Binop.Sub, lhs, rhs, ty)) rn ln = compileArithOp Sub lhs rhs ty rn ln
       | compileExp (TBinop (Binop.Mul, lhs, rhs, ty)) rn ln = compileArithOp Mul lhs rhs ty rn ln
       | compileExp (TBinop (Binop.Div, lhs, rhs, ty)) rn ln = compileArithOp SDiv lhs rhs ty rn ln
+      | compileExp (TBinop (Binop.Eq, lhs, rhs, ty)) rn ln = compileComparisonOp Eq lhs rhs ty rn ln
+      | compileExp (TBinop (Binop.NEq, lhs, rhs, ty)) rn ln = compileComparisonOp NotEq lhs rhs ty rn ln
       | compileExp _ _ _ = raise Fail "Not implemented"
     and compileArithOp oper lhs rhs ty rn ln =
         let val (insts, lhs', rn', ln') = compileExp lhs rn ln
@@ -260,6 +262,20 @@ structure LLVM :> LLVM = struct
                 let val (result, rn''') = freshRegister rn
                 in
                     let val insts'' = [Assignment (result, oper (mapTy ty, lhs', rhs'))]
+                    in
+                        (insts @ insts' @ insts'', RegisterOp result, rn''', ln'')
+                    end
+                end
+            end
+        end
+    and compileComparisonOp oper lhs rhs ty rn ln =
+        let val (insts, lhs', rn', ln') = compileExp lhs rn ln
+        in
+            let val (insts', rhs', rn'', ln'') = compileExp rhs rn' ln'
+            in
+                let val (result, rn''') = freshRegister rn
+                in
+                    let val insts'' = [Assignment (result, IntegerCompare (oper, mapTy ty, lhs', rhs'))]
                     in
                         (insts @ insts' @ insts'', RegisterOp result, rn''', ln'')
                     end
