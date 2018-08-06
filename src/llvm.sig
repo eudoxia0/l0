@@ -21,6 +21,8 @@ signature LLVM = sig
   type context
   type register_names
   type label_names
+  type operand
+  type instruction
 
   val emptyContext : context
 end
