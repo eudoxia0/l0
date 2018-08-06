@@ -126,6 +126,7 @@ structure LLVM :> LLVM = struct
                        | Store of ty * operand * operand
 
   fun renderOperand (RegisterOp r) = renderRegister r
+    | renderOperand (NamedRegister n) = "%" ^ n
     | renderOperand (IntConstant s) = s
 
   fun renderPhi (PhiPred (oper, l)) =
@@ -218,6 +219,11 @@ structure LLVM :> LLVM = struct
 
   val emptyContext = Context ([], RegisterNames 1, LabelNames 1)
 
+  (* Backend *)
+
+  fun variableRegister name =
+    "_var_" ^ (Int.toString (NameGen.nameId name))
+
   local
     open TAST
   in
@@ -226,7 +232,7 @@ structure LLVM :> LLVM = struct
       | compileExp (TConstBool true) rn ln = ([], IntConstant "true", rn, ln)
       | compileExp (TConstInt (i, _)) rn ln = ([], IntConstant (Int.toString i), rn, ln)
       | compileExp (TConstString _) _ _ = raise Fail "String support not implemented yet"
-      (*| compileExp (TVar (name, ty)) = ([], RegisterOp *)
+      | compileExp (TVar (name, ty)) rn ln = ([], RegisterOp (variableRegister name), rn, ln)
       | compileExp _ _ _ = raise Fail "Not implemented"
   end
 end
