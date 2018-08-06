@@ -18,6 +18,7 @@
 *)
 
 signature LLVM = sig
+  type ty
   type context
   type register_names
   type label_names
@@ -25,5 +26,6 @@ signature LLVM = sig
   type instruction
 
   val emptyContext : context
+  val mapTy : Type.ty -> ty
   val compileExp : TAST.tast -> register_names -> label_names -> (instruction list * operand * register_names * label_names)
 end

@@ -224,6 +224,20 @@ structure LLVM :> LLVM = struct
   fun variableRegister name =
     "_var_" ^ (Int.toString (NameGen.nameId name))
 
+  fun mapTy Type.Unit = Bool
+    | mapTy Type.Bool = Bool
+    | mapTy (Type.Int (Type.Unsigned, Type.Word8)) = Int8
+    | mapTy (Type.Int (Type.Signed, Type.Word8)) = Int8
+    | mapTy (Type.Int (Type.Unsigned, Type.Word16)) = Int16
+    | mapTy (Type.Int (Type.Signed, Type.Word16)) = Int16
+    | mapTy (Type.Int (Type.Unsigned, Type.Word32)) = Int32
+    | mapTy (Type.Int (Type.Signed, Type.Word32)) = Int32
+    | mapTy (Type.Int (Type.Unsigned, Type.Word64)) = Int64
+    | mapTy (Type.Int (Type.Signed, Type.Word64)) = Int64
+    | mapTy Type.Str = Pointer Int8
+    | mapTy (Type.RawPointer t) = Pointer (mapTy t)
+    | mapTy (Type.Tuple ts) = Struct (map mapTy ts)
+
   local
     open TAST
   in
@@ -233,6 +247,17 @@ structure LLVM :> LLVM = struct
       | compileExp (TConstInt (i, _)) rn ln = ([], IntConstant (Int.toString i), rn, ln)
       | compileExp (TConstString _) _ _ = raise Fail "String support not implemented yet"
       | compileExp (TVar (name, ty)) rn ln = ([], NamedRegister (variableRegister name), rn, ln)
+      (*| compileExp (TBinop (Add, lhs, rhs, ty)) rn ln =
+        let (insts, lhs', rn', ln') = compileExp lhs rn ln
+        in
+            let (insts', rhs', rn'', ln'') = compileExp rhs rn' ln''
+            in
+                let (result, rn''') = freshRegister rn
+                in
+                    ([Assignment (result, Add (mapTy ty, lhs', rhs'))], RegisterOp result, rn', ln)
+                end
+            end
+        end*)
       | compileExp _ _ _ = raise Fail "Not implemented"
   end
 end
