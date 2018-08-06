@@ -85,6 +85,7 @@ structure LLVM :> LLVM = struct
   (* Instructions *)
 
   datatype operand = RegisterOp of register
+                   | NamedRegister of string
                    | IntConstant of string
 
   datatype comp_op = Eq
@@ -224,7 +225,7 @@ structure LLVM :> LLVM = struct
       | compileExp (TConstBool false) rn ln = ([], IntConstant "false", rn, ln)
       | compileExp (TConstBool true) rn ln = ([], IntConstant "true", rn, ln)
       | compileExp (TConstInt (i, _)) rn ln = ([], IntConstant (Int.toString i), rn, ln)
-      | compileExp (TConstString ) _ _ = raise Fail "String support not implemented yet"
+      | compileExp (TConstString _) _ _ = raise Fail "String support not implemented yet"
       (*| compileExp (TVar (name, ty)) = ([], RegisterOp *)
       | compileExp _ _ _ = raise Fail "Not implemented"
   end
