@@ -247,17 +247,20 @@ structure LLVM :> LLVM = struct
       | compileExp (TConstInt (i, _)) rn ln = ([], IntConstant (Int.toString i), rn, ln)
       | compileExp (TConstString _) _ _ = raise Fail "String support not implemented yet"
       | compileExp (TVar (name, ty)) rn ln = ([], NamedRegister (variableRegister name), rn, ln)
-      (*| compileExp (TBinop (Add, lhs, rhs, ty)) rn ln =
-        let (insts, lhs', rn', ln') = compileExp lhs rn ln
+      | compileExp (TBinop (Binop.Add, lhs, rhs, ty)) rn ln =
+        let val (insts, lhs', rn', ln') = compileExp lhs rn ln
         in
-            let (insts', rhs', rn'', ln'') = compileExp rhs rn' ln''
+            let val (insts', rhs', rn'', ln'') = compileExp rhs rn' ln'
             in
-                let (result, rn''') = freshRegister rn
+                let val (result, rn''') = freshRegister rn
                 in
-                    ([Assignment (result, Add (mapTy ty, lhs', rhs'))], RegisterOp result, rn', ln)
+                    let val insts'' = [Assignment (result, Add (mapTy ty, lhs', rhs'))]
+                    in
+                        (insts @ insts' @ insts'', RegisterOp result, rn''', ln'')
+                    end
                 end
             end
-        end*)
+        end
       | compileExp _ _ _ = raise Fail "Not implemented"
   end
 end
