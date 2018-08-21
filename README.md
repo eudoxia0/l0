@@ -1,6 +1,6 @@
 # L0
 
-A minimal Lisp with linear types.
+A minimal Lisp with linear types. Not yet finished.
 
 ## License
 
