@@ -54,21 +54,6 @@ structure Compiler :> COMPILER = struct
                          Compiler (tenv, fenv')
                      end
              end
-         end
-       | (AST.Defrecord (name, slots)) =>
-         let val slots = map (fn (n, t) => Type.Slot (n, t)) slots
-         in
-             let val ty = Type.Record (name, slots)
-             in
-                 let val tenv' = bind (name, ty) tenv
-                 in
-                     let
-                     in
-                         print (";; Define record " ^ name);
-                         Compiler (tenv', fenv)
-                     end
-                 end
-             end
          end)
 
   fun compileString c s =
