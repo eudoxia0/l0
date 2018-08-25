@@ -18,7 +18,20 @@
 *)
 
 signature LLVM = sig
-  type ty
+  datatype ty = Bool
+              | Int8
+              | Int16
+              | Int32
+              | Int64
+              | SingleFloat
+              | DoubleFloat
+              | Pointer of ty
+              | FuncPointer of ty * ty list
+              | Struct of ty list
+       and bit_width = Word1 | Word8 | Word16 | Word32 | Word64
+       and float_width = Single | Double
+
+
   type context
   type register_names
   type label_names
