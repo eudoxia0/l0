@@ -92,4 +92,6 @@ signature LLVM = sig
 
   val freshRegister : register_names -> (register * register_names)
   val freshLabel : label_names -> (label * label_names)
+
+  val renderToplevel : toplevel -> string
 end
