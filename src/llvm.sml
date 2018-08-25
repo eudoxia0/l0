@@ -219,7 +219,7 @@ structure LLVM :> LLVM = struct
 
   val emptyContext = Context []
 
-  fun renderContext ts =
+  fun renderContext (Context ts) =
       String.concatWith "\n\n" (map renderToplevel ts)
 
   (* Backend *)
