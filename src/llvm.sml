@@ -291,18 +291,19 @@ structure LLVM :> LLVM = struct
         end
   end
 
-  fun compileFunc (Context ts) func tast =
+  fun compileFunc (Context ts) (Function.Function (name, rt, params)) tast =
       let val (insts, oper, _, _) = compileExp tast
                                                (freshRegisterNames 1)
                                                (freshLabelNames 1)
-          and rtype = mapTy (Function.funcRT func)
+          and rtype = mapTy rt
       in
-          let val fundef = FunctionDefinition (Function.funcName func,
+          let val fundef = FunctionDefinition (name,
                                                rtype,
-                                               [],
+                                               map mapParam params,
                                                insts @ [Return (rtype, oper)])
           in
               Context (ts @ fundef)
           end
       end
+  and mapParam (Function.Param (name, ty)) = Param (name, mapTy ty)
 end
