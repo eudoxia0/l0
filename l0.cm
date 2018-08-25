@@ -25,6 +25,8 @@ Library
   structure TAST
   signature LLVM
   structure LLVM
+  signature COMPILER
+  structure Compiler
 is
   vendor/parsimony/parsimony.cm
 
@@ -69,5 +71,8 @@ is
 
   src/llvm.sig
   src/llvm.sml
+
+  src/compiler.sig
+  src/compiler.sml
 
   $/basis.cm
