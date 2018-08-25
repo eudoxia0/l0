@@ -20,7 +20,7 @@
 structure Compiler :> COMPILER = struct
   open SymTab
 
-  datatype compiler = Compiler of Type.tenv * Function.fenv * LLVM.context
+  datatype compiler = Compiler of Type.tenv * Function.fenv * Backend.context
 
   local
     open Function
@@ -29,7 +29,7 @@ structure Compiler :> COMPILER = struct
     val emptyCompiler =
         let val interim_not = Function ("interim_not", [Param ("v", Bool)], Bool)
         in
-            Compiler (empty, bind ("interim_not", interim_not) empty, LLVM.emptyContext)
+            Compiler (empty, bind ("interim_not", interim_not) empty, Backend.emptyContext)
         end
   end
 
