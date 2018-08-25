@@ -291,7 +291,7 @@ structure LLVM :> LLVM = struct
         end
   end
 
-  fun compileFunc (Context ts) (Function.Function (name, rt, params)) tast =
+  fun compileFunc (Context ts) (Function.Function (name, params, ty)) tast =
       let val (insts, oper, _, _) = compileExp tast
                                                (freshRegisterNames 1)
                                                (freshLabelNames 1)
