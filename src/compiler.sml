@@ -20,7 +20,7 @@
 structure Compiler :> COMPILER = struct
   open SymTab
 
-  datatype compiler = Compiler of Type.tenv * Function.fenv
+  datatype compiler = Compiler of Type.tenv * Function.fenv * LLVM.context
 
   local
     open Function
