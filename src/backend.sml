@@ -18,4 +18,5 @@
 *)
 
 structure Backend :> BACKEND = struct
+  open LLVM
 end
