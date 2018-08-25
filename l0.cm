@@ -1,32 +1,4 @@
-Library
-  signature SYMTAB
-  structure SymTab
-  signature SET
-  structure Set
-  signature MAP
-  structure Map
-  signature NAMEGEN
-  structure NameGen
-  signature PARSER
-  structure Parser
-  signature TYPE
-  structure Type
-  signature FUNCTION
-  structure Function
-  signature AST
-  structure AST
-  signature ARAST
-  structure ARAST
-  signature BINOP
-  structure Binop
-  signature OAST
-  structure OAST
-  signature TAST
-  structure TAST
-  signature LLVM
-  structure LLVM
-  signature COMPILER
-  structure Compiler
+Group
 is
   vendor/parsimony/parsimony.cm
 
