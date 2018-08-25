@@ -33,9 +33,9 @@ structure Compiler :> COMPILER = struct
         end
   end
 
-  fun compilerTypeEnv (Compiler (t, _)) = t
+  fun compilerTypeEnv (Compiler (t, _, _)) = t
 
-  fun compileAST (Compiler (tenv, fenv)) ast =
+  fun compileAST (Compiler (tenv, fenv, llvmCtx)) ast =
     (case ast of
          (AST.Defun (func, ast)) =>
          let val fenv' = bind (Function.funcName func, func) fenv
@@ -54,7 +54,7 @@ structure Compiler :> COMPILER = struct
                          let
                          in
                              print (";; Define function " ^ (Function.funcName func));
-                             Compiler (tenv, fenv')
+                             Compiler (tenv, fenv', llvmCtx)
                          end
                  end
              end
