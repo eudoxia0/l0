@@ -262,6 +262,7 @@ structure LLVM :> LLVM = struct
       | compileExp (TBinop (Binop.LEq, lhs, rhs, ty)) rn ln = compileComparisonOp UnsignedLEq lhs rhs ty rn ln
       | compileExp (TBinop (Binop.GT, lhs, rhs, ty)) rn ln = compileComparisonOp UnsignedGT lhs rhs ty rn ln
       | compileExp (TBinop (Binop.GEq, lhs, rhs, ty)) rn ln = compileComparisonOp UnsignedGEq lhs rhs ty rn ln
+      | compileExp (TCast (ty, exp)) rn ln = raise Fail "cast not implemented"
       | compileExp (TProgn body) rn ln = compileProgn body rn ln
       | compileExp _ _ _ = raise Fail "Not implemented"
     and compileArithOp oper lhs rhs ty rn ln =
