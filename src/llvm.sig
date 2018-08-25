@@ -87,4 +87,9 @@ signature LLVM = sig
                     | FunctionDefinition of string * ty * param list * instruction list
        and param_decl = ParamDecl of ty
        and param = Param of string * ty
+
+  (* Functions *)
+
+  val freshRegister : register_names -> (register, register_names)
+  val freshLabel : label_names -> (label, label_names)
 end
