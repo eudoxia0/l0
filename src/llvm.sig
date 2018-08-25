@@ -85,12 +85,4 @@ signature LLVM = sig
                     | FunctionDefinition of string * ty * param list * instruction list
        and param_decl = ParamDecl of ty
        and param = Param of string * ty
-
-  type context
-
-  val emptyContext : context
-  val renderContext : context -> string
-  val mapTy : Type.ty -> ty
-  val compileExp : TAST.tast -> register_names -> label_names -> (instruction list * operand * register_names * label_names)
-  val compileFunc : context -> Function.func -> TAST.tast -> context
 end

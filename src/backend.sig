@@ -18,4 +18,15 @@
 *)
 
 signature BACKEND = sig
+  type context
+
+  val emptyContext : context
+  val renderContext : context -> string
+
+  val mapTy : Type.ty -> LLVM.ty
+
+  type compiled_exp = LLVM.instruction list * LLVM.operand * LLVM.register_names * LLVM.label_names
+
+  val compileExp : TAST.tast -> LLVM.register_names -> LLVM.label_names -> compiled_exp
+  val compileFunc : context -> Function.func -> TAST.tast -> context
 end
