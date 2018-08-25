@@ -27,6 +27,5 @@ signature BACKEND = sig
 
   type compiled_exp = LLVM.instruction list * LLVM.operand * LLVM.register_names * LLVM.label_names
 
-  val compileExp : TAST.tast -> LLVM.register_names -> LLVM.label_names -> compiled_exp
   val compileFunc : context -> Function.func -> TAST.tast -> context
 end
