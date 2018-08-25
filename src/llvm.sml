@@ -241,10 +241,12 @@ structure LLVM :> LLVM = struct
     | mapTy (Type.RawPointer t) = Pointer (mapTy t)
     | mapTy (Type.Tuple ts) = Struct (map mapTy ts)
 
+  fun unitConstant rn ln = ([], IntConstant "0", rn, ln)
+
   local
     open TAST
   in
-    fun compileExp TConstUnit rn ln = ([], IntConstant "0", rn, ln)
+    fun compileExp TConstUnit rn ln = unitConstant rn ln
       | compileExp (TConstBool false) rn ln = ([], IntConstant "false", rn, ln)
       | compileExp (TConstBool true) rn ln = ([], IntConstant "true", rn, ln)
       | compileExp (TConstInt (i, _)) rn ln = ([], IntConstant (Int.toString i), rn, ln)
@@ -260,7 +262,7 @@ structure LLVM :> LLVM = struct
       | compileExp (TBinop (Binop.LEq, lhs, rhs, ty)) rn ln = compileComparisonOp UnsignedLEq lhs rhs ty rn ln
       | compileExp (TBinop (Binop.GT, lhs, rhs, ty)) rn ln = compileComparisonOp UnsignedGT lhs rhs ty rn ln
       | compileExp (TBinop (Binop.GEq, lhs, rhs, ty)) rn ln = compileComparisonOp UnsignedGEq lhs rhs ty rn ln
-      | compileExp (TProgn body) rn ln = raise Fail "progn not implemented"
+      | compileExp (TProgn body) rn ln = compileProgn body rn ln
       | compileExp _ _ _ = raise Fail "Not implemented"
     and compileArithOp oper lhs rhs ty rn ln =
         let val (insts, lhs', rn', ln') = compileExp lhs rn ln
@@ -290,6 +292,11 @@ structure LLVM :> LLVM = struct
                 end
             end
         end
+    and compileProgn body rn ln =
+        if body = nil then
+            unitConstant rn ln
+        else
+            compileExps body rn ln
     and compileExpList (head::tail) rn ln =
         let val (insts, head', rn', ln') = compileExp head rn ln
         in
