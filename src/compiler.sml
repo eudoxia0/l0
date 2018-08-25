@@ -40,19 +40,22 @@ structure Compiler :> COMPILER = struct
          (AST.Defun (func, ast)) =>
          let val fenv' = bind (Function.funcName func, func) fenv
          in
-             let val tast = TAST.augment ast
-                                         (TAST.mkContext (Function.toStack func)
-                                                         tenv
-                                                         fenv')
+             let val oast = OAST.augment (ARAST.alphaRename ast)
              in
-                 if (TAST.typeOf tast) <> Function.funcRT func then
-                     raise Fail "Return type does not match type of body"
-                 else
-                     let
-                     in
-                         print (";; Define function " ^ (Function.funcName func));
-                         Compiler (tenv, fenv')
-                     end
+                 let val tast = TAST.augment oast
+                                             (TAST.mkContext (Function.toStack func)
+                                                             tenv
+                                                             fenv')
+                 in
+                     if (TAST.typeOf tast) <> Function.funcRT func then
+                         raise Fail "Return type does not match type of body"
+                     else
+                         let
+                         in
+                             print (";; Define function " ^ (Function.funcName func));
+                             Compiler (tenv, fenv')
+                         end
+                 end
              end
          end)
 
