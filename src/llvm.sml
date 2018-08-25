@@ -296,6 +296,18 @@ structure LLVM :> LLVM = struct
             (insts, head', rn', ln') :: (compileExpList tail rn' ln')
         end
       | compileExpList nil _ _ = []
+    and compileExps ls rn ln =
+        if (List.length ls) > 0 then
+            let val elems = compileExpList ls rn ln
+            in
+                let val (_, operand, rn', ln') = List.last elems
+                    and getInsts = fn (i, _, _, _) => i
+                in
+                    (map getInsts elems, operand, rn', ln')
+                end
+            end
+        else
+            raise Fail "compileExps called with empty list"
   end
 
   fun compileFunc (Context ts) (Function.Function (name, params, rt)) tast =
