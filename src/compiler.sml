@@ -53,7 +53,7 @@ structure Compiler :> COMPILER = struct
                      else
                          let
                          in
-                             print (";; Define function " ^ (Function.funcName func));
+                             print (";; Define function " ^ (Function.funcName func) ^ "\n");
                              Compiler (tenv, fenv', llvmCtx)
                          end
                  end
