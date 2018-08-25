@@ -295,7 +295,7 @@ structure LLVM :> LLVM = struct
         in
             let val (insts', tail', rn'', ln'') = compileExpList tail' rn' ln'
             in
-                (insts @ insts', head' @ tail, rn'', ln'')
+                (insts @ insts', head' @ tail', rn'', ln'')
             end
         end
       | compileExpList elem rn ln = compileExp elem rn ln
