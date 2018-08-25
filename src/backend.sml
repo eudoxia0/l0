@@ -31,8 +31,6 @@ structure Backend :> BACKEND = struct
 
   (* Backend *)
 
-  type compiled_exp = LLVM.instruction list * LLVM.operand * LLVM.register_names * LLVM.label_names
-
   fun variableRegister name =
     "_var_" ^ (Int.toString (NameGen.nameId name))
 
