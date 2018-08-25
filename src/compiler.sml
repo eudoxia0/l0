@@ -59,7 +59,10 @@ structure Compiler :> COMPILER = struct
   fun compileString c s =
     let val (sexp, _) = Parser.parseString s
     in
-        compileAST c (OAST.augment (ARAST.alphaRename (AST.parseToplevel sexp (compilerTypeEnv c))))
+        let val ast = AST.parseToplevel sexp (compilerTypeEnv c)
+        in
+            compileAST c (OAST.augment (ARAST.alphaRename ast))
+        end
     end
 
   fun compileForms c (form::rest) = let val c' = compileAST c (AST.parseToplevel form (compilerTypeEnv c))
