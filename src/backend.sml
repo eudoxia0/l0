@@ -27,7 +27,7 @@ structure Backend :> BACKEND = struct
   val emptyContext = Context []
 
   fun renderContext (Context ts) =
-      String.concatWith "\n\n" (map renderToplevel ts)
+      String.concatWith "\n\n" (map LLVM.renderToplevel ts)
 
   (* Backend *)
 
