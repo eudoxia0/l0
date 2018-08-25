@@ -18,4 +18,5 @@
 *)
 
 signature REPL = sig
+  val repl : unit -> unit
 end
