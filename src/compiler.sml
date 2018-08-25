@@ -56,7 +56,7 @@ structure Compiler :> COMPILER = struct
                              print (";; Define function " ^ (Function.funcName func) ^ "\n");
                              print "Context:\n";
                              print (LLVM.renderContext llvmCtx);
-                             print "\n"
+                             print "\n";
                              Compiler (tenv, fenv', llvmCtx)
                          end
                  end
