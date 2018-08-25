@@ -41,7 +41,7 @@ structure Compiler :> COMPILER = struct
          let val fenv' = bind (Function.funcName func, func) fenv
              and (stack, namegen) = Function.toStack func
          in
-             let val oast = OAST.augment (ARAST.alphaRename ast)
+             let val oast = OAST.augment (ARAST.alphaRename ast namegen)
              in
                  let val tast = TAST.augment oast
                                              (TAST.mkContext stack

@@ -38,8 +38,8 @@ structure ARAST :> ARAST = struct
 
   type stack = bind SymTab.symtab
 
-  fun alphaRename ast =
-    let val (ast', _, _) = rename ast SymTab.empty (freshGenerator ())
+  fun alphaRename ast ng =
+    let val (ast', _, _) = rename ast SymTab.empty ng
     in
         ast'
     end
