@@ -51,7 +51,7 @@ structure Compiler :> COMPILER = struct
                      if (TAST.typeOf tast) <> Function.funcRT func then
                          raise Fail "Return type does not match type of body"
                      else
-                         let val llvmCtx' = LLVM.compileFunc llvmCtx func tast
+                         let val llvmCtx' = Backend.compileFunc llvmCtx func tast
                          in
                              print (";; Define function " ^ (Function.funcName func) ^ "\n");
                              print "Context:\n";
