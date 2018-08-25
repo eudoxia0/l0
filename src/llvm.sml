@@ -260,6 +260,7 @@ structure LLVM :> LLVM = struct
       | compileExp (TBinop (Binop.LEq, lhs, rhs, ty)) rn ln = compileComparisonOp UnsignedLEq lhs rhs ty rn ln
       | compileExp (TBinop (Binop.GT, lhs, rhs, ty)) rn ln = compileComparisonOp UnsignedGT lhs rhs ty rn ln
       | compileExp (TBinop (Binop.GEq, lhs, rhs, ty)) rn ln = compileComparisonOp UnsignedGEq lhs rhs ty rn ln
+      | compileExp (TProgn body) rn ln = raise Fail "progn not implemented"
       | compileExp _ _ _ = raise Fail "Not implemented"
     and compileArithOp oper lhs rhs ty rn ln =
         let val (insts, lhs', rn', ln') = compileExp lhs rn ln
@@ -289,6 +290,16 @@ structure LLVM :> LLVM = struct
                 end
             end
         end
+    and compileExpList (head::tail) rn ln =
+        let val (insts, head', rn', ln') = compileExp head rn ln
+        in
+            let val (insts', tail', rn'', ln'') = compileExpList tail' rn' ln'
+            in
+                (insts @ insts', head' @ tail, rn'', ln'')
+            end
+        end
+      | compileExpList elem rn ln = compileExp elem rn ln
+      | compileExpList nil = raise Fail "compileExpList called with zero elements"
   end
 
   fun compileFunc (Context ts) (Function.Function (name, params, rt)) tast =
