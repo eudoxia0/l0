@@ -31,12 +31,54 @@ signature LLVM = sig
        and bit_width = Word1 | Word8 | Word16 | Word32 | Word64
        and float_width = Single | Double
 
+  datatype register = Register of int
+  datatype register_names = RegisterNames of int
+
+  datatype label = Label of int
+  datatype label_names = LabelNames of int
+
+  datatype operand = RegisterOp of register
+                   | NamedRegister of string
+                   | IntConstant of string
+
+  datatype comp_op = Eq
+                   | NotEq
+                   | UnsignedGT
+                   | UnsignedGEq
+                   | UnsignedLT
+                   | UnsignedLEq
+                   | SignedGT
+                   | SignedGEq
+                   | SignedLT
+                   | SignedLEq
+
+  datatype phi_pred = PhiPred of operand * label
+
+  datatype arg = Argument of ty * operand
+
+  datatype operation = Add of ty * operand * operand
+                     | Sub of ty * operand * operand
+                     | Mul of ty * operand * operand
+                     | UDiv of ty * operand * operand
+                     | SDiv of ty * operand * operand
+                     | ExtractValue of ty * operand * int
+                     | InsertValue of ty * operand * ty * operand * int
+                     | Load of ty * operand (* ty is the type of the result, not the pointer *)
+                     | IntegerCompare of comp_op * ty * operand * operand
+                     | Phi of ty * phi_pred list
+                     | DirectCall of string * ty * arg list
+                     | Alloca of ty
+
+  datatype instruction = UnconditionalBranch of label
+                       | ConditionalBranch of operand * label * label
+                       | Assignment of register * operation
+                       | Return of ty * operand
+                       (* below: ty is the type of the result, not the
+                          pointer. the first operand is the value, the second is
+                          the location. *)
+                       | Store of ty * operand * operand
 
   type context
-  type register_names
-  type label_names
-  type operand
-  type instruction
 
   val emptyContext : context
   val renderContext : context -> string
