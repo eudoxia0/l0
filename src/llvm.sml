@@ -251,7 +251,7 @@ structure LLVM :> LLVM = struct
       | compileExp (TConstBool true) rn ln = ([], IntConstant "true", rn, ln)
       | compileExp (TConstInt (i, _)) rn ln = ([], IntConstant (Int.toString i), rn, ln)
       | compileExp (TConstString _) _ _ = raise Fail "String support not implemented yet"
-      | compileExp (TVar (name, ty)) rn ln = ([], NamedRegister (variableRegister name), rn, ln)
+      | compileExp (TVar (name, ty)) rn ln = compileLoadVar name ty rn ln
       | compileExp (TBinop (Binop.Add, lhs, rhs, ty)) rn ln = compileArithOp Add lhs rhs ty rn ln
       | compileExp (TBinop (Binop.Sub, lhs, rhs, ty)) rn ln = compileArithOp Sub lhs rhs ty rn ln
       | compileExp (TBinop (Binop.Mul, lhs, rhs, ty)) rn ln = compileArithOp Mul lhs rhs ty rn ln
@@ -268,6 +268,8 @@ structure LLVM :> LLVM = struct
       | compileExp (TAssign _) rn ln = raise Fail "assign not implemented"
       | compileExp (TProgn body) rn ln = compileProgn body rn ln
       | compileExp _ _ _ = raise Fail "Not implemented"
+    and compileLoadVar name ty rn ln =
+        ([], NamedRegister (variableRegister name), rn, ln)
     and compileArithOp oper lhs rhs ty rn ln =
         let val (insts, lhs', rn', ln') = compileExp lhs rn ln
         in
