@@ -293,13 +293,9 @@ structure LLVM :> LLVM = struct
     and compileExpList (head::tail) rn ln =
         let val (insts, head', rn', ln') = compileExp head rn ln
         in
-            let val rest = compileExpList tail rn' ln'
-            in
-                (insts, head', rn', ln') :: rest
-            end
+            (insts, head', rn', ln') :: (compileExpList tail rn' ln')
         end
-      | compileExpList [elem] rn ln = [compileExp elem rn ln]
-      | compileExpList nil _ _ = raise Fail "compileExpList called with zero elements"
+      | compileExpList nil _ _ = []
   end
 
   fun compileFunc (Context ts) (Function.Function (name, params, rt)) tast =
