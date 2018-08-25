@@ -269,7 +269,10 @@ structure LLVM :> LLVM = struct
       | compileExp (TProgn body) rn ln = compileProgn body rn ln
       | compileExp _ _ _ = raise Fail "Not implemented"
     and compileLoadVar name ty rn ln =
-        ([], NamedRegister (variableRegister name), rn, ln)
+        let val (result, rn') = freshRegister rn
+        in
+            ([], NamedRegister (variableRegister name), rn, ln)
+        end
     and compileArithOp oper lhs rhs ty rn ln =
         let val (insts, lhs', rn', ln') = compileExp lhs rn ln
         in
