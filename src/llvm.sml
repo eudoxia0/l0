@@ -217,7 +217,7 @@ structure LLVM :> LLVM = struct
 
   datatype context = Context of toplevel list
 
-  val emptyContext = Context ([], RegisterNames 1, LabelNames 1)
+  val emptyContext = Context []
 
   (* Backend *)
 
