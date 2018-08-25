@@ -302,7 +302,7 @@ structure LLVM :> LLVM = struct
                                                map mapParam params,
                                                insts @ [Return (rtype, oper)])
           in
-              Context (ts @ fundef)
+              Context (ts @ [fundef])
           end
       end
   and mapParam (Function.Param (name, ty)) = Param (name, mapTy ty)
