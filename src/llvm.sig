@@ -18,6 +18,8 @@
 *)
 
 signature LLVM = sig
+  (* Types *)
+
   datatype ty = Bool
               | Int8
               | Int16
