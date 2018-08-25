@@ -271,7 +271,10 @@ structure LLVM :> LLVM = struct
     and compileLoadVar name ty rn ln =
         let val (result, rn') = freshRegister rn
         in
-            ([], NamedRegister (variableRegister name), rn, ln)
+            ([Assignment (result, Load (mapTy ty, NamedRegister (variableRegister name)))],
+             RegisterOp result,
+             rn',
+             ln)
         end
     and compileArithOp oper lhs rhs ty rn ln =
         let val (insts, lhs', rn', ln') = compileExp lhs rn ln
