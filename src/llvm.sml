@@ -303,7 +303,7 @@ structure LLVM :> LLVM = struct
                 let val (_, operand, rn', ln') = List.last elems
                     and getInsts = fn (i, _, _, _) => i
                 in
-                    (map getInsts elems, operand, rn', ln')
+                    (List.concat (map getInsts elems), operand, rn', ln')
                 end
             end
         else
