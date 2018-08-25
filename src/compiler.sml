@@ -39,11 +39,12 @@ structure Compiler :> COMPILER = struct
     (case ast of
          (AST.Defun (func, ast)) =>
          let val fenv' = bind (Function.funcName func, func) fenv
+             and (stack, namegen) = Function.toStack func
          in
              let val oast = OAST.augment (ARAST.alphaRename ast)
              in
                  let val tast = TAST.augment oast
-                                             (TAST.mkContext (Function.toStack func)
+                                             (TAST.mkContext stack
                                                              tenv
                                                              fenv')
                  in
