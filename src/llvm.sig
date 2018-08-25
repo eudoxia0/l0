@@ -78,6 +78,14 @@ signature LLVM = sig
                           the location. *)
                        | Store of ty * operand * operand
 
+  type global_var = string
+
+  datatype toplevel = StringConstant of global_var * string
+                    | FunctionDeclaration of string * ty * param_decl list
+                    | FunctionDefinition of string * ty * param list * instruction list
+       and param_decl = ParamDecl of ty
+       and param = Param of string * ty
+
   type context
 
   val emptyContext : context
