@@ -299,7 +299,7 @@ structure LLVM :> LLVM = struct
             end
         end
       | compileExpList elem rn ln = compileExp elem rn ln
-      | compileExpList nil = raise Fail "compileExpList called with zero elements"
+      | compileExpList nil _ _ = raise Fail "compileExpList called with zero elements"
   end
 
   fun compileFunc (Context ts) (Function.Function (name, params, rt)) tast =
