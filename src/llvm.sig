@@ -90,6 +90,6 @@ signature LLVM = sig
 
   (* Functions *)
 
-  val freshRegister : register_names -> (register, register_names)
-  val freshLabel : label_names -> (label, label_names)
+  val freshRegister : register_names -> (register * register_names)
+  val freshLabel : label_names -> (label * label_names)
 end
