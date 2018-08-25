@@ -293,8 +293,8 @@ structure LLVM :> LLVM = struct
 
   fun compileFunc (Context ts) (Function.Function (name, params, rt)) tast =
       let val (insts, oper, _, _) = compileExp tast
-                                               (freshRegisterNames 1)
-                                               (freshLabelNames 1)
+                                               (RegisterNames 1)
+                                               (LabelNames 1)
           and rtype = mapTy rt
       in
           let val fundef = FunctionDefinition (name,
