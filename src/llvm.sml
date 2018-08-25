@@ -298,7 +298,7 @@ structure LLVM :> LLVM = struct
                 (insts, head', rn', ln') :: rest
             end
         end
-      | compileExpList (elem::nil) rn ln = [compileExp elem rn ln]
+      | compileExpList [elem] rn ln = [compileExp elem rn ln]
       | compileExpList nil _ _ = raise Fail "compileExpList called with zero elements"
   end
 
