@@ -22,6 +22,8 @@ structure Set :> SET = struct
 
   val empty = []
 
+  fun singleton a = [a]
+
   fun add set elem =
     if Util.member elem set then
         set
