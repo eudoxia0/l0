@@ -22,19 +22,19 @@ signature OAST = sig
                | ConstBool of bool
                | ConstInt of int
                | ConstString of string
-               | Var of NameGen.name
+               | Var of Ident.ident
                | Binop of Binop.binop * ast * ast
                | Cond of ast * ast * ast
                | Cast of Type.ty * ast
                | Progn of ast list
-               | Let of NameGen.name * ast * ast
-               | Assign of NameGen.name * ast
+               | Let of Ident.ident * ast * ast
+               | Assign of Ident.ident * ast
                | NullPtr of Parser.sexp
                | Load of ast
                | Store of ast * ast
                | Malloc of Parser.sexp * ast
                | Free of ast
-               | AddressOf of NameGen.name
+               | AddressOf of Ident.ident
                | Print of ast
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list

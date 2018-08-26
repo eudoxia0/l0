@@ -22,19 +22,19 @@ structure TAST :> TAST = struct
                 | TConstBool of bool
                 | TConstInt of int * Type.ty
                 | TConstString of string
-                | TVar of NameGen.name * Type.ty
+                | TVar of Ident.ident * Type.ty
                 | TBinop of Binop.binop * tast * tast * Type.ty
                 | TCond of tast * tast * tast * Type.ty
                 | TCast of Type.ty * tast
                 | TProgn of tast list
-                | TLet of NameGen.name * tast * tast
-                | TAssign of NameGen.name * tast
+                | TLet of Ident.ident * tast * tast
+                | TAssign of Ident.ident * tast
                 | TNullPtr of Type.ty
                 | TLoad of tast * Type.ty
                 | TStore of tast * tast
                 | TMalloc of Type.ty * tast
                 | TFree of tast
-                | TAddressOf of NameGen.name * Type.ty
+                | TAddressOf of Ident.ident * Type.ty
                 | TPrint of tast
                 | TCEmbed of Type.ty * string
                 | TCCall of string * Type.ty * tast list
@@ -153,14 +153,14 @@ structure TAST :> TAST = struct
                           TAssign (var, v')
                       else
                           raise Fail ("Cannot assign to variable '"
-                                      ^ (Int.toString (NameGen.nameId var))
+                                      ^ (Int.toString (Ident.identId var))
                                       ^ "': the type of the variable is "
                                       ^ (tyToString ty)
                                       ^ ", while the type of the expression is "
                                       ^ (tyToString (typeOf v')))
                   else
                       raise Fail ("Cannot assign to immutable variable '"
-                                  ^ (Int.toString (NameGen.nameId var))
+                                  ^ (Int.toString (Ident.identId var))
                                   ^ "'")
               end
           end
