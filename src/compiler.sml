@@ -18,8 +18,6 @@
 *)
 
 structure Compiler :> COMPILER = struct
-  open SymTab
-
   datatype compiler = Compiler of Type.tenv * Function.fenv * CBackend.context
 
   local
@@ -29,7 +27,9 @@ structure Compiler :> COMPILER = struct
     val emptyCompiler =
         let val interim_not = Function ("interim_not", [Param ("v", Bool)], Bool)
         in
-            Compiler (Type.emptyTenv, bind ("interim_not", interim_not) empty, CBackend.emptyContext)
+            Compiler (Type.emptyTenv,
+                      Map.iadd Map.empty ("interim_not", interim_not),
+                      CBackend.emptyContext)
         end
   end
 
@@ -38,7 +38,9 @@ structure Compiler :> COMPILER = struct
   fun compileAST (Compiler (tenv, fenv, ctx)) ast =
     (case ast of
          (AST.Defun (func, ast)) =>
-         let val fenv' = bind (Function.funcName func, func) fenv
+         let val fenv' = case Map.add fenv (Function.funcName func, func) of
+                             SOME fenv' => fenv'
+                           | NONE => raise Fail "Function already defined"
              and (stack, namegen) = Function.toStack func
          in
              let val (arast, _) = ARAST.alphaRename ast namegen

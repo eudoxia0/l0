@@ -18,13 +18,12 @@
 *)
 
 structure Function :> FUNCTION = struct
-  open SymTab
   open Type
 
   datatype param = Param of string * ty
   datatype func = Function of string * param list * ty
 
-  type fenv = func SymTab.symtab
+  type fenv = (string, func) Map.map
 
   datatype mutability = Mutable
                       | Immutable

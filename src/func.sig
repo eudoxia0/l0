@@ -21,7 +21,7 @@ signature FUNCTION = sig
   datatype param = Param of string * Type.ty
   datatype func = Function of string * param list * Type.ty
 
-  type fenv = func SymTab.symtab
+  type fenv = (string, func) Map.map
 
   datatype mutability = Mutable
                       | Immutable

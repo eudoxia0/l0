@@ -241,7 +241,7 @@ structure TAST :> TAST = struct
                   TWhile (test', body')
           end
         | augment (Funcall (name, args)) c =
-          (case lookup name (ctxFenv c) of
+          (case Map.get (ctxFenv c) name of
                SOME (Function (_, params, rt)) =>
                let val targs = (map (fn e => augment e c) args)
                in
