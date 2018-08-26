@@ -71,7 +71,10 @@ structure Type : TYPE = struct
       | parseTypeSpecifier (Symbol "str") _ = Str
       | parseTypeSpecifier (List [Symbol "rawptr", t]) e = RawPointer (parseTypeSpecifier t e)
       | parseTypeSpecifier (List (Symbol "tuple" :: rest)) e = Tuple (map (fn s => parseTypeSpecifier s e) rest)
-      | parseTypeSpecifier (Symbol s) e = lookup s e
+      | parseTypeSpecifier (Symbol s) e =
+        (case lookup s e of
+             SOME t => t
+           | NONE => raise Fail ("No such type: " ^ s))
       | parseTypeSpecifier _ _ = raise Fail "Bad type specifier"
   end
 end

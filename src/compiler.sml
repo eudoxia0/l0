@@ -69,10 +69,11 @@ structure Compiler :> COMPILER = struct
         compileAST c (AST.parseToplevel sexp (compilerTypeEnv c))
     end
 
-  fun compileForms c (form::rest) = let val c' = compileAST c (AST.parseToplevel form (compilerTypeEnv c))
-                                    in
-                                        compileForms c' rest
-                                    end
+  fun compileForms c (form::rest) =
+      let val c' = compileAST c (AST.parseToplevel form (compilerTypeEnv c))
+      in
+          compileForms c' rest
+      end
     | compileForms c nil = c
 
   fun compileFile c path =

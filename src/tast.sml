@@ -241,14 +241,16 @@ structure TAST :> TAST = struct
                   TWhile (test', body')
           end
         | augment (Funcall (name, args)) c =
-          let val (Function (_, params, rt)) = lookup name (ctxFenv c)
-              and targs = (map (fn e => augment e c) args)
-          in
-              if (Function.matchParams params (map typeOf targs)) then
-                  TFuncall (name, targs, rt)
-              else
-                  raise Fail "Argument types don't match"
-          end
+          (case lookup name (ctxFenv c) of
+               SOME (Function (_, params, rt)) =>
+               let val targs = (map (fn e => augment e c) args)
+               in
+                   if (Function.matchParams params (map typeOf targs)) then
+                       TFuncall (name, targs, rt)
+                   else
+                       raise Fail "Argument types don't match"
+               end
+             | NONE => raise Fail "No such function")
       and augmentArithOp oper a b ctx =
           let val a' = augment a ctx
               and b' = augment b ctx

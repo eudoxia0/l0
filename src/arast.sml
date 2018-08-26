@@ -47,7 +47,10 @@ structure ARAST :> ARAST = struct
     | rename (AST.ConstBool b) s n = (ConstBool b, s, n)
     | rename (AST.ConstInt i) s n = (ConstInt i, s, n)
     | rename (AST.ConstString str) s n = (ConstString str, s, n)
-    | rename (AST.Var name) s n = (Var (SymTab.lookup name s), s, n)
+    | rename (AST.Var name) s n =
+      (case SymTab.lookup name s of
+           SOME name' => (Var name', s, n)
+         | NONE => raise Fail ("No variable with this name: " ^ name))
     | rename (AST.Cast (t, a)) s n =
       let val (a', s', n') = rename a s n
       in
@@ -73,7 +76,10 @@ structure ARAST :> ARAST = struct
       in
           (Malloc (t, e'), s', n')
       end
-    | rename (AST.AddressOf name) s n = (AddressOf (SymTab.lookup name s), s, n)
+    | rename (AST.AddressOf name) s n =
+      (case (SymTab.lookup name s) of
+           SOME name' => (AddressOf name', s, n)
+         | NONE => raise Fail ("No variable with this name: " ^ name))
     | rename (AST.CEmbed (t, e)) s n = (CEmbed (t, e), s, n)
     | rename (AST.CCall (name, ty, l)) s n =
       let val (args', s', n') = renameList l s n
