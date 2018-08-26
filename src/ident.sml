@@ -18,4 +18,10 @@
 *)
 
 structure Ident : IDENT = struct
+  datatype ident = Ident of string * int
+
+  fun mkIdent name id = Ident (name, id)
+
+  fun identString (Ident (name, id)) =
+    name ^ "_" ^ (Int.toString id)
 end

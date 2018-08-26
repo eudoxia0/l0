@@ -18,4 +18,8 @@
 *)
 
 signature IDENT = sig
+  type ident
+
+  val mkIdent : string -> int -> ident
+  val identString : ident -> string
 end
