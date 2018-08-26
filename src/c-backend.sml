@@ -67,6 +67,8 @@ structure CBackend :> C_BACKEND = struct
                                       | _ => false)
   end
 
+  (* Given the ordered set of tuples from a Context, and a TAST node, extract
+     all tuple types from that node and add them to the set of tuples. *)
   fun collectTupleTypes tuple_types tast =
     OrderedSet.union tuple_types (filterTuples (allTypes tast))
 end
