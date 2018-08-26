@@ -31,8 +31,6 @@ structure CAst :> C_AST = struct
               | Struct of string
               | RegionType
 
-  datatype param = Param of string * ty
-
   datatype exp_cast = ConstBool of bool
                     | ConstInt of int
                     | ConstString of string
@@ -58,4 +56,5 @@ structure CAst :> C_AST = struct
 
   datatype top_cast = FunctionDef of string * param list * ty * block_cast * exp_cast
                     | StructDef of string * (string * ty) list
+       and param = Param of string * ty
 end
