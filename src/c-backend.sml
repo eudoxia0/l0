@@ -200,7 +200,7 @@ structure CBackend :> C_BACKEND = struct
             and ty = convertType t
             and res = freshVar ()
         in
-            let val sizecalc = Binop (AST.Mul, cval, CSizeOf ty)
+            let val sizecalc = Binop (Binop.Mul, cval, CSizeOf ty)
             in
                 (Sequence [cblock, Declare (Pointer ty, res), Funcall (SOME res, "malloc", [sizecalc])],
                  Cast (Pointer ty, Var res))
