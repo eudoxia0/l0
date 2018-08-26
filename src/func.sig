@@ -35,6 +35,4 @@ signature FUNCTION = sig
   val funcRT : func -> Type.ty
 
   val matchParams : param list -> Type.ty list -> bool
-
-  val toStack : func -> (stack * NameGen.namegen)
 end

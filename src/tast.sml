@@ -153,14 +153,14 @@ structure TAST :> TAST = struct
                           TAssign (var, v')
                       else
                           raise Fail ("Cannot assign to variable '"
-                                      ^ (Int.toString (Ident.identId var))
+                                      ^ (Int.toString (Ident.identName var))
                                       ^ "': the type of the variable is "
                                       ^ (tyToString ty)
                                       ^ ", while the type of the expression is "
                                       ^ (tyToString (typeOf v')))
                   else
                       raise Fail ("Cannot assign to immutable variable '"
-                                  ^ (Int.toString (Ident.identId var))
+                                  ^ (Int.toString (Ident.identName var))
                                   ^ "'")
               end
           end

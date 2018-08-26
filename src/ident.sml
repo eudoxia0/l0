@@ -22,6 +22,5 @@ structure Ident : IDENT = struct
 
   fun mkIdent name id = Ident (name, id)
 
-  fun identString (Ident (name, id)) =
-    name ^ "_" ^ (Int.toString id)
+  fun identName (Ident (name, _)) = name
 end
