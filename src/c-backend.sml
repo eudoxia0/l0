@@ -18,5 +18,5 @@
 *)
 
 structure CBackend :> C_BACKEND = struct
-  datatype context = Context of CAst.top_ast list
+  datatype context = Context of CAst.top_ast list * CAst.ty OrderedSet.set
 end
