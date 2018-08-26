@@ -200,7 +200,7 @@ structure CBackend :> C_BACKEND = struct
             and ty = convertType t
             and res = freshVar ()
         in
-            let val sizecalc = CBinop (AST.Mul, cval, CSizeOf ty)
+            let val sizecalc = Binop (AST.Mul, cval, CSizeOf ty)
             in
                 (Sequence [cblock, Declare (Pointer ty, res), Funcall (SOME res, "malloc", [sizecalc])],
                  Cast (Pointer ty, Var res))
@@ -291,7 +291,7 @@ structure CBackend :> C_BACKEND = struct
             (Sequence [
                   pblock,
                   Declare (resType, result),
-                  CCond (CBinop (AST.NEq, pval, CConstNull),
+                  Cond (Binop (AST.NEq, pval, CConstNull),
                          Block [
                              Declare (convertType (typeOf p), escapeIdent var),
                              Assign (Var var, pval),
