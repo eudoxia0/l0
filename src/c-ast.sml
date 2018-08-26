@@ -18,6 +18,8 @@
 *)
 
 structure CAst :> C_AST = struct
+  (* Types *)
+
   datatype ty = Bool
               | UInt8
               | Int8
@@ -58,4 +60,6 @@ structure CAst :> C_AST = struct
                     | StructDef of string * slot list
        and param = Param of string * ty
        and slot = Slot of string * ty
+
+  (* Rendering *)
 end
