@@ -19,4 +19,6 @@
 
 structure CBackend :> C_BACKEND = struct
   datatype context = Context of CAst.top_ast list * CAst.ty OrderedSet.set
+
+  val emptyContext = Context ([], OrderedSet.empty)
 end
