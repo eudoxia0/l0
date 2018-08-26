@@ -86,6 +86,7 @@ structure CBackend :> C_BACKEND = struct
 
   local
     open TAST
+    open CAst
   in
     fun convert TConstUnit =
         (Sequence [], unitConstant)
