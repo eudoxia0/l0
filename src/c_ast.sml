@@ -18,4 +18,44 @@
 *)
 
 structure CAst :> C_AST = struct
+  datatype ctype = Bool
+                 | UInt8
+                 | Int8
+                 | UInt16
+                 | Int16
+                 | UInt32
+                 | Int32
+                 | UInt64
+                 | Int64
+                 | Pointer of ctype
+                 | Struct of string
+                 | RegionType
+
+  datatype cparam = CParam of string * ctype
+
+  datatype exp_cast = CConstBool of bool
+                    | CConstInt of int
+                    | CConstString of string
+                    | CConstNull
+                    | CVar of string
+                    | CBinop of AST.binop * exp_cast * exp_cast
+                    | CCast of ctype * exp_cast
+                    | CDeref of exp_cast
+                    | CAddressOf of exp_cast
+                    | CSizeOf of ctype
+                    | CStructInitializer of string * (string * exp_cast) list
+                    | CStructAccess of exp_cast * string
+                    | CAdjacent of exp_cast list
+                    | CRaw of string
+
+  datatype block_cast = CSeq of block_cast list
+                      | CBlock of block_cast list
+                      | CDeclare of ctype * string
+                      | CAssign of exp_cast * exp_cast
+                      | CCond of exp_cast * block_cast * block_cast
+                      | CWhile of exp_cast * block_cast
+                      | CFuncall of string option * string * exp_cast list
+
+  datatype top_cast = CFunction of string * cparam list * ctype * block_cast * exp_cast
+                    | CStructDef of string * (string * ctype) list
 end
