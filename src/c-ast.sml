@@ -61,4 +61,17 @@ structure CAst :> C_AST = struct
        and slot = Slot of string * ty
 
   (* Rendering *)
+
+  fun renderType Bool = "bool"
+    | renderType UInt8 = "uint8_t"
+    | renderType Int8 = "int8_t"
+    | renderType UInt16 = "uint16_t"
+    | renderType Int16 = "int16_t"
+    | renderType UInt32 = "uint32_t"
+    | renderType Int32 = "int32_t"
+    | renderType UInt64 = "uint64_t"
+    | renderType Int64 = "int64_t"
+    | renderType (Pointer t) = (renderType t) ^ "*"
+    | renderType (Struct n) = n
+    | renderType RegionType = "interim_region_t"
 end
