@@ -33,7 +33,8 @@ signature TYPE = sig
   val isPrintable : ty -> bool
   val tyToString : ty -> string
 
-  type tenv = ty SymTab.symtab
+  type tenv
+  val emptyTenv : tenv
 
   val parseTypeSpecifier : Parser.sexp -> tenv -> ty
 end

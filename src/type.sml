@@ -18,8 +18,6 @@
 *)
 
 structure Type : TYPE = struct
-  open SymTab
-
   datatype ty = Unit
               | Bool
               | Int of signedness * bit_width
@@ -53,7 +51,9 @@ structure Type : TYPE = struct
     | widthStr Word32 = "32"
     | widthStr Word64 = "64"
 
-  type tenv = ty symtab
+  type tenv = (string, ty) Map.map
+
+  val emptyTenv = Map.empty
 
   local
     open Parser
@@ -72,7 +72,7 @@ structure Type : TYPE = struct
       | parseTypeSpecifier (List [Symbol "rawptr", t]) e = RawPointer (parseTypeSpecifier t e)
       | parseTypeSpecifier (List (Symbol "tuple" :: rest)) e = Tuple (map (fn s => parseTypeSpecifier s e) rest)
       | parseTypeSpecifier (Symbol s) e =
-        (case lookup s e of
+        (case Map.get e s of
              SOME t => t
            | NONE => raise Fail ("No such type: " ^ s))
       | parseTypeSpecifier _ _ = raise Fail "Bad type specifier"

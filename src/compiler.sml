@@ -29,7 +29,7 @@ structure Compiler :> COMPILER = struct
     val emptyCompiler =
         let val interim_not = Function ("interim_not", [Param ("v", Bool)], Bool)
         in
-            Compiler (empty, bind ("interim_not", interim_not) empty, CBackend.emptyContext)
+            Compiler (Type.emptyTenv, bind ("interim_not", interim_not) empty, CBackend.emptyContext)
         end
   end
 
