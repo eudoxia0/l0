@@ -43,4 +43,6 @@ structure Set :> SET = struct
 
   fun fromList (x::xs) = add (fromList xs) x
     | fromList nil = empty
+
+  fun filter l f = List.filter f l
 end

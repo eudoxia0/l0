@@ -62,12 +62,12 @@ structure CBackend :> C_BACKEND = struct
     open Type
   in
     fun filterTuples types =
-        Set.filter (fn ty => case ty of
+        Set.filter types
+                   (fn ty => case ty of
                                  (Tuple _) => true
                                | _ => false)
-                   types
   end
 
   fun collectTupleTypes tuple_types tast =
-    Set.addList tuple_types (filterTuples (allTypes tast))
+    OrderedSet.union tuple_types (filterTuples (allTypes tast))
 end
