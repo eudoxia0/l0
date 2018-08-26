@@ -21,6 +21,7 @@ signature SET = sig
   type ''a set
 
   val empty : ''a set
+  val singleton : ''a -> ''a set
   val add : ''a set -> ''a -> ''a set
   val union : ''a set -> ''a set -> ''a set
   val unionList : ''a set list -> ''a set
