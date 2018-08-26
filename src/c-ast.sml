@@ -178,7 +178,8 @@ structure CAst :> C_AST = struct
     (renderType rt) ^ " " ^ (escapeIdent name) ^ "(" ^ (sepBy "," (map renderParam params)) ^ ") {\n" ^ (renderBlock body) ^ "\n  return " ^ (renderExp retval) ^ ";\n}"
     | renderTop (StructDef (name, slots)) =
       "typedef struct { "
-      ^ (String.concatWith " " (map (fn (n, t) => (renderType t) ^ " " ^ (escapeIdent n) ^ ";") slots))
+      ^ (String.concatWith " " (map renderSlot slots))
       ^ " } " ^ (escapeIdent name) ^ ";\n"
   and renderParam (Param (n, t)) = (renderType t) ^ " " ^ n
+  and renderSlot (Slot (n, t) = (renderType t) ^ " " ^ (escapeIdent n) ^ ";")
 end
