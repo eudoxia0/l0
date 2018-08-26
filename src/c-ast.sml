@@ -181,5 +181,5 @@ structure CAst :> C_AST = struct
       ^ (String.concatWith " " (map renderSlot slots))
       ^ " } " ^ (escapeIdent name) ^ ";\n"
   and renderParam (Param (n, t)) = (renderType t) ^ " " ^ n
-  and renderSlot (Slot (n, t) = (renderType t) ^ " " ^ (escapeIdent n) ^ ";"
+  and renderSlot (Slot (n, t)) = (renderType t) ^ " " ^ (escapeIdent n) ^ ";"
 end
