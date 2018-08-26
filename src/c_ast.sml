@@ -31,7 +31,7 @@ structure CAst :> C_AST = struct
               | Struct of string
               | RegionType
 
-  datatype cparam = CParam of string * ctype
+  datatype param = Param of string * ctype
 
   datatype exp_cast = CConstBool of bool
                     | CConstInt of int
