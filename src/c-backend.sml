@@ -47,6 +47,10 @@ structure CBackend :> C_BACKEND = struct
       | allTypes (TLoad (exp, ty)) = add (allTypes exp) ty
       | allTypes (TStore (ptr, exp)) = union (allTypes ptr) (allTypes exp)
       | allTypes (TMalloc (ty, exp)) = add (allTypes exp) ty
+      | allTypes (TFree exp) = allTypes exp
+      | allTypes (TPrint exp) = allTypes exp
+      | allTypes (TCEmbed (ty, _)) = singleton ty
+      | allTypes (TCCall (_, ty, args)) = add (unionList (map allTypes args)) ty
       | allTypes exp = add empty (typeOf exp)
   end
 end
