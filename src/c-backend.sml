@@ -40,6 +40,7 @@ structure CBackend :> C_BACKEND = struct
                                                       (add (allTypes a)
                                                            ty))
       | allTypes (TCast (ty, exp)) = add (allTypes exp) ty
+      | allTypes (TProgn l) = unionList (map allTypes l)
       | allTypes exp = add empty (typeOf exp)
   end
 end
