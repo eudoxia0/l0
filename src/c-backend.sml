@@ -51,6 +51,8 @@ structure CBackend :> C_BACKEND = struct
       | allTypes (TPrint exp) = allTypes exp
       | allTypes (TCEmbed (ty, _)) = singleton ty
       | allTypes (TCCall (_, ty, args)) = add (unionList (map allTypes args)) ty
+      | allTypes (TWhile (test, body)) = union (allTypes test) (allTypes body)
+      | allTypes (TFuncall (_, args, ty)) = add (unionList (map allTypes args)) ty
       | allTypes exp = add empty (typeOf exp)
   end
 end
