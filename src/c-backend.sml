@@ -32,13 +32,13 @@ structure CBackend :> C_BACKEND = struct
     open TAST
     open Set
   in
-    fun allTypes (TBinop (_, lhs, rhs, ty)) = union (allTypes lhs)
-                                                    (add (allTypes rhs)
-                                                         ty)
-      | allTypes (TCond (t, c, a, ty)) = union (allTypes t)
-                                               (union (allTypes c)
-                                                      (add (allTypes a)
-                                                           ty))
+    fun allTypes (TBinop (_, lhs, rhs, ty)) = unionList [allTypes lhs,
+                                                         allTypes rhs,
+                                                         singleton ty]
+      | allTypes (TCond (t, c, a, ty)) = unionList [allTypes t,
+                                                    allTypes c,
+                                                    allTypes a,
+                                                    singleton ty]
       | allTypes (TCast (ty, exp)) = add (allTypes exp) ty
       | allTypes (TProgn l) = unionList (map allTypes l)
       | allTypes exp = add empty (typeOf exp)
