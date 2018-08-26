@@ -85,6 +85,29 @@ structure CBackend :> C_BACKEND = struct
   (* TAST -> C AST *)
 
   local
+    open Type
+  in
+    fun convertIntType Unsigned Word8 =  CAst.UInt8
+      | convertIntType Signed   Word8 =  CAst.Int8
+      | convertIntType Unsigned Word16 = CAst.UInt16
+      | convertIntType Signed   Word16 = CAst.Int16
+      | convertIntType Unsigned Word32 = CAst.UInt32
+      | convertIntType Signed   Word32 = CAst.Int32
+      | convertIntType Unsigned Word64 = CAst.UInt64
+      | convertIntType Signed   Word64 = CAst.Int64
+  end
+
+  fun convertType (Type.Unit) = Bool
+    | convertType (Type.Bool) = Bool
+    | convertType (Type.Int (s, w)) = convertIntType s w
+    | convertType (Type.Str) = Pointer UInt8
+    | convertType (Type.RawPointer t) = Pointer (convertType t)
+    | convertType (Type.Record (n, _)) = Struct (escapeIdent n)
+    | convertType (Type.RegionType _) = RegionType
+    | convertType (Type.RegionPointer (t, _)) = Pointer (convertType t)
+    | convertType (Type.NullablePointer (t, _)) = Pointer (convertType t)
+
+  local
     open TAST
     open CAst
   in
@@ -118,15 +141,15 @@ structure CBackend :> C_BACKEND = struct
             (Sequence [
                   tblock,
                   Declare (resType, result),
-                  CCond (tval,
-                         Block [
-                             cblock,
-                             Assign (Var result, cval)
-                         ],
-                         Block [
-                             ablock,
-                             Assign (Var result, aval)
-                        ])
+                  Cond (tval,
+                        Block [
+                            cblock,
+                            Assign (Var result, cval)
+                        ],
+                        Block [
+                            ablock,
+                            Assign (Var result, aval)
+                       ])
               ],
              Var result)
         end
