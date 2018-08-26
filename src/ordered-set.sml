@@ -28,5 +28,5 @@ structure OrderedSet :> ORDERED_SET = struct
     else
         elem :: set
 
-  fun positionOf (Set l) elem = Util.position elem l
+  fun positionOf l elem = Util.position elem l
 end
