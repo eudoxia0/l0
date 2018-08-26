@@ -43,8 +43,8 @@ src/tast.sml
 src/llvm.sig
 src/llvm.sml
 
-src/c_ast.sig
-src/c_ast.sml
+src/c-ast.sig
+src/c-ast.sml
 
 src/backend.sig
 src/backend.sml
