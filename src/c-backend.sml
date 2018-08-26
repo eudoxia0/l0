@@ -121,14 +121,14 @@ structure CBackend :> C_BACKEND = struct
                   CCond (tval,
                          Block [
                              cblock,
-                             CAssign (CVar result, cval)
+                             Assign (Var result, cval)
                          ],
                          Block [
                              ablock,
-                             CAssign (CVar result, aval)
+                             Assign (Var result, aval)
                         ])
               ],
-             CVar result)
+             Var result)
         end
       | convert (TCast (ty, a)) =
         let val (ablock, aval) = convert a
@@ -149,13 +149,13 @@ structure CBackend :> C_BACKEND = struct
             and ty = convertType (typeOf v)
             and (bblock, bval) = convert b
         in
-            (Sequence [vblock, Declare (ty, name), CAssign (CVar name, vval), bblock],
+            (Sequence [vblock, Declare (ty, name), Assign (Var name, vval), bblock],
              bval)
         end
       | convert (TAssign (var, v)) =
         let val (vblock, vval) = convert v
         in
-            (Sequence [vblock, CAssign (CVar var, vval)], vval)
+            (Sequence [vblock, Assign (Var var, vval)], vval)
         end
       | convert (TNullPtr _) = (Sequence [], CConstNull)
       | convert (TLoad (e, _)) =
@@ -167,7 +167,7 @@ structure CBackend :> C_BACKEND = struct
         let val (pblock, pval) = convert p
             and (vblock, vval) = convert v
         in
-            (Sequence [pblock, vblock, CAssign ((CDeref pval), vval)], vval)
+            (Sequence [pblock, vblock, Assign ((CDeref pval), vval)], vval)
         end
       | convert (TMalloc (t, c)) =
         let val (cblock, cval) = convert c
@@ -177,7 +177,7 @@ structure CBackend :> C_BACKEND = struct
             let val sizecalc = CBinop (AST.Mul, cval, CSizeOf ty)
             in
                 (Sequence [cblock, Declare (Pointer ty, res), CFuncall (SOME res, "malloc", [sizecalc])],
-                 CCast (Pointer ty, CVar res))
+                 CCast (Pointer ty, Var res))
             end
         end
       | convert (TFree p) =
@@ -186,7 +186,7 @@ structure CBackend :> C_BACKEND = struct
             (Sequence [pblock, CFuncall (NONE, "free", [pval])], unitConstant)
         end
       | convert (TAddressOf (v, _)) =
-        (Sequence [], CAddressOf (CVar v))
+        (Sequence [], CAddressOf (Var v))
       | convert (TPrint (v, n)) =
         let val (vblock, vval) = convert v
             and ty = typeOf v
@@ -221,7 +221,7 @@ structure CBackend :> C_BACKEND = struct
                      let val res = freshVar ()
                      in
                          (Sequence (blocks @ [Declare (t', res), CFuncall (SOME res, f, argvals)]),
-                          CVar res)
+                          Var res)
                      end
              end
         end
@@ -237,23 +237,23 @@ structure CBackend :> C_BACKEND = struct
             let val name = regionName r
             in
                 (Sequence [Declare (RegionType, name),
-                       CFuncall (NONE, "interim_region_create", [CAddressOf (CVar name)]),
+                       CFuncall (NONE, "interim_region_create", [CAddressOf (Var name)]),
                        bblock,
-                       CFuncall (NONE, "interim_region_free", [CAddressOf (CVar name)])],
+                       CFuncall (NONE, "interim_region_free", [CAddressOf (Var name)])],
                  bval)
             end
         end
       | convert (TAllocate (r, v)) =
         let val (vblock, vval) = convert v
-            and cr = CAddressOf (CVar (regionName r))
+            and cr = CAddressOf (Var (regionName r))
             and res = freshVar ()
             and cty = Pointer (convertType (typeOf v))
         in
             (Sequence [vblock,
                    Declare (cty, res),
                    CFuncall (SOME res, "interim_region_allocate", [cr, CSizeOf cty]),
-                   CAssign (CDeref (CVar res), vval)],
-             CVar res)
+                   Assign (CDeref (Var res), vval)],
+             Var res)
         end
       | convert (TNullableCase (p, var, nnc, nc, t)) =
         let val (pblock, pval) = convert p
@@ -268,16 +268,16 @@ structure CBackend :> C_BACKEND = struct
                   CCond (CBinop (AST.NEq, pval, CConstNull),
                          Block [
                              Declare (convertType (typeOf p), escapeIdent var),
-                             CAssign (CVar var, pval),
+                             Assign (Var var, pval),
                              nncblock,
-                             CAssign (CVar result, nncval)
+                             Assign (Var result, nncval)
                          ],
                          Block [
                              ncblock,
-                             CAssign (CVar result, ncval)
+                             Assign (Var result, ncval)
                         ])
               ],
-             CVar result)
+             Var result)
         end
       | convert (TMakeRecord (ty, name, slots)) =
         let val args = map (fn (_, e) => convert e) slots
@@ -303,7 +303,7 @@ structure CBackend :> C_BACKEND = struct
                 and argvals = map (fn (_, v) => v) args'
             in
                 (Sequence (blocks @ [Declare (rt', res), CFuncall (SOME res, f, argvals)]),
-                 CVar res)
+                 Var res)
             end
         end
 
