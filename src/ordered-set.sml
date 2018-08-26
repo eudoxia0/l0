@@ -28,7 +28,7 @@ structure OrderedSet :> ORDERED_SET = struct
     else
         elem :: set
 
-  fun addList set (x::xs) = add (fromList xs) x
+  fun addList set (x::xs) = add (addList xs) x
     | addList set nil = set
 
   fun union a b =
