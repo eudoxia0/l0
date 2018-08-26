@@ -21,4 +21,5 @@ signature C_BACKEND = sig
   type context
 
   val emptyContext : context
+  val renderContext : context -> string
 end

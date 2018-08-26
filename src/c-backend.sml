@@ -21,4 +21,7 @@ structure CBackend :> C_BACKEND = struct
   datatype context = Context of CAst.top_ast list * CAst.ty OrderedSet.set
 
   val emptyContext = Context ([], OrderedSet.empty)
+
+  fun renderContext (Context (ts, _)) =
+      String.concatWith "\n" (map CAst.renderTop ts)
 end
