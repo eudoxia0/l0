@@ -71,4 +71,14 @@ structure CBackend :> C_BACKEND = struct
      all tuple types from that node and add them to the set of tuples. *)
   fun collectTupleTypes tuple_types tast =
     OrderedSet.union tuple_types (filterTuples (allTypes tast))
+
+  (* Fresh identifiers *)
+
+  val count = ref 0
+  fun freshVar =
+    let
+    in
+        count := !count + 1;
+        "var_" ^ (Int.toString (!count))
+    end
 end
