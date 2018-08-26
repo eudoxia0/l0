@@ -46,6 +46,9 @@ src/llvm.sml
 src/c-ast.sig
 src/c-ast.sml
 
+src/c-backend.sig
+src/c-backend.sml
+
 src/backend.sig
 src/backend.sml
 
