@@ -62,16 +62,6 @@ structure CAst :> C_AST = struct
 
   (* Identifiers *)
 
-  val count = ref 0
-  fun fresh s =
-    let
-    in
-        count := !count + 1;
-        s ^ (Int.toString (!count))
-    end
-
-  fun freshVar () = fresh "r"
-
   fun escapeIdent s = String.concat (map escapeChar (String.explode s))
   and escapeChar #"+" = "_p"
     | escapeChar #"-" = "__"
