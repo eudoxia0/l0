@@ -16,6 +16,9 @@ src/map.sml
 src/namegen.sig
 src/namegen.sml
 
+src/ident.sig
+src/ident.sml
+
 src/parser.sig
 src/parser.sml
 
