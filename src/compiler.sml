@@ -20,7 +20,7 @@
 structure Compiler :> COMPILER = struct
   open SymTab
 
-  datatype compiler = Compiler of Type.tenv * Function.fenv * Backend.context
+  datatype compiler = Compiler of Type.tenv * Function.fenv * CBackend.context
 
   local
     open Function
@@ -29,7 +29,7 @@ structure Compiler :> COMPILER = struct
     val emptyCompiler =
         let val interim_not = Function ("interim_not", [Param ("v", Bool)], Bool)
         in
-            Compiler (empty, bind ("interim_not", interim_not) empty, Backend.emptyContext)
+            Compiler (empty, bind ("interim_not", interim_not) empty, CBackend.emptyContext)
         end
   end
 
@@ -51,11 +51,11 @@ structure Compiler :> COMPILER = struct
                      if (TAST.typeOf tast) <> Function.funcRT func then
                          raise Fail "Return type does not match type of body"
                      else
-                         let val ctx' = Backend.compileFunc ctx func tast
+                         let val ctx' = CBackend.defineFunction ctx func tast
                          in
                              print (";; Define function " ^ (Function.funcName func) ^ "\n");
                              print "Context:\n";
-                             print (Backend.renderContext ctx');
+                             print (CBackend.renderContext ctx');
                              print "\n";
                              Compiler (tenv, fenv', ctx')
                          end
