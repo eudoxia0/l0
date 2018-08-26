@@ -17,7 +17,7 @@
     along with L0.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-signature SET = sig
+signature ORDERED_SET = sig
   type ''a set
 
   val empty : ''a set
