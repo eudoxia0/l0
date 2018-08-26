@@ -38,7 +38,7 @@ structure CAst :> C_AST = struct
                     | ConstString of string
                     | ConstNull
                     | Var of string
-                    | Binop of AST.binop * exp_cast * exp_cast
+                    | Binop of Binop.binop * exp_cast * exp_cast
                     | Cast of ctype * exp_cast
                     | Deref of exp_cast
                     | AddressOf of exp_cast
