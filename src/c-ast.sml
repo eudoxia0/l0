@@ -85,6 +85,21 @@ structure CAst :> C_AST = struct
 
   (* Rendering *)
 
+  local
+    open Binop
+  in
+    fun binopStr Add = "+"
+      | binopStr Sub = "-"
+      | binopStr Mul = "*"
+      | binopStr Div = "/"
+      | binopStr Eq = "=="
+      | binopStr NEq = "!="
+      | binopStr LT = "<"
+      | binopStr LEq = "<="
+      | binopStr GT = ">"
+      | binopStr GEq = ">="
+  end
+
   fun renderType Bool = "bool"
     | renderType UInt8 = "uint8_t"
     | renderType Int8 = "int8_t"
