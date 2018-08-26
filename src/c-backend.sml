@@ -25,7 +25,7 @@ structure CBackend :> C_BACKEND = struct
   val emptyContext = Context ([], OrderedSet.empty)
 
   fun renderContext (Context (ts, _)) =
-      String.concatWith "\n" (map CAst.renderTop ts)
+      String.concatWith "\n\n" (map CAst.renderTop ts)
 
   (* Extract tuple types from TAST expressions *)
 
