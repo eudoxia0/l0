@@ -91,35 +91,35 @@ structure CAst :> C_AST = struct
   fun indent d = d + indentation
   fun unindent d = d - indentation
 
-  fun renderExp (CConstBool true) = "true"
-    | renderExp (CConstBool false) = "false"
-    | renderExp (CConstInt i) = (if i < 0 then "-" else "") ^ (Int.toString (abs i))
-    | renderExp (CConstString s) =
+  fun renderExp (ConstBool true) = "true"
+    | renderExp (ConstBool false) = "false"
+    | renderExp (ConstInt i) = (if i < 0 then "-" else "") ^ (Int.toString (abs i))
+    | renderExp (ConstString s) =
       let fun tr #"\"" = "\\\""
             | tr c = str c
       in
           "\"" ^ (String.translate tr s) ^ "\""
       end
-    | renderExp CConstNull = "NULL"
-    | renderExp (CVar s) = (escapeIdent s)
-    | renderExp (CBinop (oper, a, b)) =
+    | renderExp ConstNull = "NULL"
+    | renderExp (Var s) = (escapeIdent s)
+    | renderExp (Binop (oper, a, b)) =
       "(" ^ (renderExp a) ^ " " ^ (binopStr oper) ^ " " ^ (renderExp b) ^ ")"
-    | renderExp (CCast (ty, a)) = "((" ^ (renderType ty) ^ ")(" ^ (renderExp a) ^ "))"
-    | renderExp (CDeref e) = "*" ^ (renderExp e)
-    | renderExp (CAddressOf e) = "&" ^ (renderExp e)
-    | renderExp (CSizeOf t) = "sizeof(" ^ (renderType t) ^ ")"
-    | renderExp (CStructInitializer (name, inits)) =
+    | renderExp (Cast (ty, a)) = "((" ^ (renderType ty) ^ ")(" ^ (renderExp a) ^ "))"
+    | renderExp (Deref e) = "*" ^ (renderExp e)
+    | renderExp (AddressOf e) = "&" ^ (renderExp e)
+    | renderExp (SizeOf t) = "sizeof(" ^ (renderType t) ^ ")"
+    | renderExp (StructInitializer (name, inits)) =
       "(("
       ^ (escapeIdent name)
       ^ ") { "
       ^ (String.concatWith ", " (map (fn (n, e) => "." ^ (escapeIdent n) ^ " = " ^ (renderExp e)) inits))
       ^ " })"
-    | renderExp (CStructAccess (r, slot)) =
+    | renderExp (StructAccess (r, slot)) =
       (renderExp r)
       ^ "."
       ^ (escapeIdent slot)
-    | renderExp (CAdjacent l) = String.concatWith " " (map renderExp l)
-    | renderExp (CRaw s) = s
+    | renderExp (Adjacent l) = String.concatWith " " (map renderExp l)
+    | renderExp (Raw s) = s
 
   fun renderBlock' d (CSeq l) = sepBy "\n" (map (renderBlock' d) l)
     | renderBlock' d (CBlock l) = "{\n" ^ (sepBy "\n" (map (renderBlock' d) l)) ^ "\n" ^ (pad (unindent d)) ^ "}"
