@@ -39,6 +39,7 @@ structure CBackend :> C_BACKEND = struct
                                                (union (allTypes c)
                                                       (add (allTypes a)
                                                            ty))
+      | allTypes (TCast (ty, exp)) = add (allTypes exp) ty
       | allTypes exp = add empty (typeOf exp)
   end
 end
