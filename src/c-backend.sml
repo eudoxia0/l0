@@ -18,14 +18,16 @@
 *)
 
 structure CBackend :> C_BACKEND = struct
-  type tuple_types = CAst.ty OrderedSet.set
+  type tuple_types = Type.ty OrderedSet.set
 
   datatype context = Context of CAst.top_ast list * tuple_types
 
   val emptyContext = Context ([], OrderedSet.empty)
 
   fun renderContext (Context (ts, _)) =
-      String.concatWith "\n\n" (map CAst.renderTop ts)
+    String.concatWith "\n\n" (map CAst.renderTop ts)
+
+  fun ctxTupleTypes (Context (_, tt)) = tt
 
   (* Extract tuple types from TAST expressions *)
 
@@ -106,12 +108,15 @@ structure CBackend :> C_BACKEND = struct
   local
     open CAst
   in
-    fun convertType (Type.Unit) = Bool
-      | convertType (Type.Bool) = Bool
-      | convertType (Type.Int (s, w)) = convertIntType s w
-      | convertType (Type.Str) = Pointer UInt8
-      | convertType (Type.RawPointer t) = Pointer (convertType t)
-      | convertType (Type.Tuple _) = raise Fail "tuple types not implemented yet"
+    fun convertType (Type.Unit) _ = Bool
+      | convertType (Type.Bool) _ = Bool
+      | convertType (Type.Int (s, w)) _ = convertIntType s w
+      | convertType (Type.Str) _ = Pointer UInt8
+      | convertType (Type.RawPointer t) ctx = Pointer (convertType t ctx)
+      | convertType (Type.Tuple ts) ctx =
+        case OrderedSet.positionOf (ctxTupleTypes ctx) (Type.Tuple ts) of
+            SOME i => Struct ("struct_" ^ (Int.toString i))
+          | NONE => raise Fail "Tuple not in table"
   end
 
   local
@@ -120,19 +125,19 @@ structure CBackend :> C_BACKEND = struct
   in
     val unitConstant = ConstBool false
 
-    fun convert TConstUnit =
+    fun convert TConstUnit _ =
         (Sequence [], unitConstant)
-      | convert (TConstBool b) =
+      | convert (TConstBool b) _ =
         (Sequence [], ConstBool b)
-      | convert (TConstInt (i, t)) =
-        (Sequence [], Cast (convertType t, ConstInt i))
-      | convert (TConstString s) =
+      | convert (TConstInt (i, t)) ctx =
+        (Sequence [], Cast (convertType t ctx, ConstInt i))
+      | convert (TConstString s) _ =
         (Sequence [], ConstString s)
-      | convert (TVar (s, t)) =
+      | convert (TVar (s, t)) _ =
         (Sequence [], ngVar s)
-      | convert (TBinop (oper, a, b, t)) =
-        let val (ablock, aval) = convert a
-            and (bblock, bval) = convert b
+      | convert (TBinop (oper, a, b, t)) ctx =
+        let val (ablock, aval) = convert a ctx
+            and (bblock, bval) = convert b ctx
         in
             (Sequence [
                   ablock,
@@ -140,12 +145,12 @@ structure CBackend :> C_BACKEND = struct
               ],
              Binop (oper, aval, bval))
         end
-      | convert (TCond (t, c, a, _)) =
-        let val (tblock, tval) = convert t
-            and (cblock, cval) = convert c
-            and (ablock, aval) = convert a
+      | convert (TCond (t, c, a, _)) ctx =
+        let val (tblock, tval) = convert t ctx
+            and (cblock, cval) = convert c ctx
+            and (ablock, aval) = convert a ctx
             and result = freshVar ()
-            and resType = convertType (TAST.typeOf c)
+            and resType = convertType (TAST.typeOf c) ctx
         in
             (Sequence [
                   tblock,
@@ -162,13 +167,13 @@ structure CBackend :> C_BACKEND = struct
               ],
              Var result)
         end
-      | convert (TCast (ty, a)) =
-        let val (ablock, aval) = convert a
+      | convert (TCast (ty, a)) ctx =
+        let val (ablock, aval) = convert a ctx
         in
-            (ablock, Cast (convertType ty, aval))
+            (ablock, Cast (convertType ty ctx, aval))
         end
-      | convert (TProgn exps) =
-        let val exps' = map convert exps
+      | convert (TProgn exps) ctx =
+        let val exps' = map (fn e => convert e ctx) exps
         in
             if (length exps = 0) then
                 (Sequence [], unitConstant)
@@ -176,35 +181,35 @@ structure CBackend :> C_BACKEND = struct
                 (Sequence (map (fn (b, _) => b) exps'),
                  let val (_, v) = List.last exps' in v end)
         end
-      | convert (TLet (name, v, b)) =
-        let val (vblock, vval) = convert v
-            and ty = convertType (typeOf v)
-            and (bblock, bval) = convert b
+      | convert (TLet (name, v, b)) ctx =
+        let val (vblock, vval) = convert v ctx
+            and ty = convertType (typeOf v) ctx
+            and (bblock, bval) = convert b ctx
         in
             (Sequence [vblock, Declare (ty, varName name), Assign (ngVar name, vval), bblock],
              bval)
         end
-      | convert (TAssign (var, v)) =
-        let val (vblock, vval) = convert v
+      | convert (TAssign (var, v)) ctx =
+        let val (vblock, vval) = convert v ctx
         in
             (Sequence [vblock, Assign (ngVar var, vval)], vval)
         end
-      | convert (TNullPtr _) =
+      | convert (TNullPtr _) ctx =
         (Sequence [], ConstNull)
-      | convert (TLoad (e, _)) =
-        let val (eblock, eval) = convert e
+      | convert (TLoad (e, _)) ctx =
+        let val (eblock, eval) = convert e ctx
         in
             (eblock, Deref eval)
         end
-      | convert (TStore (p, v)) =
-        let val (pblock, pval) = convert p
-            and (vblock, vval) = convert v
+      | convert (TStore (p, v)) ctx =
+        let val (pblock, pval) = convert p ctx
+            and (vblock, vval) = convert v ctx
         in
             (Sequence [pblock, vblock, Assign ((Deref pval), vval)], vval)
         end
-      | convert (TMalloc (t, c)) =
-        let val (cblock, cval) = convert c
-            and ty = convertType t
+      | convert (TMalloc (t, c)) ctx =
+        let val (cblock, cval) = convert c ctx
+            and ty = convertType t ctx
             and res = freshVar ()
         in
             let val sizecalc = Binop (Binop.Mul, cval, SizeOf ty)
@@ -213,20 +218,20 @@ structure CBackend :> C_BACKEND = struct
                  Cast (Pointer ty, Var res))
             end
         end
-      | convert (TFree p) =
-        let val (pblock, pval) = convert p
+      | convert (TFree p) ctx =
+        let val (pblock, pval) = convert p ctx
         in
             (Sequence [pblock, Funcall (NONE, "free", [pval])], unitConstant)
         end
-      | convert (TAddressOf (v, _)) =
+      | convert (TAddressOf (v, _)) _ =
         (Sequence [], AddressOf (ngVar v))
-      | convert (TPrint _) =
+      | convert (TPrint _) _ =
         raise Fail "print not implemented yet"
-      | convert (TCEmbed (t, s)) =
-        (Sequence [], Cast (convertType t, Raw s))
-      | convert (TCCall (f, t, args)) =
-        let val args' = map (fn a => convert a) args
-            and t' = convertType t
+      | convert (TCEmbed (t, s)) ctx =
+        (Sequence [], Cast (convertType t ctx, Raw s))
+      | convert (TCCall (f, t, args)) ctx =
+        let val args' = map (fn a => convert a ctx) args
+            and t' = convertType t ctx
         in
              let val blocks = map (fn (b, _) => b) args'
                  and argvals = map (fn (_, v) => v) args'
@@ -242,15 +247,15 @@ structure CBackend :> C_BACKEND = struct
                      end
              end
         end
-      | convert (TWhile (t, b)) =
-        let val (tblock, tval) = convert t
-            and (bblock, _) = convert b
+      | convert (TWhile (t, b)) ctx =
+        let val (tblock, tval) = convert t ctx
+            and (bblock, _) = convert b ctx
         in
             (Sequence [tblock, While (tval, bblock)], unitConstant)
         end
-      | convert (TFuncall (f, args, rt)) =
-        let val args' = map (fn a => convert a) args
-            and rt' = convertType rt
+      | convert (TFuncall (f, args, rt)) ctx =
+        let val args' = map (fn a => convert a ctx) args
+            and rt' = convertType rt ctx
             and res = freshVar ()
         in
             let val blocks = map (fn (b, _) => b) args'
@@ -261,17 +266,17 @@ structure CBackend :> C_BACKEND = struct
             end
         end
 
-    fun defineFunction (Function.Function (name, params, rt)) tast =
-      let val (block, retval) = convert tast
+    fun defineFunction (Function.Function (name, params, rt)) tast ctx =
+      let val (block, retval) = convert tast ctx
       in
           FunctionDef (name,
-                       map (fn (Function.Param (n,t)) => Param (n, convertType t)) params,
-                       convertType rt,
+                       map (fn (Function.Param (n,t)) => Param (n, convertType t ctx)) params,
+                       convertType rt ctx,
                        block,
                        retval)
       end
 
-    fun defineStruct name slots =
-      StructDef (name, map (fn (Type.Slot (n, t)) => Slot (n, convertType t)) slots)
+    fun defineStruct name slots ctx =
+      StructDef (name, map (fn (Type.Slot (n, t)) => Slot (n, convertType t ctx)) slots)
   end
 end
