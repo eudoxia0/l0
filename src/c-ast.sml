@@ -172,11 +172,13 @@ structure CAst :> C_AST = struct
       in
           rt' ^ " " ^ name' ^ "(" ^ params' ^ ") {\n" ^ body' ^ "\n}"
       end
-    | renderTop (StructDef (name, slots)) = renderStructDef name slots
-  and renderStructDef name slots =
-      "typedef struct { "
-      ^ (String.concatWith " " (map renderSlot slots))
-      ^ " } " ^ (escapeIdent name) ^ ";\n"
+    | renderTop (StructDef (name, slots)) =
+      let val name' = escapeIdent name
+          and slots' = String.concatWith " " (map renderSlot slots)
+      in
+          "typedef struct { " ^ slots' ^ " } " ^ name' ^ ";\n"
+      end
+
   and renderParam (Param (n, t)) =
       (renderType t) ^ " " ^ n
   and renderSlot (Slot (n, t)) =
