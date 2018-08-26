@@ -50,27 +50,26 @@ structure ARAST :> ARAST = struct
 
   type stack = (string, Ident.ident) Map.map
 
-  fun alphaRename func ast =
+  fun alphaRename (AST.Defun (name, ps, rt, body)) =
     let
     in
       resetCount ();
-      let val s = renameParams func
+      let val (stack, params) = renameParams ps
       in
-          let val (ast', _) = rename ast s
+          let val (ast', _) = rename body stack
           in
-              ast'
+              (Function.Function (name, params, rt), ast')
           end
       end
     end
-  and renameParams (Function.Function (_, ps, _)) =
-    let val paramNames = map (fn (Function.Param (n, _)) => n) ps
+  and renameParams ps =
+    let val ps' = map (fn (AST.Param (n, t)) => Function.Param (freshVar n, t)) ps
     in
-      renameParamList paramNames Map.empty
+        (Map.iaddList Map.empty
+                      (map (fn (Function.Param (i, _)) => (Ident.identName i, i))
+                           ps'),
+         ps')
     end
-  and renameParamList (head::tail) s =
-    Map.iadd (renameParamList tail s)
-             (head, freshVar head)
-    | renameParamList nil s = s
   and rename AST.ConstUnit s = (ConstUnit, s)
     | rename (AST.ConstBool b) s = (ConstBool b, s)
     | rename (AST.ConstInt i) s = (ConstInt i, s)

@@ -32,5 +32,5 @@ signature ARAST = sig
                | CCall of string * Parser.sexp * ast list
                | Operation of string * ast list
 
-  val alphaRename : Function.func -> AST.ast -> ast
+  val alphaRename : AST.top_ast -> (Function.func * ast)
 end

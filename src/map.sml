@@ -37,6 +37,10 @@ structure Map :> MAP = struct
         SOME _ => m
       | NONE => Map ((k, v) :: (mapl m))
 
+  fun iaddList m (head::tail) =
+      iadd (iaddList m tail) head
+    | iaddList m nil = m
+
   fun size (Map m) = length m
 
   fun kvmap (Map (head::tail)) f = iadd (kvmap (Map tail) f) (f head)

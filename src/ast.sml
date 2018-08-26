@@ -32,7 +32,8 @@ structure AST :> AST = struct
                | CCall of string * Parser.sexp * ast list
                | Operation of string * ast list
 
-  datatype top_ast = Defun of Function.func * ast
+  datatype top_ast = Defun of string * param list * Type.ty * ast
+       and param = Param of string * Type.ty
 
   local
     open Parser
@@ -65,16 +66,15 @@ structure AST :> AST = struct
       | parseL f rest e = Operation (f, mparse rest e)
     and mparse l e = map (fn elem => parse elem e) l
 
-    fun parseParam (List [Symbol n, t]) e = Function.Param (n, Type.parseTypeSpecifier t e)
-      | parseParam _ _ = raise Fail "Bad parameter"
-
     fun parseToplevel (List (Symbol f :: rest)) e = parseTopL f rest e
       | parseToplevel _ _ = raise Fail "Bad toplevel node"
     and parseTopL "defun" (Symbol name :: List params :: rt :: body) e =
-        Defun (Function.Function (name,
-                                  map (fn p => parseParam p e) params,
-                                  Type.parseTypeSpecifier rt e),
-               parse (List (Symbol "progn" :: body)) e)
+      Defun (name,
+             map (fn p => parseParam p e) params,
+             Type.parseTypeSpecifier rt e,
+             parse (List (Symbol "progn" :: body)) e)
       | parseTopL f _ _ = raise Fail ("Bad toplevel definition '" ^ f ^ "'")
+    and parseParam (List [Symbol n, t]) e = Param (n, Type.parseTypeSpecifier t e)
+      | parseParam _ _ = raise Fail "Bad parameter"
   end
 end
