@@ -174,7 +174,7 @@ structure CAst :> C_AST = struct
 
   fun renderBlock b = renderBlock' (indent 0) b
 
-  fun renderTop (Function (name, params, rt, body, retval)) =
+  fun renderTop (FunctionDef (name, params, rt, body, retval)) =
     (renderType rt) ^ " " ^ (escapeIdent name) ^ "(" ^ (sepBy "," (map renderParam params)) ^ ") {\n" ^ (renderBlock body) ^ "\n  return " ^ (renderExp retval) ^ ";\n}"
     | renderTop (StructDef (name, slots)) =
       "typedef struct { "
