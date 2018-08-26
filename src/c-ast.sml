@@ -73,5 +73,4 @@ structure CAst :> C_AST = struct
     | renderType Int64 = "int64_t"
     | renderType (Pointer t) = (renderType t) ^ "*"
     | renderType (Struct n) = n
-    | renderType RegionType = "interim_region_t"
 end
