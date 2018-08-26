@@ -57,4 +57,6 @@ signature C_AST = sig
                    | StructDef of string * slot list
        and param = Param of string * ty
        and slot = Slot of string * ty
+
+  val renderTop : top_ast -> string
 end
