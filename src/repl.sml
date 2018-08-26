@@ -18,8 +18,6 @@
 *)
 
 structure REPL :> REPL = struct
-  open SymTab
-
   fun readUntilBlank () =
     case (TextIO.inputLine TextIO.stdIn) of
         (SOME s) => if s = "\n" then

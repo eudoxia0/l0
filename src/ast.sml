@@ -18,8 +18,6 @@
 *)
 
 structure AST :> AST = struct
-  open SymTab
-
   datatype ast = ConstUnit
                | ConstBool of bool
                | ConstInt of int

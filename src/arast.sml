@@ -34,10 +34,10 @@ structure ARAST :> ARAST = struct
                | CCall of string * Parser.sexp * ast list
                | Operation of string * ast list
 
-  type renamed = NameGen.name SymTab.symtab
+  type renamed = (string, NameGen.name) Map.map
 
   fun alphaRename ast ng =
-    let val (ast', stack, _) = rename ast SymTab.empty ng
+    let val (ast', stack, _) = rename ast Map.empty ng
     in
         (ast', stack)
     end
@@ -46,7 +46,7 @@ structure ARAST :> ARAST = struct
     | rename (AST.ConstInt i) s n = (ConstInt i, s, n)
     | rename (AST.ConstString str) s n = (ConstString str, s, n)
     | rename (AST.Var name) s n =
-      (case SymTab.lookup name s of
+      (case Map.get s name of
            SOME name' => (Var name', s, n)
          | NONE => raise Fail ("No variable with this name: " ^ name))
     | rename (AST.Cast (t, a)) s n =
@@ -59,7 +59,7 @@ structure ARAST :> ARAST = struct
       in
           let val (fresh, n'') = freshName n'
           in
-              let val s'' = SymTab.bind (name, fresh)
+              let val s'' = Map.iadd s (name, fresh)
               in
                   let val (body', s''', n''') = rename body s' n'
                   in
@@ -75,7 +75,7 @@ structure ARAST :> ARAST = struct
           (Malloc (t, e'), s', n')
       end
     | rename (AST.AddressOf name) s n =
-      (case (SymTab.lookup name s) of
+      (case Map.get s name of
            SOME name' => (AddressOf name', s, n)
          | NONE => raise Fail ("No variable with this name: " ^ name))
     | rename (AST.CEmbed (t, e)) s n = (CEmbed (t, e), s, n)
@@ -100,7 +100,7 @@ structure ARAST :> ARAST = struct
     | renameList nil s n = (nil, s, n)
 
   fun alphaRenameParams params ng =
-      let val stack = SymTab.empty
+      let val stack = Map.empty
       in
           let val (_, stack', ng') = renameParamList params stack ng
           in
@@ -110,7 +110,7 @@ structure ARAST :> ARAST = struct
   and renameParam (Function.Param (name, ty)) stack ng =
       let val (fresh, ng') = NameGen.freshName ng
       in
-          ((), SymTab.bind (name, fresh) stack, ng')
+          ((), Map.iadd stack (name, fresh), ng')
       end
   and renameParamList (head::tail) s n =
       let val (head', s', n') = renameParam head s n
