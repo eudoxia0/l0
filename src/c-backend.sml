@@ -90,12 +90,13 @@ structure CBackend :> C_BACKEND = struct
     fun convert TConstUnit =
         (Sequence [], unitConstant)
       | convert (TConstBool b) =
-        (Sequence [], CConstBool b)
+        (Sequence [], ConstBool b)
       | convert (TConstInt (i, t)) =
         (Sequence [], Cast (convertType t, CConstInt i))
       | convert (TConstString s) =
-        (Sequenceuence [], CConstString s)
-      | convert (TVar (s, t)) = (Sequence [], CVar s)
+        (Sequence [], ConstString s)
+      | convert (TVar (s, t)) =
+        (Sequence [], Var s)
       | convert (TBinop (oper, a, b, t)) =
         let val (ablock, aval) = convert a
             and (bblock, bval) = convert b
@@ -104,7 +105,7 @@ structure CBackend :> C_BACKEND = struct
                   ablock,
                   bblock
               ],
-             (CBinop (oper, aval, bval)))
+             Binop (oper, aval, bval))
         end
       | convert (TCond (t, c, a, _)) =
         let val (tblock, tval) = convert t
@@ -115,13 +116,13 @@ structure CBackend :> C_BACKEND = struct
         in
             (Sequence [
                   tblock,
-                  CDeclare (resType, result),
+                  Declare (resType, result),
                   CCond (tval,
-                         CBlock [
+                         Block [
                              cblock,
                              CAssign (CVar result, cval)
                          ],
-                         CBlock [
+                         Block [
                              ablock,
                              CAssign (CVar result, aval)
                         ])
@@ -147,7 +148,7 @@ structure CBackend :> C_BACKEND = struct
             and ty = convertType (typeOf v)
             and (bblock, bval) = convert b
         in
-            (Sequence [vblock, CDeclare (ty, name), CAssign (CVar name, vval), bblock],
+            (Sequence [vblock, Declare (ty, name), CAssign (CVar name, vval), bblock],
              bval)
         end
       | convert (TAssign (var, v)) =
@@ -174,7 +175,7 @@ structure CBackend :> C_BACKEND = struct
         in
             let val sizecalc = CBinop (AST.Mul, cval, CSizeOf ty)
             in
-                (Sequence [cblock, CDeclare (Pointer ty, res), CFuncall (SOME res, "malloc", [sizecalc])],
+                (Sequence [cblock, Declare (Pointer ty, res), CFuncall (SOME res, "malloc", [sizecalc])],
                  CCast (Pointer ty, CVar res))
             end
         end
@@ -218,7 +219,7 @@ structure CBackend :> C_BACKEND = struct
                  else
                      let val res = freshVar ()
                      in
-                         (Sequence (blocks @ [CDeclare (t', res), CFuncall (SOME res, f, argvals)]),
+                         (Sequence (blocks @ [Declare (t', res), CFuncall (SOME res, f, argvals)]),
                           CVar res)
                      end
              end
@@ -234,7 +235,7 @@ structure CBackend :> C_BACKEND = struct
         in
             let val name = regionName r
             in
-                (Sequence [CDeclare (RegionType, name),
+                (Sequence [Declare (RegionType, name),
                        CFuncall (NONE, "interim_region_create", [CAddressOf (CVar name)]),
                        bblock,
                        CFuncall (NONE, "interim_region_free", [CAddressOf (CVar name)])],
@@ -248,7 +249,7 @@ structure CBackend :> C_BACKEND = struct
             and cty = Pointer (convertType (typeOf v))
         in
             (Sequence [vblock,
-                   CDeclare (cty, res),
+                   Declare (cty, res),
                    CFuncall (SOME res, "interim_region_allocate", [cr, CSizeOf cty]),
                    CAssign (CDeref (CVar res), vval)],
              CVar res)
@@ -262,15 +263,15 @@ structure CBackend :> C_BACKEND = struct
         in
             (Sequence [
                   pblock,
-                  CDeclare (resType, result),
+                  Declare (resType, result),
                   CCond (CBinop (AST.NEq, pval, CConstNull),
-                         CBlock [
-                             CDeclare (convertType (typeOf p), escapeIdent var),
+                         Block [
+                             Declare (convertType (typeOf p), escapeIdent var),
                              CAssign (CVar var, pval),
                              nncblock,
                              CAssign (CVar result, nncval)
                          ],
-                         CBlock [
+                         Block [
                              ncblock,
                              CAssign (CVar result, ncval)
                         ])
@@ -300,7 +301,7 @@ structure CBackend :> C_BACKEND = struct
             let val blocks = map (fn (b, _) => b) args'
                 and argvals = map (fn (_, v) => v) args'
             in
-                (Sequence (blocks @ [CDeclare (rt', res), CFuncall (SOME res, f, argvals)]),
+                (Sequence (blocks @ [Declare (rt', res), CFuncall (SOME res, f, argvals)]),
                  CVar res)
             end
         end
