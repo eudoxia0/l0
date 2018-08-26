@@ -60,6 +60,29 @@ structure CAst :> C_AST = struct
        and param = Param of string * ty
        and slot = Slot of string * ty
 
+  (* Identifiers *)
+
+  val count = ref 0
+  fun fresh s =
+    let
+    in
+        count := !count + 1;
+        s ^ (Int.toString (!count))
+    end
+
+  fun freshVar () = fresh "r"
+
+  fun escapeIdent s = String.concat (map escapeChar (String.explode s))
+  and escapeChar #"+" = "_p"
+    | escapeChar #"-" = "__"
+    | escapeChar #"*" = "_m"
+    | escapeChar #"/" = "_d"
+    | escapeChar #">" = "_g"
+    | escapeChar #"<" = "_l"
+    | escapeChar #"=" = "_e"
+    | escapeChar #"'" = "_q"
+    | escapeChar c = str c
+
   (* Rendering *)
 
   fun renderType Bool = "bool"
@@ -121,26 +144,26 @@ structure CAst :> C_AST = struct
     | renderExp (Adjacent l) = String.concatWith " " (map renderExp l)
     | renderExp (Raw s) = s
 
-  fun renderBlock' d (CSeq l) = sepBy "\n" (map (renderBlock' d) l)
-    | renderBlock' d (CBlock l) = "{\n" ^ (sepBy "\n" (map (renderBlock' d) l)) ^ "\n" ^ (pad (unindent d)) ^ "}"
-    | renderBlock' d (CDeclare (t, n)) = (pad d) ^ (renderType t) ^ " " ^ (escapeIdent n) ^ ";"
-    | renderBlock' d (CAssign (var, v)) = (pad d) ^ (renderExp var) ^ " = " ^ (renderExp v) ^ ";"
-    | renderBlock' d (CCond (t, c, a)) = (pad d) ^ "if (" ^ (renderExp t) ^ ") " ^ (renderBlock' (indent d) c)
+  fun renderBlock' d (Sequence l) = sepBy "\n" (map (renderBlock' d) l)
+    | renderBlock' d (Block l) = "{\n" ^ (sepBy "\n" (map (renderBlock' d) l)) ^ "\n" ^ (pad (unindent d)) ^ "}"
+    | renderBlock' d (Declare (t, n)) = (pad d) ^ (renderType t) ^ " " ^ (escapeIdent n) ^ ";"
+    | renderBlock' d (Assign (var, v)) = (pad d) ^ (renderExp var) ^ " = " ^ (renderExp v) ^ ";"
+    | renderBlock' d (Cond (t, c, a)) = (pad d) ^ "if (" ^ (renderExp t) ^ ") " ^ (renderBlock' (indent d) c)
                                          ^ " else " ^ (renderBlock' (indent d) a)
-    | renderBlock' d (CWhile (t, b)) =
+    | renderBlock' d (While (t, b)) =
       (pad d) ^ "while (" ^ (renderExp t) ^ ") {\n" ^ (renderBlock' (indent d) b) ^ "\n" ^ (pad d) ^ "}"
-    | renderBlock' d (CFuncall (res, f, args)) =
+    | renderBlock' d (Funcall (res, f, args)) =
       (pad d) ^ (renderRes res) ^ (escapeIdent f) ^ "(" ^ (sepBy "," (map renderExp args)) ^ ");"
   and renderRes (SOME res) = (escapeIdent res) ^ " = "
     | renderRes NONE = ""
 
   fun renderBlock b = renderBlock' (indent 0) b
 
-  fun renderTop (CFunction (name, params, rt, body, retval)) =
+  fun renderTop (Function (name, params, rt, body, retval)) =
     (renderType rt) ^ " " ^ (escapeIdent name) ^ "(" ^ (sepBy "," (map renderParam params)) ^ ") {\n" ^ (renderBlock body) ^ "\n  return " ^ (renderExp retval) ^ ";\n}"
-    | renderTop (CStructDef (name, slots)) =
+    | renderTop (StructDef (name, slots)) =
       "typedef struct { "
       ^ (String.concatWith " " (map (fn (n, t) => (renderType t) ^ " " ^ (escapeIdent n) ^ ";") slots))
       ^ " } " ^ (escapeIdent name) ^ ";\n"
-  and renderParam (CParam (n, t)) = (renderType t) ^ " " ^ n
+  and renderParam (Param (n, t)) = (renderType t) ^ " " ^ n
 end
