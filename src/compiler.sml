@@ -35,7 +35,7 @@ structure Compiler :> COMPILER = struct
 
   fun compilerTypeEnv (Compiler (t, _, _)) = t
 
-  fun compileAST (Compiler (tenv, fenv, llvmCtx)) ast =
+  fun compileAST (Compiler (tenv, fenv, ctx)) ast =
     (case ast of
          (AST.Defun (func, ast)) =>
          let val fenv' = bind (Function.funcName func, func) fenv
@@ -51,13 +51,13 @@ structure Compiler :> COMPILER = struct
                      if (TAST.typeOf tast) <> Function.funcRT func then
                          raise Fail "Return type does not match type of body"
                      else
-                         let val llvmCtx' = Backend.compileFunc llvmCtx func tast
+                         let val ctx' = Backend.compileFunc ctx func tast
                          in
                              print (";; Define function " ^ (Function.funcName func) ^ "\n");
                              print "Context:\n";
-                             print (Backend.renderContext llvmCtx');
+                             print (Backend.renderContext ctx');
                              print "\n";
-                             Compiler (tenv, fenv', llvmCtx')
+                             Compiler (tenv, fenv', ctx')
                          end
                  end
              end
