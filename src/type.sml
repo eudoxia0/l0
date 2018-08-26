@@ -17,7 +17,7 @@
     along with L0.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure Type :> TYPE = struct
+structure Type : TYPE = struct
   open SymTab
 
   datatype ty = Unit
