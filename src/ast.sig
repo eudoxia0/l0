@@ -32,7 +32,7 @@ signature AST = sig
                | CCall of string * Parser.sexp * ast list
                | Operation of string * ast list
 
-  datatype top_ast = Defun of Function.func * ast
+  datatype top_ast = Defun of string * (string * Parser.sexp) list * Parser.sexp * ast
 
   val parse : Parser.sexp -> Type.tenv -> ast
   val parseToplevel : Parser.sexp -> Type.tenv -> top_ast

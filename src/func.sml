@@ -18,23 +18,12 @@
 *)
 
 structure Function :> FUNCTION = struct
-  open Type
-
-  datatype param = Param of string * ty
-  datatype func = Function of string * param list * ty
+  datatype func = Function of string * param list * Type.ty
+       and param = Param of Ident.ident * Type.ty
 
   type fenv = (string, func) Map.map
 
-  datatype mutability = Mutable
-                      | Immutable
-
-  datatype binding = Binding of Type.ty * mutability
-  type stack = (NameGen.name, binding) Map.map
-
-  fun bindType (Binding (t, _)) = t
-
   fun funcName (Function (n, _, _)) = n
-
   fun funcRT (Function (_, _, r)) = r
 
   fun matchParams params argtypes =
