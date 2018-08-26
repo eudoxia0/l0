@@ -43,7 +43,7 @@ structure OrderedSet :> ORDERED_SET = struct
 
   fun positionOf (Set l) elem =
     case Util.position elem l of
-        SOME p => (List.length l) - p
+        SOME p => SOME ((List.length l) - p)
       | _ => NONE
 
   fun filter (Set l) f = Set (List.filter f l)
