@@ -33,20 +33,20 @@ structure CAst :> C_AST = struct
 
   datatype param = Param of string * ctype
 
-  datatype exp_cast = CConstBool of bool
-                    | CConstInt of int
-                    | CConstString of string
-                    | CConstNull
-                    | CVar of string
-                    | CBinop of AST.binop * exp_cast * exp_cast
-                    | CCast of ctype * exp_cast
-                    | CDeref of exp_cast
-                    | CAddressOf of exp_cast
-                    | CSizeOf of ctype
-                    | CStructInitializer of string * (string * exp_cast) list
-                    | CStructAccess of exp_cast * string
-                    | CAdjacent of exp_cast list
-                    | CRaw of string
+  datatype exp_cast = ConstBool of bool
+                    | ConstInt of int
+                    | ConstString of string
+                    | ConstNull
+                    | Var of string
+                    | Binop of AST.binop * exp_cast * exp_cast
+                    | Cast of ctype * exp_cast
+                    | Deref of exp_cast
+                    | AddressOf of exp_cast
+                    | SizeOf of ctype
+                    | StructInitializer of string * (string * exp_cast) list
+                    | StructAccess of exp_cast * string
+                    | Adjacent of exp_cast list
+                    | Raw of string
 
   datatype block_cast = CSeq of block_cast list
                       | CBlock of block_cast list
