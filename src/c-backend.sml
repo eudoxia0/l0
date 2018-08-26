@@ -75,7 +75,7 @@ structure CBackend :> C_BACKEND = struct
   (* Fresh identifiers *)
 
   val count = ref 0
-  fun freshVar =
+  fun freshVar () =
     let
     in
         count := !count + 1;
