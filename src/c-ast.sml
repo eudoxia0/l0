@@ -47,15 +47,15 @@ structure CAst :> C_AST = struct
                    | Adjacent of exp_ast list
                    | Raw of string
 
-  datatype block_cast = Sequence of block_cast list
-                      | Block of block_cast list
-                      | Declare of ty * string
-                      | Assign of exp_ast * exp_ast
-                      | Cond of exp_ast * block_cast * block_cast
-                      | While of exp_ast * block_cast
-                      | Funcall of string option * string * exp_ast list
+  datatype block_ast = Sequence of block_ast list
+                     | Block of block_ast list
+                     | Declare of ty * string
+                     | Assign of exp_ast * exp_ast
+                     | Cond of exp_ast * block_ast * block_ast
+                     | While of exp_ast * block_ast
+                     | Funcall of string option * string * exp_ast list
 
-  datatype top_cast = FunctionDef of string * param list * ty * block_cast * exp_ast
+  datatype top_cast = FunctionDef of string * param list * ty * block_ast * exp_ast
                     | StructDef of string * slot list
        and param = Param of string * ty
        and slot = Slot of string * ty
