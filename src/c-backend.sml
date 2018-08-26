@@ -27,7 +27,6 @@ structure CBackend :> C_BACKEND = struct
   fun renderContext (Context (ts, _)) =
       String.concatWith "\n" (map CAst.renderTop ts)
 
-
   (* Extract tuple types from TAST expressions *)
 
   local
