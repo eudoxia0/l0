@@ -165,7 +165,7 @@ structure CAst :> C_AST = struct
   fun renderBlock b = renderBlock' (indent 0) b
 
   fun renderTop (FunctionDef (name, params, rt, body, retval)) =
-      let params' = sepBy "," (map renderParam params)
+      let val params' = sepBy "," (map renderParam params)
       in
           (renderType rt) ^ " " ^ (escapeIdent name) ^ "(" ^ params' ^ ") {\n" ^ (renderBlock body) ^ "\n  return " ^ (renderExp retval) ^ ";\n}"
       end
