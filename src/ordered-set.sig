@@ -21,8 +21,18 @@ signature ORDERED_SET = sig
   type ''a set
 
   val empty : ''a set
+  val singleton : ''a -> ''a set
+
   val add : ''a set -> ''a -> ''a set
   val addList : ''a set -> ''a list -> ''a set
+
   val union : ''a set -> ''a set -> ''a set
+  val unionList : ''a set list -> ''a set
+
+  val size : a set -> int
   val positionOf : ''a set -> ''a -> int option
+
+  val filter : ''a set -> (''a -> bool) -> ''a set
+
+  val fromList : ''a list -> ''a set
 end
