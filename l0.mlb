@@ -10,6 +10,12 @@ src/symtab.sml
 src/set.sig
 src/set.sml
 
+src/map.sig
+src/map.sml
+
+src/namegen.sig
+src/namegen.sml
+
 src/parser.sig
 src/parser.sml
 
@@ -25,16 +31,23 @@ src/ast.sml
 src/arast.sig
 src/arast.sml
 
+src/binop.sig
+src/binop.sml
+
+src/oast.sig
+src/oast.sml
+
 src/tast.sig
 src/tast.sml
 
 src/llvm.sig
 src/llvm.sml
 
+src/backend.sig
+src/backend.sml
+
 src/compiler.sig
 src/compiler.sml
 
-src/l0.sig
-src/l0.sml
-
-src/cli.sml
+src/repl.sig
+src/repl.sml
