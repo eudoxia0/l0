@@ -123,7 +123,7 @@ structure CBackend :> C_BACKEND = struct
       | convert (TConstString s) =
         (Sequence [], ConstString s)
       | convert (TVar (s, t)) =
-        (Sequence [], Var s)
+        (Sequence [], ngVar s)
       | convert (TBinop (oper, a, b, t)) =
         let val (ablock, aval) = convert a
             and (bblock, bval) = convert b
@@ -175,13 +175,13 @@ structure CBackend :> C_BACKEND = struct
             and ty = convertType (typeOf v)
             and (bblock, bval) = convert b
         in
-            (Sequence [vblock, Declare (ty, name), Assign (Var name, vval), bblock],
+            (Sequence [vblock, Declare (ty, name), Assign (ngVar name, vval), bblock],
              bval)
         end
       | convert (TAssign (var, v)) =
         let val (vblock, vval) = convert v
         in
-            (Sequence [vblock, Assign (Var var, vval)], vval)
+            (Sequence [vblock, Assign (ngVar var, vval)], vval)
         end
       | convert (TNullPtr _) = (Sequence [], CConstNull)
       | convert (TLoad (e, _)) =
@@ -212,7 +212,7 @@ structure CBackend :> C_BACKEND = struct
             (Sequence [pblock, Funcall (NONE, "free", [pval])], unitConstant)
         end
       | convert (TAddressOf (v, _)) =
-        (Sequence [], CAddressOf (Var v))
+        (Sequence [], CAddressOf (ngVar v))
       | convert (TPrint (v, n)) =
         let val (vblock, vval) = convert v
             and ty = typeOf v
