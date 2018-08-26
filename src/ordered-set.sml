@@ -28,5 +28,8 @@ structure OrderedSet :> ORDERED_SET = struct
     else
         elem :: set
 
+  fun addList set (x::xs) = add (fromList xs) x
+    | addList set nil = set
+
   fun positionOf l elem = Util.position elem l
 end

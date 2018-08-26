@@ -22,6 +22,7 @@ signature ORDERED_SET = sig
 
   val empty : ''a set
   val add : ''a set -> ''a -> ''a set
+  val addList : ''a set -> ''a list -> ''a set
   val union : ''a set -> ''a set -> ''a set
   val positionOf : ''a set -> ''a -> int option
 end
