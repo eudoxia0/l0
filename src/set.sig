@@ -23,6 +23,7 @@ signature SET = sig
   val empty : ''a set
   val singleton : ''a -> ''a set
   val add : ''a set -> ''a -> ''a set
+  val addList : ''a set -> ''a list -> ''a set
   val union : ''a set -> ''a set -> ''a set
   val unionList : ''a set list -> ''a set
   val size : ''a set -> int
