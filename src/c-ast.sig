@@ -18,4 +18,43 @@
 *)
 
 signature C_AST = sig
+  datatype ty = Bool
+              | UInt8
+              | Int8
+              | UInt16
+              | Int16
+              | UInt32
+              | Int32
+              | UInt64
+              | Int64
+              | Pointer of ty
+              | Struct of string
+
+  datatype exp_cast = ConstBool of bool
+                    | ConstInt of int
+                    | ConstString of string
+                    | ConstNull
+                    | Var of string
+                    | Binop of Binop.binop * exp_cast * exp_cast
+                    | Cast of ty * exp_cast
+                    | Deref of exp_cast
+                    | AddressOf of exp_cast
+                    | SizeOf of ty
+                    | StructInitializer of string * (string * exp_cast) list
+                    | StructAccess of exp_cast * string
+                    | Adjacent of exp_cast list
+                    | Raw of string
+
+  datatype block_cast = Sequence of block_cast list
+                      | Block of block_cast list
+                      | Declare of ty * string
+                      | Assign of exp_cast * exp_cast
+                      | Cond of exp_cast * block_cast * block_cast
+                      | While of exp_cast * block_cast
+                      | Funcall of string option * string * exp_cast list
+
+  datatype top_cast = FunctionDef of string * param list * ty * block_cast * exp_cast
+                    | StructDef of string * slot list
+       and param = Param of string * ty
+       and slot = Slot of string * ty
 end
