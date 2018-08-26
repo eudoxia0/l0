@@ -41,6 +41,7 @@ structure CBackend :> C_BACKEND = struct
                                                     singleton ty]
       | allTypes (TCast (ty, exp)) = add (allTypes exp) ty
       | allTypes (TProgn l) = unionList (map allTypes l)
+      | allTypes (TLet (_, v, exp)) = union (allTypes v) (allTypes exp)
       | allTypes exp = add empty (typeOf exp)
   end
 end
