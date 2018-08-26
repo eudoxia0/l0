@@ -61,11 +61,11 @@ structure CBackend :> C_BACKEND = struct
   local
     open Type
   in
-    fun filterTuples l =
-        List.filter (fn ty => case ty of
-                                  (Tuple _) => true
-                                | _ => false)
-                    l
+    fun filterTuples types =
+        Set.filter (fn ty => case ty of
+                                 (Tuple _) => true
+                               | _ => false)
+                   types
   end
 
   fun collectTupleTypes tuple_types tast =
