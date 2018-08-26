@@ -50,12 +50,12 @@ structure CAst :> C_AST = struct
 
   datatype block_cast = Sequence of block_cast list
                       | Block of block_cast list
-                      | Declare of ctype * string
+                      | Declare of ty * string
                       | Assign of exp_cast * exp_cast
                       | Cond of exp_cast * block_cast * block_cast
                       | While of exp_cast * block_cast
                       | Funcall of string option * string * exp_cast list
 
-  datatype top_cast = CFunction of string * cparam list * ctype * block_cast * exp_cast
-                    | CStructDef of string * (string * ctype) list
+  datatype top_cast = CFunction of string * param list * ty * block_cast * exp_cast
+                    | CStructDef of string * (string * ty) list
 end
