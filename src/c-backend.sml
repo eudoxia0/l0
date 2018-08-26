@@ -159,7 +159,7 @@ structure CBackend :> C_BACKEND = struct
       | convert (TCast (ty, a)) =
         let val (ablock, aval) = convert a
         in
-            (ablock, CCast (convertType ty, aval))
+            (ablock, Cast (convertType ty, aval))
         end
       | convert (TProgn exps) =
         let val exps' = map convert exps
@@ -203,7 +203,7 @@ structure CBackend :> C_BACKEND = struct
             let val sizecalc = CBinop (AST.Mul, cval, CSizeOf ty)
             in
                 (Sequence [cblock, Declare (Pointer ty, res), Funcall (SOME res, "malloc", [sizecalc])],
-                 CCast (Pointer ty, Var res))
+                 Cast (Pointer ty, Var res))
             end
         end
       | convert (TFree p) =
@@ -232,7 +232,7 @@ structure CBackend :> C_BACKEND = struct
             end
         end
       | convert (TCEmbed (t, s)) =
-        (Sequence [], CCast (convertType t, CRaw s))
+        (Sequence [], Cast (convertType t, Raw s))
       | convert (TCCall (f, t, args)) =
         let val args' = map (fn a => convert a) args
             and t' = convertType t
