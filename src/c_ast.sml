@@ -18,18 +18,18 @@
 *)
 
 structure CAst :> C_AST = struct
-  datatype ctype = Bool
-                 | UInt8
-                 | Int8
-                 | UInt16
-                 | Int16
-                 | UInt32
-                 | Int32
-                 | UInt64
-                 | Int64
-                 | Pointer of ctype
-                 | Struct of string
-                 | RegionType
+  datatype ty = Bool
+              | UInt8
+              | Int8
+              | UInt16
+              | Int16
+              | UInt32
+              | Int32
+              | UInt64
+              | Int64
+              | Pointer of ctype
+              | Struct of string
+              | RegionType
 
   datatype cparam = CParam of string * ctype
 
