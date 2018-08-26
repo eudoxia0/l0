@@ -18,4 +18,5 @@
 *)
 
 signature C_BACKEND = sig
+  type context
 end
