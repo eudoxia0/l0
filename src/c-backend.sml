@@ -84,6 +84,9 @@ structure CBackend :> C_BACKEND = struct
 
   (* TAST -> C AST *)
 
+  fun ngVar n =
+    Var ("var_" ^ (Int.toString (NameGen.nameId n)))
+
   local
     open Type
   in
@@ -199,14 +202,14 @@ structure CBackend :> C_BACKEND = struct
         in
             let val sizecalc = CBinop (AST.Mul, cval, CSizeOf ty)
             in
-                (Sequence [cblock, Declare (Pointer ty, res), CFuncall (SOME res, "malloc", [sizecalc])],
+                (Sequence [cblock, Declare (Pointer ty, res), Funcall (SOME res, "malloc", [sizecalc])],
                  CCast (Pointer ty, Var res))
             end
         end
       | convert (TFree p) =
         let val (pblock, pval) = convert p
         in
-            (Sequence [pblock, CFuncall (NONE, "free", [pval])], unitConstant)
+            (Sequence [pblock, Funcall (NONE, "free", [pval])], unitConstant)
         end
       | convert (TAddressOf (v, _)) =
         (Sequence [], CAddressOf (Var v))
@@ -219,10 +222,10 @@ structure CBackend :> C_BACKEND = struct
                                                    AST.Newline => CConstBool true
                                                  | AST.NoNewline => CConstBool false)
                                   in
-                                      CFuncall (NONE, "interim_print_bool", [vval, nl])
+                                      Funcall (NONE, "interim_print_bool", [vval, nl])
                                   end
                               else
-                                  CFuncall (NONE, "printf", (formatStringFor ty n) @ [vval])
+                                  Funcall (NONE, "printf", (formatStringFor ty n) @ [vval])
             in
                 (Sequence [vblock, printer],
                  unitConstant)
@@ -238,12 +241,12 @@ structure CBackend :> C_BACKEND = struct
                  and argvals = map (fn (_, v) => v) args'
              in
                  if t = Type.Unit then
-                     (Sequence (blocks @ [CFuncall (NONE, f, argvals)]),
+                     (Sequence (blocks @ [Funcall (NONE, f, argvals)]),
                       unitConstant)
                  else
                      let val res = freshVar ()
                      in
-                         (Sequence (blocks @ [Declare (t', res), CFuncall (SOME res, f, argvals)]),
+                         (Sequence (blocks @ [Declare (t', res), Funcall (SOME res, f, argvals)]),
                           Var res)
                      end
              end
@@ -260,9 +263,9 @@ structure CBackend :> C_BACKEND = struct
             let val name = regionName r
             in
                 (Sequence [Declare (RegionType, name),
-                       CFuncall (NONE, "interim_region_create", [CAddressOf (Var name)]),
+                       Funcall (NONE, "interim_region_create", [CAddressOf (Var name)]),
                        bblock,
-                       CFuncall (NONE, "interim_region_free", [CAddressOf (Var name)])],
+                       Funcall (NONE, "interim_region_free", [CAddressOf (Var name)])],
                  bval)
             end
         end
@@ -274,7 +277,7 @@ structure CBackend :> C_BACKEND = struct
         in
             (Sequence [vblock,
                    Declare (cty, res),
-                   CFuncall (SOME res, "interim_region_allocate", [cr, CSizeOf cty]),
+                   Funcall (SOME res, "interim_region_allocate", [cr, CSizeOf cty]),
                    Assign (CDeref (Var res), vval)],
              Var res)
         end
@@ -307,15 +310,15 @@ structure CBackend :> C_BACKEND = struct
             and slot_names = map (fn (n, _) => n) slots
         in
             (Sequence (map (fn (b, _) => b) args),
-             CStructInitializer (name,
-                                 (ListPair.map (fn (name, v) => (name, v))
-                                               (slot_names,
-                                                map (fn (_, v) => v) args))))
+             StructInitializer (name,
+                                (ListPair.map (fn (name, v) => (name, v))
+                                              (slot_names,
+                                               map (fn (_, v) => v) args))))
         end
       | convert (TSlotAccess (r, s, _)) =
         let val (rblock, rval) = convert r
         in
-            (rblock, CStructAccess (rval, s))
+            (rblock, StructAccess (rval, s))
         end
       | convert (TFuncall (f, args, rt)) =
         let val args' = map (fn a => convert a) args
@@ -325,7 +328,7 @@ structure CBackend :> C_BACKEND = struct
             let val blocks = map (fn (b, _) => b) args'
                 and argvals = map (fn (_, v) => v) args'
             in
-                (Sequence (blocks @ [Declare (rt', res), CFuncall (SOME res, f, argvals)]),
+                (Sequence (blocks @ [Declare (rt', res), Funcall (SOME res, f, argvals)]),
                  Var res)
             end
         end
@@ -333,14 +336,14 @@ structure CBackend :> C_BACKEND = struct
     fun defineFunction (Function.Function (name, params, rt)) tast =
       let val (block, retval) = convert tast
       in
-          CFunction (name,
-                     map (fn (Function.Param (n,t)) => CParam (n, convertParamType t)) params,
-                     convertType rt,
-                     block,
-                     retval)
+          FunctionDef (name,
+                       map (fn (Function.Param (n,t)) => CParam (n, convertParamType t)) params,
+                       convertType rt,
+                       block,
+                       retval)
       end
 
     fun defineStruct name slots =
-      CStructDef (name, map (fn (Type.Slot (n, t)) => (n, convertType t)) slots)
+      StructDef (name, map (fn (Type.Slot (n, t)) => (n, convertType t)) slots)
   end
 end
