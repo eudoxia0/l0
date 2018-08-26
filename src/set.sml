@@ -28,6 +28,11 @@ structure Set :> SET = struct
     else
         elem :: set
 
+  fun addList set (x::xs) = add (addList set xs) x
+    | addList set nil = set
+
+  fun union a b = addList (addList empty a) b
+
   fun size set = List.length set
 
   fun fromList (x::xs) = add (fromList xs) x
