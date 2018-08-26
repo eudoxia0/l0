@@ -32,7 +32,7 @@ structure CBackend :> C_BACKEND = struct
 
   local
     open TAST
-    open Set
+    open OrderedSet
   in
     fun allTypes (TBinop (_, lhs, rhs, ty)) = unionList [allTypes lhs,
                                                          allTypes rhs,
