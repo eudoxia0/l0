@@ -22,4 +22,6 @@ signature C_BACKEND = sig
 
   val emptyContext : context
   val renderContext : context -> string
+
+  val defineFunction : context -> Function.func -> TAST.tast -> context
 end

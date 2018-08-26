@@ -27,6 +27,7 @@ structure CBackend :> C_BACKEND = struct
   fun renderContext (Context (ts, _)) =
     String.concatWith "\n\n" (map CAst.renderTop ts)
 
+  fun ctxToplevel (Context (t, _)) = t
   fun ctxTupleTypes (Context (_, tt)) = tt
 
   (* Extract tuple types from TAST expressions *)
@@ -266,14 +267,21 @@ structure CBackend :> C_BACKEND = struct
             end
         end
 
-    fun defineFunction (Function.Function (name, params, rt)) tast ctx =
+    fun defineFunction ctx (Function.Function (name, params, rt)) tast =
       let val (block, retval) = convert tast ctx
+          and tt = collectTupleTypes (ctxTupleTypes ctx) tast
       in
-          FunctionDef (name,
-                       map (fn (Function.Param (n,t)) => Param (n, convertType t ctx)) params,
-                       convertType rt ctx,
-                       block,
-                       retval)
+          let val ctx' = Context (ctxToplevel ctx, tt)
+          in
+              let val def = FunctionDef (name,
+                                         map (fn (Function.Param (n,t)) => Param (n, convertType t ctx')) params,
+                                         convertType rt ctx',
+                                         block,
+                                         retval)
+              in
+                  Context (ctxToplevel ctx @ [def], tt)
+              end
+          end
       end
 
     fun defineStruct name slots ctx =
