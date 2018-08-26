@@ -18,32 +18,32 @@
 *)
 
 structure OrderedSet :> ORDERED_SET = struct
-  type ''a set = ''a list
+  datatype ''a set = Set of ''a list
 
-  val empty = []
+  val empty = Set []
 
-  fun singleton a = [a]
+  fun singleton a = Set [a]
 
-  fun add set elem =
-    if Util.member elem set then
-        set
+  fun add (Set l) elem =
+    if Util.member elem l then
+        Set l
     else
-        elem :: set
+        Set (elem :: l)
 
   fun addList set (x::xs) = add (addList set xs) x
     | addList set nil = set
 
-  fun union a b = addList (addList empty a) b
+  fun union (Set a) (Set b) = addList (addList empty a) b
 
   fun unionList l = foldl (fn (a, b) => union a b)
                           empty
                           l
 
-  fun size set = List.length set
+  fun size (Set l) = List.length l
 
-  fun positionOf l elem = Util.position elem l
+  fun positionOf (Set l) elem = Util.position elem l
 
-  fun filter l f = List.filter f l
+  fun filter (Set l) f = Set (List.filter f l)
 
   fun fromList (x::xs) = add (fromList xs) x
     | fromList nil = empty
