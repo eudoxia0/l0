@@ -48,13 +48,13 @@ structure CAst :> C_AST = struct
                     | Adjacent of exp_cast list
                     | Raw of string
 
-  datatype block_cast = CSeq of block_cast list
-                      | CBlock of block_cast list
-                      | CDeclare of ctype * string
-                      | CAssign of exp_cast * exp_cast
-                      | CCond of exp_cast * block_cast * block_cast
-                      | CWhile of exp_cast * block_cast
-                      | CFuncall of string option * string * exp_cast list
+  datatype block_cast = Sequence of block_cast list
+                      | Block of block_cast list
+                      | Declare of ctype * string
+                      | Assign of exp_cast * exp_cast
+                      | Cond of exp_cast * block_cast * block_cast
+                      | While of exp_cast * block_cast
+                      | Funcall of string option * string * exp_cast list
 
   datatype top_cast = CFunction of string * cparam list * ctype * block_cast * exp_cast
                     | CStructDef of string * (string * ctype) list
