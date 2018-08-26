@@ -33,6 +33,10 @@ structure Set :> SET = struct
 
   fun union a b = addList (addList empty a) b
 
+  fun unionList l = foldl (fn (a, b) => union a b)
+                          empty
+                          l
+
   fun size set = List.length set
 
   fun fromList (x::xs) = add (fromList xs) x
