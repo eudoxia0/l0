@@ -31,8 +31,7 @@ structure OrderedSet :> ORDERED_SET = struct
   fun addList set (x::xs) = add (addList set xs) x
     | addList set nil = set
 
-  fun union a b =
-      addList (addList empty a) b
+  fun union a b = addList (addList empty a) b
 
   fun positionOf l elem = Util.position elem l
 end
