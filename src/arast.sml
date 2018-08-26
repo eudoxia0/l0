@@ -34,14 +34,12 @@ structure ARAST :> ARAST = struct
                | CCall of string * Parser.sexp * ast list
                | Operation of string * ast list
 
-  datatype bind = Binding of string * NameGen.name
-
-  type stack = bind SymTab.symtab
+  type renamed = NameGen.name SymTab.symtab
 
   fun alphaRename ast ng =
-    let val (ast', _, _) = rename ast SymTab.empty ng
+    let val (ast', stack, _) = rename ast SymTab.empty ng
     in
-        ast'
+        (ast', stack)
     end
   and rename AST.ConstUnit s n = (ConstUnit, s, n)
     | rename (AST.ConstBool b) s n = (ConstBool b, s, n)
@@ -100,4 +98,27 @@ structure ARAST :> ARAST = struct
           end
       end
     | renameList nil s n = (nil, s, n)
+
+  fun alphaRenameParams params ng =
+      let val stack = SymTab.empty
+      in
+          let val (_, stack', ng') = renameParamList params stack ng
+          in
+              (stack', ng')
+          end
+      end
+  and renameParam (Function.Param (name, ty)) stack ng =
+      let val (fresh, ng') = NameGen.freshName ng
+      in
+          ((), SymTab.bind (name, fresh) stack, ng')
+      end
+  and renameParamList (head::tail) s n =
+      let val (head', s', n') = renameParam head s n
+      in
+          let val (list, s'', n'') = (renameParamList tail s' n')
+          in
+              (head' :: list, s'', n'')
+          end
+      end
+    | renameParamList nil s n = (nil, s, n)
 end

@@ -41,24 +41,27 @@ structure Compiler :> COMPILER = struct
          let val fenv' = bind (Function.funcName func, func) fenv
              and (stack, namegen) = Function.toStack func
          in
-             let val oast = OAST.augment (ARAST.alphaRename ast namegen)
+             let val (arast, _) = ARAST.alphaRename ast namegen
              in
-                 let val tast = TAST.augment oast
-                                             (TAST.mkContext stack
-                                                             tenv
-                                                             fenv')
+                 let val oast = OAST.augment arast
                  in
-                     if (TAST.typeOf tast) <> Function.funcRT func then
-                         raise Fail "Return type does not match type of body"
-                     else
-                         let val ctx' = CBackend.defineFunction ctx func tast
-                         in
-                             print (";; Define function " ^ (Function.funcName func) ^ "\n");
-                             print "Context:\n";
-                             print (CBackend.renderContext ctx');
-                             print "\n";
-                             Compiler (tenv, fenv', ctx')
-                         end
+                     let val tast = TAST.augment oast
+                                                 (TAST.mkContext stack
+                                                                 tenv
+                                                                 fenv')
+                     in
+                         if (TAST.typeOf tast) <> Function.funcRT func then
+                             raise Fail "Return type does not match type of body"
+                         else
+                             let val ctx' = CBackend.defineFunction ctx func tast
+                             in
+                                 print (";; Define function " ^ (Function.funcName func) ^ "\n");
+                                 print "Context:\n";
+                                 print (CBackend.renderContext ctx');
+                                 print "\n";
+                                 Compiler (tenv, fenv', ctx')
+                             end
+                     end
                  end
              end
          end)

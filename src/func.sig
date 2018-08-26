@@ -19,7 +19,6 @@
 
 signature FUNCTION = sig
   datatype param = Param of string * Type.ty
-  datatype conc_param = ConcParam of string * Type.ty
   datatype func = Function of string * param list * Type.ty
 
   type fenv = func SymTab.symtab

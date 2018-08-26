@@ -32,5 +32,8 @@ signature ARAST = sig
                | CCall of string * Parser.sexp * ast list
                | Operation of string * ast list
 
-  val alphaRename : AST.ast -> NameGen.namegen -> ast
+  type renamed
+
+  val alphaRename : AST.ast -> NameGen.namegen -> (ast * renamed)
+  val alphaRenameParams : Function.param list -> NameGen.namegen -> (renamed * NameGen.namegen)
 end
