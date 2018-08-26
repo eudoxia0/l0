@@ -18,8 +18,6 @@
 *)
 
 structure TAST :> TAST = struct
-  open SymTab
-
   datatype tast = TConstUnit
                 | TConstBool of bool
                 | TConstInt of int * Type.ty
