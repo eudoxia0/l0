@@ -81,4 +81,241 @@ structure CBackend :> C_BACKEND = struct
         count := !count + 1;
         "var_" ^ (Int.toString (!count))
     end
+
+  (* TAST -> C AST *)
+
+  local
+    open TAST
+  in
+    fun convert TConstUnit =
+        (Sequence [], unitConstant)
+      | convert (TConstBool b) =
+        (Sequence [], CConstBool b)
+      | convert (TConstInt (i, t)) =
+        (Sequence [], Cast (convertType t, CConstInt i))
+      | convert (TConstString s) =
+        (Sequenceuence [], CConstString s)
+      | convert (TVar (s, t)) = (Sequence [], CVar s)
+      | convert (TBinop (oper, a, b, t)) =
+        let val (ablock, aval) = convert a
+            and (bblock, bval) = convert b
+        in
+            (Sequence [
+                  ablock,
+                  bblock
+              ],
+             (CBinop (oper, aval, bval)))
+        end
+      | convert (TCond (t, c, a, _)) =
+        let val (tblock, tval) = convert t
+            and (cblock, cval) = convert c
+            and (ablock, aval) = convert a
+            and result = freshVar ()
+            and resType = convertType (TAST.typeOf c)
+        in
+            (Sequence [
+                  tblock,
+                  CDeclare (resType, result),
+                  CCond (tval,
+                         CBlock [
+                             cblock,
+                             CAssign (CVar result, cval)
+                         ],
+                         CBlock [
+                             ablock,
+                             CAssign (CVar result, aval)
+                        ])
+              ],
+             CVar result)
+        end
+      | convert (TCast (ty, a)) =
+        let val (ablock, aval) = convert a
+        in
+            (ablock, CCast (convertType ty, aval))
+        end
+      | convert (TProgn exps) =
+        let val exps' = map convert exps
+        in
+            if (length exps = 0) then
+                (Sequence [], unitConstant)
+            else
+                (Sequence (map (fn (b, _) => b) exps'),
+                 let val (_, v) = List.last exps' in v end)
+        end
+      | convert (TLet (name, v, b)) =
+        let val (vblock, vval) = convert v
+            and ty = convertType (typeOf v)
+            and (bblock, bval) = convert b
+        in
+            (Sequence [vblock, CDeclare (ty, name), CAssign (CVar name, vval), bblock],
+             bval)
+        end
+      | convert (TAssign (var, v)) =
+        let val (vblock, vval) = convert v
+        in
+            (Sequence [vblock, CAssign (CVar var, vval)], vval)
+        end
+      | convert (TNullPtr _) = (Sequence [], CConstNull)
+      | convert (TLoad (e, _)) =
+        let val (eblock, eval) = convert e
+        in
+            (eblock, CDeref eval)
+        end
+      | convert (TStore (p, v)) =
+        let val (pblock, pval) = convert p
+            and (vblock, vval) = convert v
+        in
+            (Sequence [pblock, vblock, CAssign ((CDeref pval), vval)], vval)
+        end
+      | convert (TMalloc (t, c)) =
+        let val (cblock, cval) = convert c
+            and ty = convertType t
+            and res = freshVar ()
+        in
+            let val sizecalc = CBinop (AST.Mul, cval, CSizeOf ty)
+            in
+                (Sequence [cblock, CDeclare (Pointer ty, res), CFuncall (SOME res, "malloc", [sizecalc])],
+                 CCast (Pointer ty, CVar res))
+            end
+        end
+      | convert (TFree p) =
+        let val (pblock, pval) = convert p
+        in
+            (Sequence [pblock, CFuncall (NONE, "free", [pval])], unitConstant)
+        end
+      | convert (TAddressOf (v, _)) =
+        (Sequence [], CAddressOf (CVar v))
+      | convert (TPrint (v, n)) =
+        let val (vblock, vval) = convert v
+            and ty = typeOf v
+        in
+            let val printer = if ty = Type.Bool then
+                                  let val nl = (case n of
+                                                   AST.Newline => CConstBool true
+                                                 | AST.NoNewline => CConstBool false)
+                                  in
+                                      CFuncall (NONE, "interim_print_bool", [vval, nl])
+                                  end
+                              else
+                                  CFuncall (NONE, "printf", (formatStringFor ty n) @ [vval])
+            in
+                (Sequence [vblock, printer],
+                 unitConstant)
+            end
+        end
+      | convert (TCEmbed (t, s)) =
+        (Sequence [], CCast (convertType t, CRaw s))
+      | convert (TCCall (f, t, args)) =
+        let val args' = map (fn a => convert a) args
+            and t' = convertType t
+        in
+             let val blocks = map (fn (b, _) => b) args'
+                 and argvals = map (fn (_, v) => v) args'
+             in
+                 if t = Type.Unit then
+                     (Sequence (blocks @ [CFuncall (NONE, f, argvals)]),
+                      unitConstant)
+                 else
+                     let val res = freshVar ()
+                     in
+                         (Sequence (blocks @ [CDeclare (t', res), CFuncall (SOME res, f, argvals)]),
+                          CVar res)
+                     end
+             end
+        end
+      | convert (TWhile (t, b)) =
+        let val (tblock, tval) = convert t
+            and (bblock, _) = convert b
+        in
+            (Sequence [tblock, CWhile (tval, bblock)], unitConstant)
+        end
+      | convert (TLetRegion (r, b)) =
+        let val (bblock, bval) = convert b
+        in
+            let val name = regionName r
+            in
+                (Sequence [CDeclare (RegionType, name),
+                       CFuncall (NONE, "interim_region_create", [CAddressOf (CVar name)]),
+                       bblock,
+                       CFuncall (NONE, "interim_region_free", [CAddressOf (CVar name)])],
+                 bval)
+            end
+        end
+      | convert (TAllocate (r, v)) =
+        let val (vblock, vval) = convert v
+            and cr = CAddressOf (CVar (regionName r))
+            and res = freshVar ()
+            and cty = Pointer (convertType (typeOf v))
+        in
+            (Sequence [vblock,
+                   CDeclare (cty, res),
+                   CFuncall (SOME res, "interim_region_allocate", [cr, CSizeOf cty]),
+                   CAssign (CDeref (CVar res), vval)],
+             CVar res)
+        end
+      | convert (TNullableCase (p, var, nnc, nc, t)) =
+        let val (pblock, pval) = convert p
+            and (nncblock, nncval) = convert nnc
+            and (ncblock, ncval) = convert nc
+            and result = freshVar ()
+            and resType = convertType t
+        in
+            (Sequence [
+                  pblock,
+                  CDeclare (resType, result),
+                  CCond (CBinop (AST.NEq, pval, CConstNull),
+                         CBlock [
+                             CDeclare (convertType (typeOf p), escapeIdent var),
+                             CAssign (CVar var, pval),
+                             nncblock,
+                             CAssign (CVar result, nncval)
+                         ],
+                         CBlock [
+                             ncblock,
+                             CAssign (CVar result, ncval)
+                        ])
+              ],
+             CVar result)
+        end
+      | convert (TMakeRecord (ty, name, slots)) =
+        let val args = map (fn (_, e) => convert e) slots
+            and slot_names = map (fn (n, _) => n) slots
+        in
+            (Sequence (map (fn (b, _) => b) args),
+             CStructInitializer (name,
+                                 (ListPair.map (fn (name, v) => (name, v))
+                                               (slot_names,
+                                                map (fn (_, v) => v) args))))
+        end
+      | convert (TSlotAccess (r, s, _)) =
+        let val (rblock, rval) = convert r
+        in
+            (rblock, CStructAccess (rval, s))
+        end
+      | convert (TFuncall (f, args, rt)) =
+        let val args' = map (fn a => convert a) args
+            and rt' = convertType rt
+            and res = freshVar ()
+        in
+            let val blocks = map (fn (b, _) => b) args'
+                and argvals = map (fn (_, v) => v) args'
+            in
+                (Sequence (blocks @ [CDeclare (rt', res), CFuncall (SOME res, f, argvals)]),
+                 CVar res)
+            end
+        end
+
+    fun defineFunction (Function.Function (name, params, rt)) tast =
+      let val (block, retval) = convert tast
+      in
+          CFunction (name,
+                     map (fn (Function.Param (n,t)) => CParam (n, convertParamType t)) params,
+                     convertType rt,
+                     block,
+                     retval)
+      end
+
+    fun defineStruct name slots =
+      CStructDef (name, map (fn (Type.Slot (n, t)) => (n, convertType t)) slots)
+  end
 end
