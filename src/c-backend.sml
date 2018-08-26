@@ -79,7 +79,7 @@ structure CBackend :> C_BACKEND = struct
     let
     in
         count := !count + 1;
-        "var_" ^ (Int.toString (!count))
+        "autovar_" ^ (Int.toString (!count))
     end
 
   (* TAST -> C AST *)
