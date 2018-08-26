@@ -67,4 +67,7 @@ structure CBackend :> C_BACKEND = struct
                                 | _ => false)
                     l
   end
+
+  fun collectTupleTypes tuple_types tast =
+    Set.addList tuple_types (filterTuples (allTypes tast))
 end
