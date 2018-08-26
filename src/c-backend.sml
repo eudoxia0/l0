@@ -84,8 +84,11 @@ structure CBackend :> C_BACKEND = struct
 
   (* TAST -> C AST *)
 
+  fun varName n =
+    "var_" ^ (Int.toString (NameGen.nameId n))
+
   fun ngVar n =
-    Var ("var_" ^ (Int.toString (NameGen.nameId n)))
+    CAst.Var (varName n)
 
   local
     open Type
@@ -100,26 +103,29 @@ structure CBackend :> C_BACKEND = struct
       | convertIntType Signed   Word64 = CAst.Int64
   end
 
-  fun convertType (Type.Unit) = Bool
-    | convertType (Type.Bool) = Bool
-    | convertType (Type.Int (s, w)) = convertIntType s w
-    | convertType (Type.Str) = Pointer UInt8
-    | convertType (Type.RawPointer t) = Pointer (convertType t)
-    | convertType (Type.Record (n, _)) = Struct (escapeIdent n)
-    | convertType (Type.RegionType _) = RegionType
-    | convertType (Type.RegionPointer (t, _)) = Pointer (convertType t)
-    | convertType (Type.NullablePointer (t, _)) = Pointer (convertType t)
+  local
+    open CAst
+  in
+    fun convertType (Type.Unit) = Bool
+      | convertType (Type.Bool) = Bool
+      | convertType (Type.Int (s, w)) = convertIntType s w
+      | convertType (Type.Str) = Pointer UInt8
+      | convertType (Type.RawPointer t) = Pointer (convertType t)
+      | convertType (Type.Tuple _) = raise Fail "tuple types not implemented yet"
+  end
 
   local
     open TAST
     open CAst
   in
+    val unitConstant = ConstBool false
+
     fun convert TConstUnit =
         (Sequence [], unitConstant)
       | convert (TConstBool b) =
         (Sequence [], ConstBool b)
       | convert (TConstInt (i, t)) =
-        (Sequence [], Cast (convertType t, CConstInt i))
+        (Sequence [], Cast (convertType t, ConstInt i))
       | convert (TConstString s) =
         (Sequence [], ConstString s)
       | convert (TVar (s, t)) =
@@ -175,7 +181,7 @@ structure CBackend :> C_BACKEND = struct
             and ty = convertType (typeOf v)
             and (bblock, bval) = convert b
         in
-            (Sequence [vblock, Declare (ty, name), Assign (ngVar name, vval), bblock],
+            (Sequence [vblock, Declare (ty, varName name), Assign (ngVar name, vval), bblock],
              bval)
         end
       | convert (TAssign (var, v)) =
@@ -183,24 +189,25 @@ structure CBackend :> C_BACKEND = struct
         in
             (Sequence [vblock, Assign (ngVar var, vval)], vval)
         end
-      | convert (TNullPtr _) = (Sequence [], CConstNull)
+      | convert (TNullPtr _) =
+        (Sequence [], ConstNull)
       | convert (TLoad (e, _)) =
         let val (eblock, eval) = convert e
         in
-            (eblock, CDeref eval)
+            (eblock, Deref eval)
         end
       | convert (TStore (p, v)) =
         let val (pblock, pval) = convert p
             and (vblock, vval) = convert v
         in
-            (Sequence [pblock, vblock, Assign ((CDeref pval), vval)], vval)
+            (Sequence [pblock, vblock, Assign ((Deref pval), vval)], vval)
         end
       | convert (TMalloc (t, c)) =
         let val (cblock, cval) = convert c
             and ty = convertType t
             and res = freshVar ()
         in
-            let val sizecalc = Binop (Binop.Mul, cval, CSizeOf ty)
+            let val sizecalc = Binop (Binop.Mul, cval, SizeOf ty)
             in
                 (Sequence [cblock, Declare (Pointer ty, res), Funcall (SOME res, "malloc", [sizecalc])],
                  Cast (Pointer ty, Var res))
@@ -212,25 +219,9 @@ structure CBackend :> C_BACKEND = struct
             (Sequence [pblock, Funcall (NONE, "free", [pval])], unitConstant)
         end
       | convert (TAddressOf (v, _)) =
-        (Sequence [], CAddressOf (ngVar v))
-      | convert (TPrint (v, n)) =
-        let val (vblock, vval) = convert v
-            and ty = typeOf v
-        in
-            let val printer = if ty = Type.Bool then
-                                  let val nl = (case n of
-                                                   AST.Newline => CConstBool true
-                                                 | AST.NoNewline => CConstBool false)
-                                  in
-                                      Funcall (NONE, "interim_print_bool", [vval, nl])
-                                  end
-                              else
-                                  Funcall (NONE, "printf", (formatStringFor ty n) @ [vval])
-            in
-                (Sequence [vblock, printer],
-                 unitConstant)
-            end
-        end
+        (Sequence [], AddressOf (ngVar v))
+      | convert (TPrint _) =
+        raise Fail "print not implemented yet"
       | convert (TCEmbed (t, s)) =
         (Sequence [], Cast (convertType t, Raw s))
       | convert (TCCall (f, t, args)) =
@@ -255,70 +246,7 @@ structure CBackend :> C_BACKEND = struct
         let val (tblock, tval) = convert t
             and (bblock, _) = convert b
         in
-            (Sequence [tblock, CWhile (tval, bblock)], unitConstant)
-        end
-      | convert (TLetRegion (r, b)) =
-        let val (bblock, bval) = convert b
-        in
-            let val name = regionName r
-            in
-                (Sequence [Declare (RegionType, name),
-                       Funcall (NONE, "interim_region_create", [CAddressOf (Var name)]),
-                       bblock,
-                       Funcall (NONE, "interim_region_free", [CAddressOf (Var name)])],
-                 bval)
-            end
-        end
-      | convert (TAllocate (r, v)) =
-        let val (vblock, vval) = convert v
-            and cr = CAddressOf (Var (regionName r))
-            and res = freshVar ()
-            and cty = Pointer (convertType (typeOf v))
-        in
-            (Sequence [vblock,
-                   Declare (cty, res),
-                   Funcall (SOME res, "interim_region_allocate", [cr, CSizeOf cty]),
-                   Assign (CDeref (Var res), vval)],
-             Var res)
-        end
-      | convert (TNullableCase (p, var, nnc, nc, t)) =
-        let val (pblock, pval) = convert p
-            and (nncblock, nncval) = convert nnc
-            and (ncblock, ncval) = convert nc
-            and result = freshVar ()
-            and resType = convertType t
-        in
-            (Sequence [
-                  pblock,
-                  Declare (resType, result),
-                  Cond (Binop (AST.NEq, pval, CConstNull),
-                         Block [
-                             Declare (convertType (typeOf p), escapeIdent var),
-                             Assign (Var var, pval),
-                             nncblock,
-                             Assign (Var result, nncval)
-                         ],
-                         Block [
-                             ncblock,
-                             Assign (Var result, ncval)
-                        ])
-              ],
-             Var result)
-        end
-      | convert (TMakeRecord (ty, name, slots)) =
-        let val args = map (fn (_, e) => convert e) slots
-            and slot_names = map (fn (n, _) => n) slots
-        in
-            (Sequence (map (fn (b, _) => b) args),
-             StructInitializer (name,
-                                (ListPair.map (fn (name, v) => (name, v))
-                                              (slot_names,
-                                               map (fn (_, v) => v) args))))
-        end
-      | convert (TSlotAccess (r, s, _)) =
-        let val (rblock, rval) = convert r
-        in
-            (rblock, StructAccess (rval, s))
+            (Sequence [tblock, While (tval, bblock)], unitConstant)
         end
       | convert (TFuncall (f, args, rt)) =
         let val args' = map (fn a => convert a) args
@@ -337,13 +265,13 @@ structure CBackend :> C_BACKEND = struct
       let val (block, retval) = convert tast
       in
           FunctionDef (name,
-                       map (fn (Function.Param (n,t)) => CParam (n, convertParamType t)) params,
+                       map (fn (Function.Param (n,t)) => Param (n, convertType t)) params,
                        convertType rt,
                        block,
                        retval)
       end
 
     fun defineStruct name slots =
-      StructDef (name, map (fn (Type.Slot (n, t)) => (n, convertType t)) slots)
+      StructDef (name, map (fn (Type.Slot (n, t)) => Slot (n, convertType t)) slots)
   end
 end
