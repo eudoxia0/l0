@@ -166,7 +166,8 @@ structure CAst :> C_AST = struct
 
   fun renderTop (FunctionDef (name, params, rt, body, retval)) =
     (renderType rt) ^ " " ^ (escapeIdent name) ^ "(" ^ (sepBy "," (map renderParam params)) ^ ") {\n" ^ (renderBlock body) ^ "\n  return " ^ (renderExp retval) ^ ";\n}"
-    | renderTop (StructDef (name, slots)) =
+    | renderTop (StructDef (name, slots)) = renderStructDef name slots
+  and renderStructDef name slots =
       "typedef struct { "
       ^ (String.concatWith " " (map renderSlot slots))
       ^ " } " ^ (escapeIdent name) ^ ";\n"
