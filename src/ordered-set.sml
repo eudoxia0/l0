@@ -22,6 +22,8 @@ structure OrderedSet :> ORDERED_SET = struct
 
   val empty = []
 
+  fun singleton a = [a]
+
   fun add set elem =
     if Util.member elem set then
         set
@@ -33,5 +35,16 @@ structure OrderedSet :> ORDERED_SET = struct
 
   fun union a b = addList (addList empty a) b
 
+  fun unionList l = foldl (fn (a, b) => union a b)
+                          empty
+                          l
+
+  fun size set = List.length set
+
   fun positionOf l elem = Util.position elem l
+
+  fun filter l f = List.filter f l
+
+  fun fromList (x::xs) = add (fromList xs) x
+    | fromList nil = empty
 end
