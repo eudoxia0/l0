@@ -30,6 +30,7 @@ signature ORDERED_SET = sig
   val unionList : ''a set list -> ''a set
 
   val size : ''a set -> int
+  (* positions start at 1 *)
   val positionOf : ''a set -> ''a -> int option
 
   val filter : ''a set -> (''a -> bool) -> ''a set
