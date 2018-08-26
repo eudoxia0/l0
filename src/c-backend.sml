@@ -24,4 +24,21 @@ structure CBackend :> C_BACKEND = struct
 
   fun renderContext (Context (ts, _)) =
       String.concatWith "\n" (map CAst.renderTop ts)
+
+
+  (* Extract tuple types from TAST expressions *)
+
+  local
+    open TAST
+    open Set
+  in
+    fun allTypes (TBinop (_, lhs, rhs, ty)) = union (allTypes lhs)
+                                                    (add (allTypes rhs)
+                                                         ty)
+      | allTypes (TCond (t, c, a, ty)) = union (allTypes t)
+                                               (union (allTypes c)
+                                                      (add (allTypes a)
+                                                           ty))
+      | allTypes exp = add empty (typeOf exp)
+  end
 end
