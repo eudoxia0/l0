@@ -27,11 +27,11 @@ structure CAst :> C_AST = struct
               | Int32
               | UInt64
               | Int64
-              | Pointer of ctype
+              | Pointer of ty
               | Struct of string
               | RegionType
 
-  datatype param = Param of string * ctype
+  datatype param = Param of string * ty
 
   datatype exp_cast = ConstBool of bool
                     | ConstInt of int
@@ -39,10 +39,10 @@ structure CAst :> C_AST = struct
                     | ConstNull
                     | Var of string
                     | Binop of Binop.binop * exp_cast * exp_cast
-                    | Cast of ctype * exp_cast
+                    | Cast of ty * exp_cast
                     | Deref of exp_cast
                     | AddressOf of exp_cast
-                    | SizeOf of ctype
+                    | SizeOf of ty
                     | StructInitializer of string * (string * exp_cast) list
                     | StructAccess of exp_cast * string
                     | Adjacent of exp_cast list
