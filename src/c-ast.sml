@@ -57,4 +57,5 @@ structure CAst :> C_AST = struct
   datatype top_cast = FunctionDef of string * param list * ty * block_cast * exp_cast
                     | StructDef of string * (string * ty) list
        and param = Param of string * ty
+       and slot = Slot of string * ty
 end
