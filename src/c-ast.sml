@@ -31,7 +31,6 @@ structure CAst :> C_AST = struct
               | Int64
               | Pointer of ty
               | Struct of string
-              | RegionType
 
   datatype exp_cast = ConstBool of bool
                     | ConstInt of int
