@@ -28,63 +28,14 @@ structure CBackend :> C_BACKEND = struct
 
   (* Context *)
 
-  type tuple_types = Type.ty OrderedSet.set
+  datatype context = Context of CAst.top_ast list
 
-  datatype context = Context of CAst.top_ast list * tuple_types
+  val emptyContext = Context []
 
-  val emptyContext = Context ([], OrderedSet.empty)
-
-  fun renderContext (Context (ts, _)) =
+  fun renderContext (Context ts) =
     prelude ^ "\n\n" ^ (String.concatWith "\n\n" (map CAst.renderTop ts))
 
-  fun ctxToplevel (Context (t, _)) = t
-  fun ctxTupleTypes (Context (_, tt)) = tt
-
-  (* Extract tuple types from TAST expressions *)
-
-  local
-    open TAST
-    open OrderedSet
-  in
-    fun allTypes (TBinop (_, lhs, rhs, ty)) = unionList [allTypes lhs,
-                                                         allTypes rhs,
-                                                         singleton ty]
-      | allTypes (TCond (t, c, a, ty)) = unionList [allTypes t,
-                                                    allTypes c,
-                                                    allTypes a,
-                                                    singleton ty]
-      | allTypes (TCast (ty, exp)) = add (allTypes exp) ty
-      | allTypes (TProgn l) = unionList (map allTypes l)
-      | allTypes (TLet (_, v, exp)) = union (allTypes v) (allTypes exp)
-      | allTypes (TAssign (_, exp)) = allTypes exp
-      | allTypes (TNullPtr ty) = singleton ty
-      | allTypes (TLoad (exp, ty)) = add (allTypes exp) ty
-      | allTypes (TStore (ptr, exp)) = union (allTypes ptr) (allTypes exp)
-      | allTypes (TMalloc (ty, exp)) = add (allTypes exp) ty
-      | allTypes (TFree exp) = allTypes exp
-      | allTypes (TPrint (exp, _)) = allTypes exp
-      | allTypes (TCEmbed (ty, _)) = singleton ty
-      | allTypes (TCCall (_, ty, args)) = add (unionList (map allTypes args)) ty
-      | allTypes (TWhile (test, body)) = union (allTypes test) (allTypes body)
-      | allTypes (TFuncall (_, args, ty)) = add (unionList (map allTypes args)) ty
-      | allTypes exp = add empty (typeOf exp)
-  end
-
-  local
-    open Type
-  in
-    fun filterTuples types =
-        OrderedSet.filter types
-                          (fn ty => case ty of
-                                        (Tuple _) => true
-                                      | _ => false)
-  end
-
-  fun collectTupleTypes rt tast =
-      filterTuples (OrderedSet.union (allTypes tast) (OrderedSet.singleton rt))
-
-  fun newTupleTypes old_tuple_types new_tuple_types =
-    OrderedSet.difference new_tuple_types old_tuple_types
+  fun ctxToplevel (Context t) = t
 
   (* Fresh identifiers *)
 
@@ -118,14 +69,6 @@ structure CBackend :> C_BACKEND = struct
       | convertIntType Unsigned Word64 = CAst.UInt64
       | convertIntType Signed   Word64 = CAst.Int64
   end
-
-  fun tupleName ctx ty =
-    (case OrderedSet.positionOf (ctxTupleTypes ctx) ty of
-         SOME i => "struct_" ^ (Int.toString i)
-       | NONE => raise Fail "Tuple not in table")
-
-  fun tupleFieldName idx =
-    "_" ^ (Int.toString idx)
 
   local
     open CAst
