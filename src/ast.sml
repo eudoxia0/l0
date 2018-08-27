@@ -59,6 +59,14 @@ structure AST :> AST = struct
         end
       | parseL "let" ((List nil)::body) e =
         Operation ("progn", mparse body e)
+      | parseL "bind" ((List binds)::tup::body) e =
+        let fun parseBind (Symbol s) = s
+              | parseBind _ = raise Fail "Not a binding"
+        in
+          Bind (map parseBind binds,
+                parse tup e,
+                Operation ("progn", mparse body e))
+        end
       | parseL "tuple" rest e =
         Operation ("tuple", mparse rest e)
       | parseL "proj" [exp, Integer i]  e =
