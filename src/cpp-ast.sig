@@ -17,7 +17,7 @@
     along with L0.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-signature C_AST = sig
+signature CPP_AST = sig
   datatype ty = Bool
               | UInt8
               | Int8

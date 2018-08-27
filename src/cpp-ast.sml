@@ -17,7 +17,7 @@
     along with L0.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure CAst :> C_AST = struct
+structure CppAst :> CPP_AST = struct
   (* Types *)
 
   datatype ty = Bool
