@@ -81,7 +81,7 @@ structure CBackend :> C_BACKEND = struct
   end
 
   fun collectTupleTypes rt tast =
-      filterTuples (OrderedSet.union (allTypes tast) [OrderedSet.singleton rt])
+      filterTuples (OrderedSet.union (allTypes tast) (OrderedSet.singleton rt))
 
   fun newTupleTypes old_tuple_types new_tuple_types =
     OrderedSet.difference new_tuple_types old_tuple_types
