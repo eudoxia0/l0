@@ -290,8 +290,8 @@ structure CBackend :> C_BACKEND = struct
               end
           end
       end
-    and convertParam (Function.Param (i,t)) =
-      Param ("var_" ^ (Ident.identName i), convertType t ctx'))
+    and convertParam (Function.Param (i, t)) =
+      Param ("var_" ^ (Ident.identName i), convertType t ctx')
 
     fun defineStruct name slots ctx =
       StructDef (name, map (fn (Type.Slot (n, t)) => Slot (n, convertType t ctx)) slots)
