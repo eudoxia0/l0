@@ -31,7 +31,7 @@ signature TYPE = sig
   val isEquatable : ty -> bool
   val isNumeric : ty -> bool
   val isPrintable : ty -> bool
-  val tyToString : ty -> string
+  val toString : ty -> string
 
   type tenv
   val emptyTenv : tenv
