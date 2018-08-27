@@ -175,7 +175,7 @@ structure TAST :> TAST = struct
           in
               let val (Binding (ty, m)) = case (Map.get (ctxBindings c) var) of
                                               SOME bind => bind
-                                            | NONE => raise Fail "No such variable"
+                                            | NONE => raise Fail ("No such variable: " ^ (Ident.identName var))
               in
                   if m = Mutable then
                       if typeOf v' = ty then
