@@ -58,6 +58,8 @@ structure AST :> AST = struct
         end
       | parseL "let" ((List nil)::body) e =
         Operation ("progn", mparse body e)
+      | parseL "tuple" rest e =
+        Operation ("tuple", mparse rest e)
       | parseL "c/nullptr" [t] _ = NullPtr t
       | parseL "c/malloc" [t, c] e = Malloc (t, parse c e)
       | parseL "c/address-of" [Symbol s] _ = AddressOf s
