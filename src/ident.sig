@@ -23,4 +23,6 @@ signature IDENT = sig
   val mkIdent : string -> int -> ident
   val identName : ident -> string
   val identId : ident -> int
+
+  val toString : ident -> string
 end
