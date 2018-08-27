@@ -38,6 +38,8 @@ structure Compiler :> COMPILER = struct
   fun compileAST (Compiler (tenv, fenv, ctx)) ast =
       let val (func, arast) = ARAST.alphaRename ast
       in
+          print "ARAST: \n";
+          print (ARAST.toString arast);
           let val fenv' = case Map.add fenv (Function.funcName func, func) of
                               SOME fenv' => fenv'
                             | NONE => raise Fail "Function already defined"
