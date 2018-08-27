@@ -352,7 +352,7 @@ structure CBackend :> C_BACKEND = struct
     and convertParam ctx (Function.Param (i, t)) =
       Param ("var_" ^ (Ident.identName i), convertType t ctx)
     and defineTuple ctx tt =
-      let name = tupleName ctx tt
+      let val name = tupleName ctx tt
       in
         StructDef (name, defineSlots tt)
       end
