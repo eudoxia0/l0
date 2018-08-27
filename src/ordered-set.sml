@@ -42,6 +42,10 @@ structure OrderedSet :> ORDERED_SET = struct
                           empty
                           l
 
+  fun difference (Set blist) a =
+    (* All elements in B but not in A *)
+    Set (List.filter (fn belem => not (exists a belem)) blist)
+
   fun size (Set l) = List.length l
 
   fun positionOf (Set l) elem =
