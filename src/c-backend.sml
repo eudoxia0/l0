@@ -118,6 +118,11 @@ structure CBackend :> C_BACKEND = struct
       | convertIntType Signed   Word64 = CAst.Int64
   end
 
+  fun tupleName ctx ty =
+    (case OrderedSet.positionOf (ctxTupleTypes ctx) (Type.Tuple ty) of
+         SOME i => "struct_" ^ (Int.toString i)
+       | NONE => raise Fail "Tuple not in table")
+
   local
     open CAst
   in
@@ -126,10 +131,7 @@ structure CBackend :> C_BACKEND = struct
       | convertType (Type.Int (s, w)) _ = convertIntType s w
       | convertType (Type.Str) _ = Pointer UInt8
       | convertType (Type.RawPointer t) ctx = Pointer (convertType t ctx)
-      | convertType (Type.Tuple ts) ctx =
-        case OrderedSet.positionOf (ctxTupleTypes ctx) (Type.Tuple ts) of
-            SOME i => Struct ("struct_" ^ (Int.toString i))
-          | NONE => raise Fail "Tuple not in table"
+      | convertType (Type.Tuple ts) ctx = Struct (tupleName ctx ts)
   end
 
   (* Printing *)
