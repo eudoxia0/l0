@@ -25,6 +25,7 @@ structure ARAST :> ARAST = struct
                | Var of Ident.ident
                | Cast of Type.ty * ast
                | Let of Ident.ident * ast * ast
+               | Bind of string list * ast * ast
                | NullPtr of Parser.sexp
                | Malloc of Parser.sexp * ast
                | AddressOf of Ident.ident
