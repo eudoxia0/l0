@@ -142,4 +142,16 @@ structure ARAST :> ARAST = struct
           end
       end
     | renameList nil s = (nil, s)
+
+  fun toString ConstUnit = "nil"
+    | toString (ConstBool true) = "true"
+    | toString (ConstBool false) = "false"
+    | toString (ConstInt i) = (Int.toString i)
+    | toString (ConstString s) = "\"" ^ s ^ "\""
+    | toString (Var i) = Ident.toString i
+    | toString (Cast (t, e)) =
+      "(cast " ^ (Type.toString t) ^ " " ^ (toString e) ^ ")"
+    | toString Let (i, v, b) =
+      "(let ((" ^ (Ident.toString i) ^ " " ^ (toString v) ^ ")) " ^ (toString b) ^ ")"
+    | toString _ = raise Fail "NOT IMPLEMENTED YET"
 end
