@@ -331,7 +331,7 @@ structure CBackend :> C_BACKEND = struct
               and newTT = newTupleTypes (ctxTupleTypes ctx) allTupleTypes
           in
               let val ctx' = Context (ctxToplevel ctx, tt)
-                  and newTTdefs = map defineTuple newTT
+                  and newTTdefs = map defineTuple (OrderedSet.toList newTT)
               in
                   let val def = FunctionDef (name,
                                              map (convertParam ctx') params,
