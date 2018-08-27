@@ -151,6 +151,25 @@ structure TAST :> TAST = struct
                         augment body (mkContext s' (ctxTenv c) (ctxFenv c)))
               end
           end
+        | augment (Bind (binds, tup, body)) c =
+          let val tup' = augment tup c
+          in
+            case typeOf tup' of
+                (Type.Tuple tys) => if (List.length tys) = (List.length binds) then
+                                        let val s' = Map.iaddList (ctxBindings c)
+                                                                  (ListPair.map (fn (b, idx) => (b, Binding (List.nth (tys, idx), Immutable)))
+                                                                                (binds,
+                                                                                 List.tabulate (List.length binds, fn x => x)))
+                                        in
+                                            let val ctx' = mkContext s' (ctxTenv c) (ctxFenv c)
+                                            in
+                                                TBind (binds, tup', augment body ctx')
+                                            end
+                                        end
+                                    else
+                                        raise Fail "Number of bindings does not match tuple size"
+             |  _ => raise Fail "Cannot bind a non-tuple"
+          end
         | augment (Assign (var, v)) c =
           let val v' = augment v c
           in
