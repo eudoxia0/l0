@@ -25,6 +25,7 @@ structure AST :> AST = struct
                | Var of string
                | Cast of Type.ty * ast
                | Let of string * ast * ast
+               | Bind of string list * ast * ast
                | NullPtr of Parser.sexp
                | Malloc of Parser.sexp * ast
                | AddressOf of string
