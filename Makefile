@@ -31,11 +31,14 @@ $(BIN): $(SRC) $(PARSIMONY)
 test: $(BIN)
 	./l0 examples/hello.lisp hello.cpp
 	./l0 examples/fib.lisp fib.cpp
+	./l0 examples/tuple.lisp tuple.cpp
 	clang --std=c++11 hello.cpp -o hello
 	clang --std=c++11 fib.cpp -o fib
+	clang --std=c++11 tuple.cpp -o tuple
 	./hello
 	./fib
-	rm hello.cpp hello fib.cpp fib
+	./tuple
+	rm hello.cpp hello fib.cpp fib tuple.cpp tuple
 
 clean:
 	rm -rf $(VENDOR_DIR)
