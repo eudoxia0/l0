@@ -5,3 +5,5 @@ TODO:
 - Bind tuple contents
 - Linear types
 - Count appearances of linear variables
+- Simplify printing
+- Factor out data structure code?
