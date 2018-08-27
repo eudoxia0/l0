@@ -69,8 +69,10 @@ structure Type : TYPE = struct
       | parseTypeSpecifier (Symbol "u64") _ = Int (Unsigned, Word64)
       | parseTypeSpecifier (Symbol "i64") _ = Int (Signed, Word64)
       | parseTypeSpecifier (Symbol "str") _ = Str
-      | parseTypeSpecifier (List [Symbol "rawptr", t]) e = RawPointer (parseTypeSpecifier t e)
-      | parseTypeSpecifier (List (Symbol "tuple" :: rest)) e = Tuple (map (fn s => parseTypeSpecifier s e) rest)
+      | parseTypeSpecifier (List [Symbol "rawptr", t]) e =
+        RawPointer (parseTypeSpecifier t e)
+      | parseTypeSpecifier (List (Symbol "tuple" :: rest)) e =
+        Tuple (map (fn s => parseTypeSpecifier s e) rest)
       | parseTypeSpecifier (Symbol s) e =
         (case Map.get e s of
              SOME t => t
