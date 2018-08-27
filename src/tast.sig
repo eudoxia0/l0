@@ -30,6 +30,7 @@ signature TAST = sig
                 | TLet of Ident.ident * tast * tast
                 | TAssign of Ident.ident * tast
                 | TTuple of tast list
+                | TTupleProj of tast * int
                 | TNullPtr of Type.ty
                 | TLoad of tast * Type.ty
                 | TStore of tast * tast
