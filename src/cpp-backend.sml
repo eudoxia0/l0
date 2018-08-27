@@ -180,15 +180,17 @@ structure CppBackend :> CPP_BACKEND = struct
       | convert (TBind (binds, tup, body)) ctx =
         let val (tblock, tval) = convert tup ctx
             and (bblock, bval) = convert body ctx
-            and (Type.Tuple tupTys) = typeOf tup
         in
-            let val decls = ListPair.map (fn (n, t) => Declare (convertType t ctx, varName n))
-                                         (binds, tupTys)
-                and assigns = ListPair.map (fn (n, idx) => Assign (ngVar n, AccessTuple (tval, idx)))
-                                           (binds, List.tabulate (List.length tupTys, fn x => x))
-            in
-                (Sequence (tblock :: decls @ assigns @ [bblock]), bval)
-            end
+            case typeOf tup of
+                (Type.Tuple tupTys) =>
+                let val decls = ListPair.map (fn (n, t) => Declare (convertType t ctx, varName n))
+                                             (binds, tupTys)
+                    and assigns = ListPair.map (fn (n, idx) => Assign (ngVar n, AccessTuple (tval, idx)))
+                                               (binds, List.tabulate (List.length tupTys, fn x => x))
+                in
+                    (Sequence (tblock :: decls @ assigns @ [bblock]), bval)
+                end
+              | _ => raise Fail "Not a tuple"
         end
       | convert (TAssign (var, v)) ctx =
         let val (vblock, vval) = convert v ctx
