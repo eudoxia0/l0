@@ -103,7 +103,7 @@ structure TAST :> TAST = struct
         | augment (Var i) c =
           (case (Map.get (ctxBindings c) i) of
                SOME bind => TVar (i, bindType bind)
-             | NONE => raise Fail "No such variable")
+             | NONE => raise Fail ("No such variable: " ^ (Ident.identName i)))
         | augment (Binop (Add, a, b)) c = augmentArithOp Add a b c
         | augment (Binop (Sub, a, b)) c = augmentArithOp Sub a b c
         | augment (Binop (Mul, a, b)) c = augmentArithOp Mul a b c
