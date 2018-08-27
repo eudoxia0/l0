@@ -281,7 +281,7 @@ structure CBackend :> C_BACKEND = struct
           let val ctx' = Context (ctxToplevel ctx, tt)
           in
               let val def = FunctionDef (name,
-                                         map (fn (Function.Param (i,t)) => Param ("var_" ^ (Ident.identName i), convertType t ctx')) params,
+                                         map convertParam params,
                                          convertType rt ctx',
                                          block,
                                          retval)
@@ -290,6 +290,8 @@ structure CBackend :> C_BACKEND = struct
               end
           end
       end
+    and convertParam (Function.Param (i,t)) =
+      Param ("var_" ^ (Ident.identName i), convertType t ctx'))
 
     fun defineStruct name slots ctx =
       StructDef (name, map (fn (Type.Slot (n, t)) => Slot (n, convertType t ctx)) slots)
