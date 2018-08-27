@@ -64,6 +64,7 @@ structure TAST :> TAST = struct
         else
             typeOf (List.last ls)
       | typeOf (TLet (_, _, b)) = typeOf b
+      | typeOf (TBind (_, _, b)) = typeOf b
       | typeOf (TAssign (_, v)) = typeOf v
       | typeOf (TTuple es) = Tuple (map typeOf es)
       | typeOf (TTupleProj (exp, i)) =
