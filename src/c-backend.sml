@@ -80,7 +80,8 @@ structure CBackend :> C_BACKEND = struct
                                       | _ => false)
   end
 
-  fun collectTupleTypes tast = filterTuples (allTypes tast)
+  fun collectTupleTypes rt tast =
+      filterTuples (OrderedSet.union (allTypes tast) [OrderedSet.singleton rt])
 
   fun newTupleTypes old_tuple_types new_tuple_types =
     OrderedSet.difference new_tuple_types old_tuple_types
@@ -342,7 +343,7 @@ structure CBackend :> C_BACKEND = struct
 
     fun defineFunction ctx (Function.Function (name, params, rt)) tast =
       let val (block, retval) = convert tast ctx
-          and allTupleTypes = collectTupleTypes tast
+          and allTupleTypes = collectTupleTypes rt tast
       in
           let val tt = OrderedSet.union (ctxTupleTypes ctx) allTupleTypes
               and newTT = newTupleTypes (ctxTupleTypes ctx) allTupleTypes
