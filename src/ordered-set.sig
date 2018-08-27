@@ -38,4 +38,5 @@ signature ORDERED_SET = sig
   val filter : ''a set -> (''a -> bool) -> ''a set
 
   val fromList : ''a list -> ''a set
+  val toList : ''a set -> ''a list
 end
