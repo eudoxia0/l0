@@ -6,3 +6,4 @@ install:
 
 script:
   - make l0
+  - make test
