@@ -286,25 +286,14 @@ structure CppBackend :> CPP_BACKEND = struct
 
     fun defineFunction ctx (Function.Function (name, params, rt)) tast =
       let val (block, retval) = convert tast ctx
-          and allTupleTypes = collectTupleTypes rt tast
       in
-          let val tt = OrderedSet.union (ctxTupleTypes ctx) allTupleTypes
-              and newTT = newTupleTypes (ctxTupleTypes ctx) allTupleTypes
+          let val def = FunctionDef (name,
+                                     map (convertParam ctx') params,
+                                     convertType rt ctx',
+                                     block,
+                                     retval)
           in
-              let val ctx' = Context (ctxToplevel ctx, tt)
-              in
-                  let val newTTdefs = map (defineTuple ctx') (OrderedSet.toList newTT)
-                  in
-                      let val def = FunctionDef (name,
-                                                 map (convertParam ctx') params,
-                                                 convertType rt ctx',
-                                                 block,
-                                                 retval)
-                      in
-                          Context (ctxToplevel ctx @ [def], tt)
-                      end
-                  end
-              end
+              Context (ctxToplevel ctx @ [def])
           end
       end
     and convertParam ctx (Function.Param (i, t)) =
