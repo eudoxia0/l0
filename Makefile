@@ -29,13 +29,13 @@ $(BIN): $(SRC) $(PARSIMONY)
 
 .PHONY: test
 test: $(BIN)
-	./l0 examples/hello.lisp hello.c
-	./l0 examples/fib.lisp fib.c
-	clang hello.c -o hello
-	clang fib.c -o fib
+	./l0 examples/hello.lisp hello.cpp
+	./l0 examples/fib.lisp fib.cpp
+	clang hello.cpp -o hello
+	clang fib.cpp -o fib
 	./hello
 	./fib
-	rm hello.c hello fib.c fib
+	rm hello.cpp hello fib.cpp fib
 
 clean:
 	rm -rf $(VENDOR_DIR)
