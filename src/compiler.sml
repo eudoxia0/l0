@@ -55,10 +55,6 @@ structure Compiler :> COMPILER = struct
                       else
                           let val ctx' = CBackend.defineFunction ctx func tast
                           in
-                              print (";; Define function " ^ (Function.funcName func) ^ "\n");
-                              print "Context:\n";
-                              print (CBackend.renderContext ctx');
-                              print "\n";
                               Compiler (tenv, fenv', ctx')
                           end
                   end
