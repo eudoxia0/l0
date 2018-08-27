@@ -1,9 +1,12 @@
 TODO:
 
-- Implement tuple creation
 - Implement tuple access
 - Bind tuple contents
 - Linear types
 - Count appearances of linear variables
 - Simplify printing
 - Factor out data structure code?
+
+DONE:
+
+- Implement tuple creation
