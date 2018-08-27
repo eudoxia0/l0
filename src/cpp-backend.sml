@@ -188,6 +188,11 @@ structure CppBackend :> CPP_BACKEND = struct
             (Sequence (map (fn (b, _) => b) args),
              CreateTuple (map (fn (_, e) => e) args))
         end
+      | convert (TTupleProj (exp, i)) ctx =
+        let val (vblock, vval) = convert exp ctx
+        in
+            (vblock, AccessTuple (vval, i))
+        end
       | convert (TNullPtr _) ctx =
         (Sequence [], ConstNull)
       | convert (TLoad (e, _)) ctx =
