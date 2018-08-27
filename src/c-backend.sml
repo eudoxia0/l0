@@ -80,10 +80,7 @@ structure CBackend :> C_BACKEND = struct
                                       | _ => false)
   end
 
-  (* Given the ordered set of tuples from a Context, and a TAST node, extract
-     all tuple types from that node and add them to the set of tuples. *)
-  fun collectTupleTypes tuple_types tast =
-    OrderedSet.union tuple_types (filterTuples (allTypes tast))
+  fun collectTupleTypes tast = filterTuples (allTypes tast)
 
   (* Fresh identifiers *)
 
@@ -325,17 +322,20 @@ structure CBackend :> C_BACKEND = struct
 
     fun defineFunction ctx (Function.Function (name, params, rt)) tast =
       let val (block, retval) = convert tast ctx
-          and tt = collectTupleTypes (ctxTupleTypes ctx) tast
+          and allTupleTypes = collectTupleTypes tast
       in
-          let val ctx' = Context (ctxToplevel ctx, tt)
+          let val tt = OrderedSet.union (ctxTupleTypes ctx) allTupleTypes
           in
-              let val def = FunctionDef (name,
-                                         map (convertParam ctx') params,
-                                         convertType rt ctx',
-                                         block,
-                                         retval)
+              let val ctx' = Context (ctxToplevel ctx, tt)
               in
-                  Context (ctxToplevel ctx @ [def], tt)
+                  let val def = FunctionDef (name,
+                                             map (convertParam ctx') params,
+                                             convertType rt ctx',
+                                             block,
+                                             retval)
+                  in
+                      Context (ctxToplevel ctx @ [def], tt)
+                  end
               end
           end
       end
