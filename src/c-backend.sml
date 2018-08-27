@@ -123,6 +123,9 @@ structure CBackend :> C_BACKEND = struct
          SOME i => "struct_" ^ (Int.toString i)
        | NONE => raise Fail "Tuple not in table")
 
+  fun tupleFieldName idx =
+    "_" ^ (Int.toString idx)
+
   local
     open CAst
   in
@@ -331,21 +334,33 @@ structure CBackend :> C_BACKEND = struct
               and newTT = newTupleTypes (ctxTupleTypes ctx) allTupleTypes
           in
               let val ctx' = Context (ctxToplevel ctx, tt)
-                  and newTTdefs = map defineTuple (OrderedSet.toList newTT)
               in
-                  let val def = FunctionDef (name,
-                                             map (convertParam ctx') params,
-                                             convertType rt ctx',
-                                             block,
-                                             retval)
+                  let val newTTdefs = map (defineTuple ctx) (OrderedSet.toList newTT)
                   in
-                      Context (ctxToplevel ctx @ [def], tt)
+                      let val def = FunctionDef (name,
+                                                 map (convertParam ctx') params,
+                                                 convertType rt ctx',
+                                                 block,
+                                                 retval)
+                      in
+                          Context (ctxToplevel ctx @ [def], tt)
+                      end
                   end
               end
           end
       end
     and convertParam ctx (Function.Param (i, t)) =
       Param ("var_" ^ (Ident.identName i), convertType t ctx)
+    and defineTuple ctx tt =
+      let name = tupleName ctx tt
+      in
+        StructDef (name, defineSlots tt)
+      end
+    and defineSlots (Tuple l) =
+      tabulate (List.length l, defineSlot l)
+      | defineSlots _ = raise Fail "Not a tuple"
+    and defineSlot l idx =
+      CAst.Slot (tupleFieldName idx, List.nth l idx)
 
     fun defineStruct name slots ctx =
       StructDef (name, map (fn (Type.Slot (n, t)) => Slot (n, convertType t ctx)) slots)
