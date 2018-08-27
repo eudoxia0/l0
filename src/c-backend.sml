@@ -238,6 +238,20 @@ structure CBackend :> C_BACKEND = struct
         in
             (Sequence [vblock, Assign (ngVar var, vval)], vval)
         end
+      | convert (TTuple exps) ctx =
+        let val args = map (fn e => convert e ctx) exps
+            and ty = typeOf (TTuple exps)
+        in
+            let val name = tupleName ctx ty
+                and slot_names = List.tabulate (List.length exps, tupleFieldName)
+            in
+                (Sequence (map (fn (b, _) => b) args),
+                 StructInitializer (tupleName ctx ty,
+                                    (ListPair.map (fn (name, v) => (name, v))
+                                                  (slot_names,
+                                                   map (fn (_, v) => v) args))))
+            end
+        end
       | convert (TNullPtr _) ctx =
         (Sequence [], ConstNull)
       | convert (TLoad (e, _)) ctx =
