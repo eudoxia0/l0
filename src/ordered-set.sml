@@ -24,6 +24,9 @@ structure OrderedSet :> ORDERED_SET = struct
 
   fun singleton a = Set [a]
 
+  fun exists (Set l) elem =
+    Util.member elem l
+
   fun add (Set l) elem =
     if Util.member elem l then
         Set l
