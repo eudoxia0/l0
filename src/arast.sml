@@ -153,5 +153,19 @@ structure ARAST :> ARAST = struct
       "(cast " ^ (Type.toString t) ^ " " ^ (toString e) ^ ")"
     | toString (Let (i, v, b)) =
       "(let ((" ^ (Ident.toString i) ^ " " ^ (toString v) ^ ")) " ^ (toString b) ^ ")"
-    | toString _ = ""
+    | toString (Bind (ids, t, b)) =
+      "(bind (" ^ (String.concatWith " " (map Ident.toString ids)) ^ ") "
+      ^ (toString t) ^ " " ^ (toString b) ^ ")"
+    | toString (NullPtr t) =
+      "c/nullptr"
+    | toString (Malloc _) =
+      "c/malloc"
+    | toString (AddressOf _) =
+      "c/address-of"
+    | toString (CEmbed _) =
+      "c/embed"
+    | toString (CCall _) =
+      "c/call"
+    | toString (Operation (name, args)) =
+      "(fn:" ^ name ^ " " ^ (String.concatWith " " (map toString args)) ^ ")"
 end
