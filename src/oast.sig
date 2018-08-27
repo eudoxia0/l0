@@ -31,6 +31,7 @@ signature OAST = sig
                | Assign of Ident.ident * ast
                | NullPtr of Parser.sexp
                | Tuple of ast list
+               | TupleProj of ast * int
                | Load of ast
                | Store of ast * ast
                | Malloc of Parser.sexp * ast

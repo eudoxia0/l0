@@ -30,6 +30,7 @@ structure OAST :> OAST = struct
                | Let of Ident.ident * ast * ast
                | Assign of Ident.ident * ast
                | Tuple of ast list
+               | TupleProj of ast * int
                | NullPtr of Parser.sexp
                | Load of ast
                | Store of ast * ast
