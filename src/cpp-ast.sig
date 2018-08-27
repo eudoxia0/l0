@@ -28,6 +28,7 @@ signature CPP_AST = sig
               | UInt64
               | Int64
               | Pointer of ty
+              | Tuple of ty list
               | Struct of string
 
   datatype exp_ast = ConstBool of bool
@@ -40,6 +41,8 @@ signature CPP_AST = sig
                    | Deref of exp_ast
                    | AddressOf of exp_ast
                    | SizeOf of ty
+                   | CreateTuple of exp_ast list
+                   | AccessTuple of exp_ast * int
                    | StructInitializer of string * (string * exp_ast) list
                    | StructAccess of exp_ast * string
                    | Adjacent of exp_ast list
