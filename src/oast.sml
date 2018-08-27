@@ -72,6 +72,7 @@ structure OAST :> OAST = struct
     | augmentOp ">=" [l, r] = Binop (Binop.GEq, l, r)
     | augmentOp "progn" args = Progn args
     | augmentOp "tuple" args = Tuple args
+    | augmentOp "proj" [e, ConstInt i] = TupleProj (e, i)
     | augmentOp "load" [e] = Load e
     | augmentOp "load" _ = raise Fail "Bad load form"
     | augmentOp "store" [p, v] = Store (p, v)
