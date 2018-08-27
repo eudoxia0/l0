@@ -20,9 +20,6 @@
 structure Backend :> BACKEND = struct
   open LLVM
 
-  val prelude =
-    String.concatWith "\n" ["#include <stdlib.h>"]
-
   (* Context *)
 
   datatype context = Context of toplevel list
@@ -30,7 +27,7 @@ structure Backend :> BACKEND = struct
   val emptyContext = Context []
 
   fun renderContext (Context ts) =
-      prelude ^ (String.concatWith "\n\n" (map LLVM.renderToplevel ts))
+    String.concatWith "\n\n" (map LLVM.renderToplevel ts)
 
   (* Backend *)
 

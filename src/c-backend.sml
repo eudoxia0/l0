@@ -18,6 +18,13 @@
 *)
 
 structure CBackend :> C_BACKEND = struct
+  (* Prelude *)
+
+  val prelude =
+    String.concatWith "\n" ["#include <stdlib.h>"]
+
+  (* Context *)
+
   type tuple_types = Type.ty OrderedSet.set
 
   datatype context = Context of CAst.top_ast list * tuple_types
@@ -25,7 +32,7 @@ structure CBackend :> C_BACKEND = struct
   val emptyContext = Context ([], OrderedSet.empty)
 
   fun renderContext (Context (ts, _)) =
-    String.concatWith "\n\n" (map CAst.renderTop ts)
+    prelude ^ (String.concatWith "\n\n" (map CAst.renderTop ts))
 
   fun ctxToplevel (Context (t, _)) = t
   fun ctxTupleTypes (Context (_, tt)) = tt
