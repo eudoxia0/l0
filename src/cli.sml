@@ -24,7 +24,7 @@ in
   fun compile input output =
     let val c = compileFile emptyCompiler input
     in
-        raise Fail "TODO IMPLEMENT THIS"
+        writeStringToFile output (compilerCode c)
     end
 end
 

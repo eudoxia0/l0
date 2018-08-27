@@ -60,3 +60,5 @@ src/compiler.sml
 
 src/repl.sig
 src/repl.sml
+
+src/cli.sml

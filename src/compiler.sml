@@ -86,4 +86,7 @@ structure Compiler :> COMPILER = struct
             (Parser.List l, _) => compileForms c l
           | _ => raise Fail "Impossible"
     end
+
+  fun compilerCode (Compiler (_, _, ctx)) =
+      CBackend.renderContext ctx
 end

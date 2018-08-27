@@ -24,4 +24,6 @@ signature COMPILER = sig
 
     val compileString : compiler -> string -> compiler
     val compileFile : compiler -> string -> compiler
+
+    val compilerCode : compiler -> string
 end
