@@ -28,6 +28,7 @@ structure OAST :> OAST = struct
                | Cast of Type.ty * ast
                | Progn of ast list
                | Let of Ident.ident * ast * ast
+               | Bind of Ident.ident list * ast * ast
                | Assign of Ident.ident * ast
                | Tuple of ast list
                | TupleProj of ast * int

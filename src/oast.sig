@@ -28,6 +28,7 @@ signature OAST = sig
                | Cast of Type.ty * ast
                | Progn of ast list
                | Let of Ident.ident * ast * ast
+               | Bind of Ident.ident list * ast * ast
                | Assign of Ident.ident * ast
                | NullPtr of Parser.sexp
                | Tuple of ast list
