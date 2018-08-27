@@ -21,10 +21,10 @@ structure CBackend :> C_BACKEND = struct
   (* Prelude *)
 
   val prelude =
-      String.concatWith "\n" ["#include <stdlib.h>",
-                              "#include <stdio.h>",
-                              "#include <inttypes.h>",
-                              "#include <stdbool.h>"]
+      String.concatWith "\n" ["#include <cstdlib>",
+                              "#include <cstdio>",
+                              "#include <cinttypes>",
+                              "#include <tuple>"]
 
   (* Context *)
 
