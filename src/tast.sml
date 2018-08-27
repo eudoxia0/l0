@@ -167,6 +167,8 @@ structure TAST :> TAST = struct
                                   ^ "'")
               end
           end
+        | augment (Tuple exps) c =
+          TTuple (map (fn e => augment e c) exps)
         | augment (NullPtr t) c =
           TNullPtr (parseTypeSpecifier t (ctxTenv c))
         | augment (Load e) c =
