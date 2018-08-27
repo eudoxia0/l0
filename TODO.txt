@@ -1,6 +1,5 @@
 TODO:
 
-- Implement tuple access
 - Bind tuple contents
 - Linear types
 - Count appearances of linear variables
@@ -10,3 +9,4 @@ TODO:
 DONE:
 
 - Implement tuple creation
+- Implement tuple access
