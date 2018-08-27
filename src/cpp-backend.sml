@@ -174,7 +174,7 @@ structure CppBackend :> CPP_BACKEND = struct
             and ty = convertType (typeOf v) ctx
             and (bblock, bval) = convert b ctx
         in
-            (Sequence [vblock, Declare (ty, varName name), Assign (ngVar name, vval), bblock],
+            (Block [vblock, Declare (ty, varName name), Assign (ngVar name, vval), bblock],
              bval)
         end
       | convert (TBind (binds, tup, body)) ctx =
@@ -188,7 +188,7 @@ structure CppBackend :> CPP_BACKEND = struct
                     and assigns = ListPair.map (fn (n, idx) => Assign (ngVar n, AccessTuple (tval, idx)))
                                                (binds, List.tabulate (List.length tupTys, fn x => x))
                 in
-                    (Sequence (tblock :: decls @ assigns @ [bblock]), bval)
+                    (Block (tblock :: decls @ assigns @ [bblock]), bval)
                 end
               | _ => raise Fail "Not a tuple"
         end
