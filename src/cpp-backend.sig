@@ -17,7 +17,7 @@
     along with L0.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-signature C_BACKEND = sig
+signature CPP_BACKEND = sig
   type context
 
   val emptyContext : context
