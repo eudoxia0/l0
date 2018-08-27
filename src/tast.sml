@@ -29,6 +29,7 @@ structure TAST :> TAST = struct
                 | TProgn of tast list
                 | TLet of Ident.ident * tast * tast
                 | TAssign of Ident.ident * tast
+                | TTuple of tast list
                 | TNullPtr of Type.ty
                 | TLoad of tast * Type.ty
                 | TStore of tast * tast
@@ -62,6 +63,7 @@ structure TAST :> TAST = struct
             typeOf (List.last ls)
       | typeOf (TLet (_, _, b)) = typeOf b
       | typeOf (TAssign (_, v)) = typeOf v
+      | typeOf (TTuple es) = Tuple (map typeOf es)
       | typeOf (TNullPtr t) = RawPointer t
       | typeOf (TLoad (_, t)) = t
       | typeOf (TStore (_, v)) = typeOf v
