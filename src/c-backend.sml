@@ -21,7 +21,8 @@ structure CBackend :> C_BACKEND = struct
   (* Prelude *)
 
   val prelude =
-    String.concatWith "\n" ["#include <stdlib.h>"]
+      String.concatWith "\n" ["#include <stdlib.h>",
+                              "#include <stdio.h>"]
 
   (* Context *)
 
