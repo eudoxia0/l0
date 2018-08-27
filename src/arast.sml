@@ -91,7 +91,7 @@ structure ARAST :> ARAST = struct
           in
               let val s'' = Map.iadd s (name, fresh)
               in
-                  let val (body', s''') = rename body s'
+                  let val (body', s''') = rename body s''
                   in
                       (Let (fresh, exp', body'), s''')
                   end
