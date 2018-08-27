@@ -17,7 +17,7 @@
     along with L0.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure CBackend :> C_BACKEND = struct
+structure CppBackend :> CPP_BACKEND = struct
   (* Prelude *)
 
   val prelude =
