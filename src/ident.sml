@@ -25,4 +25,7 @@ structure Ident : IDENT = struct
   fun identName (Ident (name, _)) = name
 
   fun identId (Ident (_, i)) = i
+
+  fun toString (Ident (name, id)) =
+    name ^ ":" ^ (Int.toString id)
 end
