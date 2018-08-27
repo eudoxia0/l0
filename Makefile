@@ -33,6 +33,10 @@ test: $(BIN)
 	clang hello.c -o hello
 	./hello
 	rm hello.c hello
+	./l0 examples/fib.lisp fib.c
+	clang fib.c -o fib
+	./fib
+	rm fib.c fib
 
 clean:
 	rm -rf $(VENDOR_DIR)
