@@ -49,13 +49,19 @@ structure ARAST :> ARAST = struct
 
   (* Alpha renaming *)
 
-  type stack = (string, Ident.ident) Map.map
+  type stack = (string * Ident.ident) list
+
+  fun lookup ((n,v)::xs) s = if (n = s) then
+                                 v
+                             else
+                                 lookup xs s
+    | lookup nil s = raise Fail ("No such variable: '" ^ s ^ "'")
 
   fun alphaRename (AST.Defun (name, ps, rt, body)) =
     let
     in
       resetCount ();
-      let val (stack, params) = renameParams ps
+      let val (stack : stack, params) = renameParams ps
       in
           let val (ast', _) = rename body stack
           in
@@ -66,19 +72,16 @@ structure ARAST :> ARAST = struct
   and renameParams ps =
     let val ps' = map (fn (AST.Param (n, t)) => Function.Param (freshVar n, t)) ps
     in
-        (Map.iaddList Map.empty
-                      (map (fn (Function.Param (i, _)) => (Ident.identName i, i))
-                           ps'),
+        (map (fn (Function.Param (i, _)) => (Ident.identName i, i))
+             ps',
          ps')
     end
-  and rename AST.ConstUnit s = (ConstUnit, s)
+  and rename AST.ConstUnit (s: stack) = (ConstUnit, s)
     | rename (AST.ConstBool b) s = (ConstBool b, s)
     | rename (AST.ConstInt i) s = (ConstInt i, s)
     | rename (AST.ConstString str) s = (ConstString str, s)
     | rename (AST.Var name) s =
-      (case Map.get s name of
-           SOME name' => (Var name', s)
-         | NONE => raise Fail ("No variable with this name: " ^ name))
+      (Var (lookup s name), s)
     | rename (AST.Cast (t, a)) s =
       let val (a', s') = rename a s
       in
@@ -89,7 +92,7 @@ structure ARAST :> ARAST = struct
       in
           let val fresh = freshVar name
           in
-              let val s'' = Map.iadd s' (name, fresh)
+              let val s'' = (name, fresh) :: s'
               in
                   let val (body', s''') = rename body s''
                   in
@@ -101,16 +104,16 @@ structure ARAST :> ARAST = struct
     | rename (AST.Bind (binds, tup, body)) s =
       let val (tup', s') = rename tup s
       in
-        let val freshBinds = map (fn b => (b, freshVar b)) binds
-        in
-          let val s'' = Map.iaddList s' freshBinds
+          let val freshBinds = map (fn b => (b, freshVar b)) binds
           in
-            let val (body', s''') = rename body s''
-            in
-                (Bind (map (fn (_, f) => f) freshBinds, tup', body'), s''')
-            end
+              let val s'' = freshBinds @ s'
+              in
+                  let val (body', s''') = rename body s''
+                  in
+                      (Bind (map (fn (_, f) => f) freshBinds, tup', body'), s''')
+                  end
+              end
           end
-        end
       end
     | rename (AST.NullPtr t) s = (NullPtr t, s)
     | rename (AST.Malloc (t, e)) s =
@@ -119,9 +122,7 @@ structure ARAST :> ARAST = struct
           (Malloc (t, e'), s')
       end
     | rename (AST.AddressOf name) s =
-      (case Map.get s name of
-           SOME name' => (AddressOf name', s)
-         | NONE => raise Fail ("No variable with this name: " ^ name))
+      (AddressOf (lookup s name), s)
     | rename (AST.CEmbed (t, e)) s = (CEmbed (t, e), s)
     | rename (AST.CCall (name, ty, l)) s =
       let val (args', s') = renameList l s
