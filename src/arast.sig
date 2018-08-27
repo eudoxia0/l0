@@ -34,4 +34,6 @@ signature ARAST = sig
                | Operation of string * ast list
 
   val alphaRename : AST.top_ast -> (Function.func * ast)
+
+  val toString : ast -> string
 end
