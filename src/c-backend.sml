@@ -328,6 +328,7 @@ structure CBackend :> C_BACKEND = struct
           and allTupleTypes = collectTupleTypes tast
       in
           let val tt = OrderedSet.union (ctxTupleTypes ctx) allTupleTypes
+              and newTT = newTupleTypes (ctxTupleTypes ctx) allTupleTypes
           in
               let val ctx' = Context (ctxToplevel ctx, tt)
               in
