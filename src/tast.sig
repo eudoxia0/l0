@@ -28,6 +28,7 @@ signature TAST = sig
                 | TCast of Type.ty * tast
                 | TProgn of tast list
                 | TLet of Ident.ident * tast * tast
+                | TBind of Ident.ident list * ast * ast
                 | TAssign of Ident.ident * tast
                 | TTuple of tast list
                 | TTupleProj of tast * int
