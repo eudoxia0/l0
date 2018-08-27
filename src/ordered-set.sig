@@ -29,6 +29,8 @@ signature ORDERED_SET = sig
   val union : ''a set -> ''a set -> ''a set
   val unionList : ''a set list -> ''a set
 
+  val difference : ''a set -> ''a set -> ''a set
+
   val size : ''a set -> int
   (* positions start at 1 *)
   val positionOf : ''a set -> ''a -> int option
