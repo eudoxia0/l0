@@ -28,12 +28,12 @@ structure CppBackend :> CPP_BACKEND = struct
 
   (* Context *)
 
-  datatype context = Context of CAst.top_ast list
+  datatype context = Context of CppAst.top_ast list
 
   val emptyContext = Context []
 
   fun renderContext (Context ts) =
-    prelude ^ "\n\n" ^ (String.concatWith "\n\n" (map CAst.renderTop ts))
+    prelude ^ "\n\n" ^ (String.concatWith "\n\n" (map CppAst.renderTop ts))
 
   fun ctxToplevel (Context t) = t
 
@@ -53,25 +53,25 @@ structure CppBackend :> CPP_BACKEND = struct
     "var_" ^ (Ident.identName n)
 
   fun ngVar n =
-    CAst.Var (varName n)
+    CppAst.Var (varName n)
 
   (* Mapping types *)
 
   local
     open Type
   in
-    fun convertIntType Unsigned Word8 =  CAst.UInt8
-      | convertIntType Signed   Word8 =  CAst.Int8
-      | convertIntType Unsigned Word16 = CAst.UInt16
-      | convertIntType Signed   Word16 = CAst.Int16
-      | convertIntType Unsigned Word32 = CAst.UInt32
-      | convertIntType Signed   Word32 = CAst.Int32
-      | convertIntType Unsigned Word64 = CAst.UInt64
-      | convertIntType Signed   Word64 = CAst.Int64
+    fun convertIntType Unsigned Word8 =  CppAst.UInt8
+      | convertIntType Signed   Word8 =  CppAst.Int8
+      | convertIntType Unsigned Word16 = CppAst.UInt16
+      | convertIntType Signed   Word16 = CppAst.Int16
+      | convertIntType Unsigned Word32 = CppAst.UInt32
+      | convertIntType Signed   Word32 = CppAst.Int32
+      | convertIntType Unsigned Word64 = CppAst.UInt64
+      | convertIntType Signed   Word64 = CppAst.Int64
   end
 
   local
-    open CAst
+    open CppAst
   in
     fun convertType (Type.Unit) _ = Bool
       | convertType (Type.Bool) _ = Bool
@@ -85,7 +85,7 @@ structure CppBackend :> CPP_BACKEND = struct
 
   local
     open Type
-    open CAst
+    open CppAst
   in
     fun formatStringFor Unit n = [ConstString ("nil" ^ (newline n))]
       | formatStringFor Type.Bool _ = raise Fail "bool can't be printf'd"
@@ -109,7 +109,7 @@ structure CppBackend :> CPP_BACKEND = struct
 
   local
     open TAST
-    open CAst
+    open CppAst
   in
     val unitConstant = ConstBool false
 
@@ -318,7 +318,7 @@ structure CppBackend :> CPP_BACKEND = struct
       List.tabulate (List.length l, defineSlot ctx l)
       | defineSlots _ _ = raise Fail "Not a tuple"
     and defineSlot ctx l idx =
-      CAst.Slot (tupleFieldName idx, convertType (List.nth (l, idx)) ctx)
+      CppAst.Slot (tupleFieldName idx, convertType (List.nth (l, idx)) ctx)
 
     fun defineStruct name slots ctx =
       StructDef (name, map (fn (Type.Slot (n, t)) => Slot (n, convertType t ctx)) slots)
