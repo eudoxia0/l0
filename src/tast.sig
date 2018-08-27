@@ -44,7 +44,7 @@ signature TAST = sig
   val typeOf : tast -> Type.ty
 
   type context
-  val mkContext : Type.tenv -> Function.fenv -> context
+  val mkContext : Binding.bindings -> Type.tenv -> Function.fenv -> context
 
   val augment : OAST.ast -> context -> tast
 end

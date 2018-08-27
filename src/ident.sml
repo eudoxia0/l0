@@ -23,4 +23,6 @@ structure Ident : IDENT = struct
   fun mkIdent name id = Ident (name, id)
 
   fun identName (Ident (name, _)) = name
+
+  fun identId (Ident (_, i)) = i
 end

@@ -88,7 +88,7 @@ structure CBackend :> C_BACKEND = struct
   (* TAST -> C AST *)
 
   fun varName n =
-    "var_" ^ (Int.toString (NameGen.nameId n))
+    "var_" ^ (Ident.identName n)
 
   fun ngVar n =
     CAst.Var (varName n)
@@ -274,7 +274,7 @@ structure CBackend :> C_BACKEND = struct
           let val ctx' = Context (ctxToplevel ctx, tt)
           in
               let val def = FunctionDef (name,
-                                         map (fn (Function.Param (n,t)) => Param (n, convertType t ctx')) params,
+                                         map (fn (Function.Param (i,t)) => Param (Ident.identName i, convertType t ctx')) params,
                                          convertType rt ctx',
                                          block,
                                          retval)

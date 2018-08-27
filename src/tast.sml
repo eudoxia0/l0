@@ -74,24 +74,25 @@ structure TAST :> TAST = struct
       | typeOf (TWhile _) = Unit
       | typeOf (TFuncall (_, _, t)) = t
 
-    datatype context = Context of Function.stack * Type.tenv * Function.fenv
+    datatype context = Context of Binding.bindings * Type.tenv * Function.fenv
 
-    fun mkContext s t f = Context (s, t, f)
+    fun mkContext b t f = Context (b, t, f)
 
-    fun ctxStack (Context (s, _, _)) = s
+    fun ctxBindings (Context (b, _, _)) = b
     fun ctxTenv (Context (_, t, _)) = t
     fun ctxFenv (Context (_, _, f)) = f
 
     local
       open OAST
       open Binop
+      open Binding
     in
       fun augment ConstUnit _ = TConstUnit
         | augment (ConstBool b) _ = TConstBool b
         | augment (ConstInt i) _ = TConstInt (i, defaultIntType)
         | augment (ConstString s) _ = TConstString s
         | augment (Var i) c =
-          (case (Map.get (ctxStack c) i) of
+          (case (Map.get (ctxBindings c) i) of
                SOME bind => TVar (i, bindType bind)
              | NONE => raise Fail "No such variable")
         | augment (Binop (Add, a, b)) c = augmentArithOp Add a b c
@@ -133,7 +134,7 @@ structure TAST :> TAST = struct
         | augment (Let (name, v, body)) c =
           let val v' = augment v c
           in
-              let val s' = Map.iadd (ctxStack c)
+              let val s' = Map.iadd (ctxBindings c)
                                     (name, (Binding (typeOf v', Mutable)))
               in
                   TLet (name,
@@ -144,7 +145,7 @@ structure TAST :> TAST = struct
         | augment (Assign (var, v)) c =
           let val v' = augment v c
           in
-              let val (Binding (ty, m)) = case (Map.get (ctxStack c) var) of
+              let val (Binding (ty, m)) = case (Map.get (ctxBindings c) var) of
                                               SOME bind => bind
                                             | NONE => raise Fail "No such variable"
               in
@@ -207,7 +208,7 @@ structure TAST :> TAST = struct
                 | _ => raise Fail "Can't free a non-pointer"
           end
         | augment (AddressOf n) c =
-          let val (Binding (ty, _)) = case Map.get (ctxStack c) n of
+          let val (Binding (ty, _)) = case Map.get (ctxBindings c) n of
                                           SOME b => b
                                         | NONE => raise Fail "Cannot find variable"
           in

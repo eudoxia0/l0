@@ -32,7 +32,7 @@ structure Backend :> BACKEND = struct
   (* Backend *)
 
   fun variableRegister name =
-    "_var_" ^ (Int.toString (NameGen.nameId name))
+    "_var_" ^ (Ident.identName name) ^ (Int.toString (Ident.identId name))
 
   fun mapTy Type.Unit = Bool
     | mapTy Type.Bool = Bool
@@ -150,5 +150,5 @@ structure Backend :> BACKEND = struct
               Context (ts @ [fundef])
           end
       end
-  and mapParam (Function.Param (name, ty)) = Param (name, mapTy ty)
+  and mapParam (Function.Param (ident, ty)) = Param (Ident.identName ident, mapTy ty)
 end

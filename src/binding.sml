@@ -18,4 +18,11 @@
 *)
 
 structure Binding :> BINDING = struct
+  datatype binding = Binding of Type.ty * mutability
+       and mutability = Immutable
+                      | Mutable
+
+  type bindings = (Ident.ident, binding) Map.map
+
+  fun bindType (Binding (t, _)) = t
 end

@@ -14,9 +14,6 @@ is
   src/map.sig
   src/map.sml
 
-  src/namegen.sig
-  src/namegen.sml
-
   src/ident.sig
   src/ident.sml
 
@@ -25,6 +22,9 @@ is
 
   src/type.sig
   src/type.sml
+
+  src/binding.sig
+  src/binding.sml
 
   src/func.sig
   src/func.sml

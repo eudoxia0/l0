@@ -18,4 +18,11 @@
 *)
 
 signature BINDING = sig
+  datatype binding = Binding of Type.ty * mutability
+       and mutability = Immutable
+                      | Mutable
+
+  type bindings = (Ident.ident, binding) Map.map
+
+  val bindType : binding -> Type.ty
 end

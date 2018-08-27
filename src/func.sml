@@ -26,6 +26,14 @@ structure Function :> FUNCTION = struct
   fun funcName (Function (n, _, _)) = n
   fun funcRT (Function (_, _, r)) = r
 
+  local
+    open Binding
+  in
+    fun funcBindings (Function (_, ps, _)) =
+        Map.iaddList Map.empty
+                     (map (fn (Param (i, t)) => (i, Binding (t, Immutable))) ps)
+  end
+
   fun matchParams params argtypes =
     if (length params <> length argtypes) then
         raise Fail "Wrong parameter count"
