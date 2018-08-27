@@ -27,6 +27,13 @@ compile: $(SRC) $(PARSIMONY)
 $(BIN): $(SRC) $(PARSIMONY)
 	$(MLTON) $(MLB_FILE)
 
+.PHONY: test
+test: $(BIN)
+	./l0 examples/hello.lisp hello.c
+	clang hello.c -o hello
+	./hello
+	rm hello.c hello
+
 clean:
 	rm -rf $(VENDOR_DIR)
 	rm $(BIN)
