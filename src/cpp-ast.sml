@@ -103,6 +103,7 @@ structure CppAst :> CPP_AST = struct
     | renderType UInt64 = "uint64_t"
     | renderType Int64 = "int64_t"
     | renderType (Pointer t) = (renderType t) ^ "*"
+    | renderType (Tuple ts) = "std::tuple<" ^ (sepBy ", " (map renderType ts)) ^ ">"
     | renderType (Struct n) = n
 
   local
