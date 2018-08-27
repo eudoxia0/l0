@@ -53,9 +53,6 @@ is
   src/c-backend.sig
   src/c-backend.sml
 
-  src/backend.sig
-  src/backend.sml
-
   src/compiler.sig
   src/compiler.sml
 
