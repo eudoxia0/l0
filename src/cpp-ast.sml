@@ -141,7 +141,7 @@ structure CppAst :> CPP_AST = struct
     | renderExp (SizeOf t) = "sizeof(" ^ (renderType t) ^ ")"
     | renderExp (CreateTuple exps) =
       "std::make_tuple(" ^ (sepBy ", " (map renderExp exps)) ^ ")"
-    | renderExp (AccessTuple exp i) =
+    | renderExp (AccessTuple (exp, i)) =
       "std::get<" ^ (Int.toString i) ^ ">(" ^ (renderExp exp) ^ ")"
     | renderExp (StructInitializer (name, inits)) =
       "(("
