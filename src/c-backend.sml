@@ -119,7 +119,7 @@ structure CBackend :> C_BACKEND = struct
   end
 
   fun tupleName ctx ty =
-    (case OrderedSet.positionOf (ctxTupleTypes ctx) (Type.Tuple ty) of
+    (case OrderedSet.positionOf (ctxTupleTypes ctx) ty of
          SOME i => "struct_" ^ (Int.toString i)
        | NONE => raise Fail "Tuple not in table")
 
@@ -134,7 +134,7 @@ structure CBackend :> C_BACKEND = struct
       | convertType (Type.Int (s, w)) _ = convertIntType s w
       | convertType (Type.Str) _ = Pointer UInt8
       | convertType (Type.RawPointer t) ctx = Pointer (convertType t ctx)
-      | convertType (Type.Tuple ts) ctx = Struct (tupleName ctx ts)
+      | convertType (Type.Tuple ts) ctx = Struct (tupleName ctx (Type.Tuple ts))
   end
 
   (* Printing *)
@@ -335,7 +335,7 @@ structure CBackend :> C_BACKEND = struct
           in
               let val ctx' = Context (ctxToplevel ctx, tt)
               in
-                  let val newTTdefs = map (defineTuple ctx) (OrderedSet.toList newTT)
+                  let val newTTdefs = map (defineTuple ctx') (OrderedSet.toList newTT)
                   in
                       let val def = FunctionDef (name,
                                                  map (convertParam ctx') params,
@@ -351,16 +351,16 @@ structure CBackend :> C_BACKEND = struct
       end
     and convertParam ctx (Function.Param (i, t)) =
       Param ("var_" ^ (Ident.identName i), convertType t ctx)
-    and defineTuple ctx tt =
-      let val name = tupleName ctx tt
+    and defineTuple ctx (ty: Type.ty) =
+      let val name = tupleName ctx ty
       in
-        StructDef (name, defineSlots tt)
+        StructDef (name, defineSlots ctx ty)
       end
-    and defineSlots (Type.Tuple l) =
-      List.tabulate (List.length l, defineSlot l)
-      | defineSlots _ = raise Fail "Not a tuple"
-    and defineSlot l idx =
-      CAst.Slot (tupleFieldName idx, List.nth l idx)
+    and defineSlots ctx (Type.Tuple l) =
+      List.tabulate (List.length l, defineSlot ctx l)
+      | defineSlots _ _ = raise Fail "Not a tuple"
+    and defineSlot ctx l idx =
+      CAst.Slot (tupleFieldName idx, convertType (List.nth (l, idx)) ctx)
 
     fun defineStruct name slots ctx =
       StructDef (name, map (fn (Type.Slot (n, t)) => Slot (n, convertType t ctx)) slots)
