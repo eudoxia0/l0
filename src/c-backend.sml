@@ -92,13 +92,15 @@ structure CBackend :> C_BACKEND = struct
         "autovar_" ^ (Int.toString (!count))
     end
 
-  (* TAST -> C AST *)
+  (* Variables *)
 
   fun varName n =
     "var_" ^ (Ident.identName n)
 
   fun ngVar n =
     CAst.Var (varName n)
+
+  (* Mapping types *)
 
   local
     open Type
@@ -126,6 +128,30 @@ structure CBackend :> C_BACKEND = struct
             SOME i => Struct ("struct_" ^ (Int.toString i))
           | NONE => raise Fail "Tuple not in table"
   end
+
+  (* Printing *)
+
+  local
+    open Type
+  in
+    fun formatStringFor Unit n = [CConstString ("nil" ^ (newline n))]
+      | formatStringFor Bool n = raise Fail "bool can't be printf'd"
+      | formatStringFor (Int (Unsigned, Word8)) n = wrap "PRIu8" n
+      | formatStringFor (Int (Signed,   Word8)) n = wrap "PRIi8" n
+      | formatStringFor (Int (Unsigned, Word16)) n = wrap "PRIu16" n
+      | formatStringFor (Int (Signed,   Word16)) n = wrap "PRIi16" n
+      | formatStringFor (Int (Unsigned, Word32)) n = wrap "PRIu32" n
+      | formatStringFor (Int (Signed,   Word32)) n = wrap "PRIi32" n
+      | formatStringFor (Int (Unsigned, Word64)) n = wrap "PRIu64" n
+      | formatStringFor (Int (Signed,   Word64)) n = wrap "PRIi64" n
+      | formatStringFor Str n = [CConstString ("%s" ^ (newline n))]
+      | formatStringFor (RawPointer _) n = [CConstString ("%p" ^ (newline n))]
+      | formatStringFor _ _ = raise Fail "Records cannot be printf'd"
+    and wrap s n = [CAdjacent [CConstString "%", CVar s, CConstString (newline n)]]
+    and newline AST.Newline = "\\n"
+      | newline AST.NoNewline = ""
+
+  (* TAST -> T CAST *)
 
   local
     open TAST
@@ -233,8 +259,24 @@ structure CBackend :> C_BACKEND = struct
         end
       | convert (TAddressOf (v, _)) _ =
         (Sequence [], AddressOf (ngVar v))
-      | convert (TPrint _) _ =
-        raise Fail "print not implemented yet"
+      | convert (TPrint v) ctx =
+        let val (vblock, vval) = convert v
+            and ty = typeOf v
+        in
+            let val printer = if ty = Type.Bool then
+                                  let val nl = (case n of
+                                                    AST.Newline => ConstBool true
+                                                  | AST.NoNewline => ConstBool false)
+                                  in
+                                      Funcall (NONE, "interim_print_bool", [vval, nl])
+                                  end
+                              else
+                                  Funcall (NONE, "printf", (formatStringFor ty n) @ [vval])
+            in
+                (Sequence [vblock, printer],
+                 unitConstant)
+            end
+        end
       | convert (TCEmbed (t, s)) ctx =
         (Sequence [], Cast (convertType t ctx, Raw s))
       | convert (TCCall (f, t, args)) ctx =
