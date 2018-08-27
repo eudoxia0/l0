@@ -47,8 +47,8 @@ is
   src/cpp-ast.sig
   src/cpp-ast.sml
 
-  src/c-backend.sig
-  src/c-backend.sml
+  src/cpp-backend.sig
+  src/cpp-backend.sml
 
   src/compiler.sig
   src/compiler.sml
