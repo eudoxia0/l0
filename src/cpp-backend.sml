@@ -309,16 +309,6 @@ structure CppBackend :> CPP_BACKEND = struct
       end
     and convertParam ctx (Function.Param (i, t)) =
       Param ("var_" ^ (Ident.identName i), convertType t ctx)
-    and defineTuple ctx (ty: Type.ty) =
-      let val name = tupleName ctx ty
-      in
-        StructDef (name, defineSlots ctx ty)
-      end
-    and defineSlots ctx (Type.Tuple l) =
-      List.tabulate (List.length l, defineSlot ctx l)
-      | defineSlots _ _ = raise Fail "Not a tuple"
-    and defineSlot ctx l idx =
-      CppAst.Slot (tupleFieldName idx, convertType (List.nth (l, idx)) ctx)
 
     fun defineStruct name slots ctx =
       StructDef (name, map (fn (Type.Slot (n, t)) => Slot (n, convertType t ctx)) slots)
