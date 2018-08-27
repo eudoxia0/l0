@@ -59,7 +59,7 @@ structure CBackend :> C_BACKEND = struct
       | allTypes (TStore (ptr, exp)) = union (allTypes ptr) (allTypes exp)
       | allTypes (TMalloc (ty, exp)) = add (allTypes exp) ty
       | allTypes (TFree exp) = allTypes exp
-      | allTypes (TPrint exp) = allTypes exp
+      | allTypes (TPrint (exp, _)) = allTypes exp
       | allTypes (TCEmbed (ty, _)) = singleton ty
       | allTypes (TCCall (_, ty, args)) = add (unionList (map allTypes args)) ty
       | allTypes (TWhile (test, body)) = union (allTypes test) (allTypes body)
@@ -133,9 +133,10 @@ structure CBackend :> C_BACKEND = struct
 
   local
     open Type
+    open CAst
   in
-    fun formatStringFor Unit n = [CConstString ("nil" ^ (newline n))]
-      | formatStringFor Bool n = raise Fail "bool can't be printf'd"
+    fun formatStringFor Unit n = [ConstString ("nil" ^ (newline n))]
+      | formatStringFor Type.Bool _ = raise Fail "bool can't be printf'd"
       | formatStringFor (Int (Unsigned, Word8)) n = wrap "PRIu8" n
       | formatStringFor (Int (Signed,   Word8)) n = wrap "PRIi8" n
       | formatStringFor (Int (Unsigned, Word16)) n = wrap "PRIu16" n
@@ -144,12 +145,13 @@ structure CBackend :> C_BACKEND = struct
       | formatStringFor (Int (Signed,   Word32)) n = wrap "PRIi32" n
       | formatStringFor (Int (Unsigned, Word64)) n = wrap "PRIu64" n
       | formatStringFor (Int (Signed,   Word64)) n = wrap "PRIi64" n
-      | formatStringFor Str n = [CConstString ("%s" ^ (newline n))]
-      | formatStringFor (RawPointer _) n = [CConstString ("%p" ^ (newline n))]
+      | formatStringFor Str n = [ConstString ("%s" ^ (newline n))]
+      | formatStringFor (RawPointer _) n = [ConstString ("%p" ^ (newline n))]
       | formatStringFor _ _ = raise Fail "Records cannot be printf'd"
-    and wrap s n = [CAdjacent [CConstString "%", CVar s, CConstString (newline n)]]
-    and newline AST.Newline = "\\n"
-      | newline AST.NoNewline = ""
+    and wrap s n = [Adjacent [ConstString "%", Var s, ConstString (newline n)]]
+    and newline OAST.Newline = "\\n"
+      | newline OAST.NoNewline = ""
+  end
 
   (* TAST -> T CAST *)
 
@@ -259,14 +261,14 @@ structure CBackend :> C_BACKEND = struct
         end
       | convert (TAddressOf (v, _)) _ =
         (Sequence [], AddressOf (ngVar v))
-      | convert (TPrint v) ctx =
-        let val (vblock, vval) = convert v
+      | convert (TPrint (v, n)) ctx =
+        let val (vblock, vval) = convert v ctx
             and ty = typeOf v
         in
             let val printer = if ty = Type.Bool then
                                   let val nl = (case n of
-                                                    AST.Newline => ConstBool true
-                                                  | AST.NoNewline => ConstBool false)
+                                                    OAST.Newline => ConstBool true
+                                                  | OAST.NoNewline => ConstBool false)
                                   in
                                       Funcall (NONE, "interim_print_bool", [vval, nl])
                                   end

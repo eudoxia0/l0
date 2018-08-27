@@ -35,11 +35,13 @@ structure OAST :> OAST = struct
                | Malloc of Parser.sexp * ast
                | Free of ast
                | AddressOf of Ident.ident
-               | Print of ast
+               | Print of ast * newline
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
                | While of ast * ast
                | Funcall of string * ast list
+       and newline = Newline
+                   | NoNewline
 
   fun augment ARAST.ConstUnit = ConstUnit
     | augment (ARAST.ConstBool b) = ConstBool b
@@ -73,8 +75,10 @@ structure OAST :> OAST = struct
     | augmentOp "store" _ = raise Fail "Bad store form"
     | augmentOp "free" [p] = Free p
     | augmentOp "free" _ = raise Fail "Bad free form"
-    | augmentOp "print" [v] = Print v
+    | augmentOp "print" [v] = Print (v, NoNewline)
     | augmentOp "print" _ = raise Fail "Bad print form"
+    | augmentOp "println" [v] = Print (v, Newline)
+    | augmentOp "println" _ = raise Fail "Bad println form"
     | augmentOp "while" (t::body) = While (t, Progn body)
     | augmentOp "while" _ = raise Fail "Bad while form"
     | augmentOp name args = Funcall (name, args)
