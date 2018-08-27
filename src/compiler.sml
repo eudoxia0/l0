@@ -18,7 +18,7 @@
 *)
 
 structure Compiler :> COMPILER = struct
-  datatype compiler = Compiler of Type.tenv * Function.fenv * CBackend.context
+  datatype compiler = Compiler of Type.tenv * Function.fenv * CppBackend.context
 
   local
     open Function
@@ -29,7 +29,7 @@ structure Compiler :> COMPILER = struct
         in
             Compiler (Type.emptyTenv,
                       Map.iadd Map.empty ("interim_not", interim_not),
-                      CBackend.emptyContext)
+                      CppBackend.emptyContext)
         end
   end
 
@@ -53,7 +53,7 @@ structure Compiler :> COMPILER = struct
                       if (TAST.typeOf tast) <> Function.funcRT func then
                           raise Fail "Return type does not match type of body"
                       else
-                          let val ctx' = CBackend.defineFunction ctx func tast
+                          let val ctx' = CppBackend.defineFunction ctx func tast
                           in
                               Compiler (tenv, fenv', ctx')
                           end
@@ -84,5 +84,5 @@ structure Compiler :> COMPILER = struct
     end
 
   fun compilerCode (Compiler (_, _, ctx)) =
-      CBackend.renderContext ctx
+      CppBackend.renderContext ctx
 end
