@@ -65,6 +65,10 @@ structure TAST :> TAST = struct
       | typeOf (TLet (_, _, b)) = typeOf b
       | typeOf (TAssign (_, v)) = typeOf v
       | typeOf (TTuple es) = Tuple (map typeOf es)
+      | typeOf (TTupleProj (exp, i)) =
+        (case typeOf exp of
+             (Tuple ts) => List.nth (ts, i)
+           | _ => raise Fail "Not a tuple")
       | typeOf (TNullPtr t) = RawPointer t
       | typeOf (TLoad (_, t)) = t
       | typeOf (TStore (_, v)) = typeOf v
@@ -170,6 +174,8 @@ structure TAST :> TAST = struct
           end
         | augment (Tuple exps) c =
           TTuple (map (fn e => augment e c) exps)
+        | augment (TupleProj (exp, i)) c =
+          TTupleProj (augment exp c, i)
         | augment (NullPtr t) c =
           TNullPtr (parseTypeSpecifier t (ctxTenv c))
         | augment (Load e) c =
