@@ -185,7 +185,7 @@ structure CppBackend :> CPP_BACKEND = struct
             let val decls = ListPair.map (fn (n, t) => Declare (t, varName n))
                                          (binds, tupTys)
                 and assigns = ListPair.map (fn (n, idx) => Assign (ngVar name, AccessTuple (tval, idx)))
-                                           (binds, List.tabulate (List.length tupTys, fn x = x))
+                                           (binds, List.tabulate (List.length tupTys, fn x => x))
             in
                 (Sequence (tblock :: decls :: assigns :: bblock), bval)
             end
