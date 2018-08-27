@@ -18,23 +18,14 @@
 *)
 
 signature FUNCTION = sig
-  datatype param = Param of string * Type.ty
   datatype func = Function of string * param list * Type.ty
+       and param = Param of Ident.ident * Type.ty
 
   type fenv = (string, func) Map.map
 
-  datatype mutability = Mutable
-                      | Immutable
-
-  datatype binding = Binding of Type.ty * mutability
-  type stack = (NameGen.name, binding) Map.map
-
-  val bindType : binding -> Type.ty
-
   val funcName : func -> string
   val funcRT : func -> Type.ty
+  val funcBindings : func -> Binding.bindings
 
   val matchParams : param list -> Type.ty list -> bool
-
-  val toStack : func -> (stack * NameGen.namegen)
 end

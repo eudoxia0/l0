@@ -25,7 +25,7 @@ structure Compiler :> COMPILER = struct
     open Type
   in
     val emptyCompiler =
-        let val interim_not = Function ("interim_not", [Param ("v", Bool)], Bool)
+        let val interim_not = Function ("interim_not", [Param (Ident.mkIdent "v" 0, Bool)], Bool)
         in
             Compiler (Type.emptyTenv,
                       Map.iadd Map.empty ("interim_not", interim_not),
@@ -36,37 +36,35 @@ structure Compiler :> COMPILER = struct
   fun compilerTypeEnv (Compiler (t, _, _)) = t
 
   fun compileAST (Compiler (tenv, fenv, ctx)) ast =
-    (case ast of
-         (AST.Defun (func, ast)) =>
-         let val fenv' = case Map.add fenv (Function.funcName func, func) of
-                             SOME fenv' => fenv'
-                           | NONE => raise Fail "Function already defined"
-             and (stack, namegen) = Function.toStack func
-         in
-             let val (arast, _) = ARAST.alphaRename ast namegen
-             in
-                 let val oast = OAST.augment arast
-                 in
-                     let val tast = TAST.augment oast
-                                                 (TAST.mkContext stack
-                                                                 tenv
-                                                                 fenv')
-                     in
-                         if (TAST.typeOf tast) <> Function.funcRT func then
-                             raise Fail "Return type does not match type of body"
-                         else
-                             let val ctx' = CBackend.defineFunction ctx func tast
-                             in
-                                 print (";; Define function " ^ (Function.funcName func) ^ "\n");
-                                 print "Context:\n";
-                                 print (CBackend.renderContext ctx');
-                                 print "\n";
-                                 Compiler (tenv, fenv', ctx')
-                             end
-                     end
-                 end
-             end
-         end)
+      let val (func, arast) = ARAST.alphaRename ast
+      in
+          let val fenv' = case Map.add fenv (Function.funcName func, func) of
+                              SOME fenv' => fenv'
+                            | NONE => raise Fail "Function already defined"
+              and bindings = Function.funcBindings func
+          in
+              let val oast = OAST.augment arast
+              in
+                  let val tast = TAST.augment oast
+                                              (TAST.mkContext bindings
+                                                              tenv
+                                                              fenv')
+                  in
+                      if (TAST.typeOf tast) <> Function.funcRT func then
+                          raise Fail "Return type does not match type of body"
+                      else
+                          let val ctx' = CBackend.defineFunction ctx func tast
+                          in
+                              print (";; Define function " ^ (Function.funcName func) ^ "\n");
+                              print "Context:\n";
+                              print (CBackend.renderContext ctx');
+                              print "\n";
+                              Compiler (tenv, fenv', ctx')
+                          end
+                  end
+              end
+          end
+      end
 
   fun compileString c s =
     let val (sexp, _) = Parser.parseString s

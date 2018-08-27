@@ -17,32 +17,12 @@
     along with L0.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure Map :> MAP = struct
-  datatype (''k, 'v) map = Map of (''k * 'v) list
+signature BINDING = sig
+  datatype binding = Binding of Type.ty * mutability
+       and mutability = Immutable
+                      | Mutable
 
-  val empty = Map []
+  type bindings = (Ident.ident, binding) Map.map
 
-  fun mapl (Map m) = m
-
-  fun get (Map ((k', v)::rest)) k = if k = k' then SOME v else get (Map rest) k
-    | get (Map nil) _ = NONE
-
-  fun add m (k, v) =
-    case (get m k) of
-        SOME _ => NONE
-      | NONE => SOME (Map ((k, v) :: (mapl m)))
-
-  fun iadd m (k, v) =
-    case (get m k) of
-        SOME _ => m
-      | NONE => Map ((k, v) :: (mapl m))
-
-  fun iaddList m (head::tail) =
-      iadd (iaddList m tail) head
-    | iaddList m nil = m
-
-  fun size (Map m) = length m
-
-  fun kvmap (Map (head::tail)) f = iadd (kvmap (Map tail) f) (f head)
-    | kvmap (Map nil) _ = Map nil
+  val bindType : binding -> Type.ty
 end

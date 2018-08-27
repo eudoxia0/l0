@@ -18,107 +18,113 @@
 *)
 
 structure ARAST :> ARAST = struct
-  open NameGen
-
   datatype ast = ConstUnit
                | ConstBool of bool
                | ConstInt of int
                | ConstString of string
-               | Var of NameGen.name
+               | Var of Ident.ident
                | Cast of Type.ty * ast
-               | Let of NameGen.name * ast * ast
+               | Let of Ident.ident * ast * ast
                | NullPtr of Parser.sexp
                | Malloc of Parser.sexp * ast
-               | AddressOf of NameGen.name
+               | AddressOf of Ident.ident
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
                | Operation of string * ast list
 
-  type renamed = (string, NameGen.name) Map.map
+  (* Fresh identifiers *)
 
-  fun alphaRename ast ng =
-    let val (ast', stack, _) = rename ast Map.empty ng
+  val count = ref 0
+
+  fun freshVar name =
+    let
     in
-        (ast', stack)
+        count := !count + 1;
+        Ident.mkIdent name (!count)
     end
-  and rename AST.ConstUnit s n = (ConstUnit, s, n)
-    | rename (AST.ConstBool b) s n = (ConstBool b, s, n)
-    | rename (AST.ConstInt i) s n = (ConstInt i, s, n)
-    | rename (AST.ConstString str) s n = (ConstString str, s, n)
-    | rename (AST.Var name) s n =
-      (case Map.get s name of
-           SOME name' => (Var name', s, n)
-         | NONE => raise Fail ("No variable with this name: " ^ name))
-    | rename (AST.Cast (t, a)) s n =
-      let val (a', s', n') = rename a s n
+
+  fun resetCount () =
+    count := 0
+
+  (* Alpha renaming *)
+
+  type stack = (string, Ident.ident) Map.map
+
+  fun alphaRename (AST.Defun (name, ps, rt, body)) =
+    let
+    in
+      resetCount ();
+      let val (stack, params) = renameParams ps
       in
-          (Cast (t, a'), s', n')
+          let val (ast', _) = rename body stack
+          in
+              (Function.Function (name, params, rt), ast')
+          end
       end
-    | rename (AST.Let (name, exp, body)) s n =
-      let val (exp', s', n') = rename exp s n
+    end
+  and renameParams ps =
+    let val ps' = map (fn (AST.Param (n, t)) => Function.Param (freshVar n, t)) ps
+    in
+        (Map.iaddList Map.empty
+                      (map (fn (Function.Param (i, _)) => (Ident.identName i, i))
+                           ps'),
+         ps')
+    end
+  and rename AST.ConstUnit s = (ConstUnit, s)
+    | rename (AST.ConstBool b) s = (ConstBool b, s)
+    | rename (AST.ConstInt i) s = (ConstInt i, s)
+    | rename (AST.ConstString str) s = (ConstString str, s)
+    | rename (AST.Var name) s =
+      (case Map.get s name of
+           SOME name' => (Var name', s)
+         | NONE => raise Fail ("No variable with this name: " ^ name))
+    | rename (AST.Cast (t, a)) s =
+      let val (a', s') = rename a s
       in
-          let val (fresh, n'') = freshName n'
+          (Cast (t, a'), s')
+      end
+    | rename (AST.Let (name, exp, body)) s =
+      let val (exp', s') = rename exp s
+      in
+          let val fresh = freshVar name
           in
               let val s'' = Map.iadd s (name, fresh)
               in
-                  let val (body', s''', n''') = rename body s' n'
+                  let val (body', s''') = rename body s'
                   in
-                      (Let (fresh, exp', body'), s''', n''')
+                      (Let (fresh, exp', body'), s''')
                   end
               end
           end
       end
-    | rename (AST.NullPtr t) s n = (NullPtr t, s, n)
-    | rename (AST.Malloc (t, e)) s n =
-      let val (e', s', n') = rename e s n
+    | rename (AST.NullPtr t) s = (NullPtr t, s)
+    | rename (AST.Malloc (t, e)) s =
+      let val (e', s') = rename e s
       in
-          (Malloc (t, e'), s', n')
+          (Malloc (t, e'), s')
       end
-    | rename (AST.AddressOf name) s n =
+    | rename (AST.AddressOf name) s =
       (case Map.get s name of
-           SOME name' => (AddressOf name', s, n)
+           SOME name' => (AddressOf name', s)
          | NONE => raise Fail ("No variable with this name: " ^ name))
-    | rename (AST.CEmbed (t, e)) s n = (CEmbed (t, e), s, n)
-    | rename (AST.CCall (name, ty, l)) s n =
-      let val (args', s', n') = renameList l s n
+    | rename (AST.CEmbed (t, e)) s = (CEmbed (t, e), s)
+    | rename (AST.CCall (name, ty, l)) s =
+      let val (args', s') = renameList l s
       in
-          (CCall (name, ty, args'), s', n')
+          (CCall (name, ty, args'), s')
       end
-    | rename (AST.Operation (oper, l)) s n =
-      let val (args', s', n') = renameList l s n
+    | rename (AST.Operation (oper, l)) s =
+      let val (args', s') = renameList l s
       in
-          (Operation (oper, args'), s', n')
+          (Operation (oper, args'), s')
       end
-  and renameList (head::tail) s n =
-      let val (head', s', n') = rename head s n
+  and renameList (head::tail) s =
+      let val (head', s') = rename head s
       in
-          let val (list, s'', n'') = (renameList tail s' n')
+          let val (list, s'') = (renameList tail s')
           in
-              (head' :: list, s'', n'')
+              (head' :: list, s'')
           end
       end
-    | renameList nil s n = (nil, s, n)
-
-  fun alphaRenameParams params ng =
-      let val stack = Map.empty
-      in
-          let val (_, stack', ng') = renameParamList params stack ng
-          in
-              (stack', ng')
-          end
-      end
-  and renameParam (Function.Param (name, ty)) stack ng =
-      let val (fresh, ng') = NameGen.freshName ng
-      in
-          ((), Map.iadd stack (name, fresh), ng')
-      end
-  and renameParamList (head::tail) s n =
-      let val (head', s', n') = renameParam head s n
-      in
-          let val (list, s'', n'') = (renameParamList tail s' n')
-          in
-              (head' :: list, s'', n'')
-          end
-      end
-    | renameParamList nil s n = (nil, s, n)
+    | renameList nil s = (nil, s)
 end

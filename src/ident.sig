@@ -17,32 +17,10 @@
     along with L0.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure Map :> MAP = struct
-  datatype (''k, 'v) map = Map of (''k * 'v) list
+signature IDENT = sig
+  type ident
 
-  val empty = Map []
-
-  fun mapl (Map m) = m
-
-  fun get (Map ((k', v)::rest)) k = if k = k' then SOME v else get (Map rest) k
-    | get (Map nil) _ = NONE
-
-  fun add m (k, v) =
-    case (get m k) of
-        SOME _ => NONE
-      | NONE => SOME (Map ((k, v) :: (mapl m)))
-
-  fun iadd m (k, v) =
-    case (get m k) of
-        SOME _ => m
-      | NONE => Map ((k, v) :: (mapl m))
-
-  fun iaddList m (head::tail) =
-      iadd (iaddList m tail) head
-    | iaddList m nil = m
-
-  fun size (Map m) = length m
-
-  fun kvmap (Map (head::tail)) f = iadd (kvmap (Map tail) f) (f head)
-    | kvmap (Map nil) _ = Map nil
+  val mkIdent : string -> int -> ident
+  val identName : ident -> string
+  val identId : ident -> int
 end

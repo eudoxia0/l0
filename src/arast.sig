@@ -22,18 +22,15 @@ signature ARAST = sig
                | ConstBool of bool
                | ConstInt of int
                | ConstString of string
-               | Var of NameGen.name
+               | Var of Ident.ident
                | Cast of Type.ty * ast
-               | Let of NameGen.name * ast * ast
+               | Let of Ident.ident * ast * ast
                | NullPtr of Parser.sexp
                | Malloc of Parser.sexp * ast
-               | AddressOf of NameGen.name
+               | AddressOf of Ident.ident
                | CEmbed of Parser.sexp * string
                | CCall of string * Parser.sexp * ast list
                | Operation of string * ast list
 
-  type renamed
-
-  val alphaRename : AST.ast -> NameGen.namegen -> (ast * renamed)
-  val alphaRenameParams : Function.param list -> NameGen.namegen -> (renamed * NameGen.namegen)
+  val alphaRename : AST.top_ast -> (Function.func * ast)
 end
