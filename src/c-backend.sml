@@ -82,6 +82,9 @@ structure CBackend :> C_BACKEND = struct
 
   fun collectTupleTypes tast = filterTuples (allTypes tast)
 
+  fun newTupleTypes old_tuple_types new_tuple_types =
+    OrderedSet.difference new_tuple_types old_tuple_types
+
   (* Fresh identifiers *)
 
   val count = ref 0
