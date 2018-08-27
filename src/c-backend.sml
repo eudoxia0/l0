@@ -356,7 +356,7 @@ structure CBackend :> C_BACKEND = struct
       in
         StructDef (name, defineSlots tt)
       end
-    and defineSlots (Tuple l) =
+    and defineSlots (Type.Tuple l) =
       tabulate (List.length l, defineSlot l)
       | defineSlots _ = raise Fail "Not a tuple"
     and defineSlot l idx =
