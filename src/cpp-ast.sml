@@ -18,6 +18,25 @@
 *)
 
 structure CppAst :> CPP_AST = struct
+  (* Rendering utilities *)
+
+  local
+    open Substring
+  in
+    fun sepBy sep strings = trimWhitespace (String.concatWith sep strings)
+    and trimWhitespace s = string (dropl (fn c => c = #"\n") (full s))
+  end
+
+  fun pad n =
+    if n > 0 then
+        " " ^ (pad (n-1))
+    else
+        ""
+
+  val indentation = 2
+  fun indent d = d + indentation
+  fun unindent d = d - indentation
+
   (* Types *)
 
   datatype ty = Bool
@@ -105,23 +124,6 @@ structure CppAst :> CPP_AST = struct
     | renderType (Pointer t) = (renderType t) ^ "*"
     | renderType (Tuple ts) = "std::tuple<" ^ (sepBy ", " (map renderType ts)) ^ ">"
     | renderType (Struct n) = n
-
-  local
-    open Substring
-  in
-    fun sepBy sep strings = trimWhitespace (String.concatWith sep strings)
-    and trimWhitespace s = string (dropl (fn c => c = #"\n") (full s))
-  end
-
-  fun pad n =
-    if n > 0 then
-        " " ^ (pad (n-1))
-    else
-        ""
-
-  val indentation = 2
-  fun indent d = d + indentation
-  fun unindent d = d - indentation
 
   fun renderExp (ConstBool true) = "true"
     | renderExp (ConstBool false) = "false"
