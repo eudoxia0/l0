@@ -357,7 +357,7 @@ structure CBackend :> C_BACKEND = struct
         StructDef (name, defineSlots tt)
       end
     and defineSlots (Type.Tuple l) =
-      tabulate (List.length l, defineSlot l)
+      List.tabulate (List.length l, defineSlot l)
       | defineSlots _ = raise Fail "Not a tuple"
     and defineSlot l idx =
       CAst.Slot (tupleFieldName idx, List.nth l idx)
