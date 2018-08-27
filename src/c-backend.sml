@@ -32,7 +32,7 @@ structure CBackend :> C_BACKEND = struct
   val emptyContext = Context ([], OrderedSet.empty)
 
   fun renderContext (Context (ts, _)) =
-    prelude ^ (String.concatWith "\n\n" (map CAst.renderTop ts))
+    prelude ^ "\n\n" ^ (String.concatWith "\n\n" (map CAst.renderTop ts))
 
   fun ctxToplevel (Context (t, _)) = t
   fun ctxTupleTypes (Context (_, tt)) = tt
