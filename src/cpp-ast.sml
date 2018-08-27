@@ -30,6 +30,7 @@ structure CppAst :> CPP_AST = struct
               | UInt64
               | Int64
               | Pointer of ty
+              | Tuple of ty list
               | Struct of string
 
   datatype exp_ast = ConstBool of bool
@@ -42,6 +43,8 @@ structure CppAst :> CPP_AST = struct
                    | Deref of exp_ast
                    | AddressOf of exp_ast
                    | SizeOf of ty
+                   | CreateTuple of exp_ast list
+                   | AccessTuple of exp_ast * int
                    | StructInitializer of string * (string * exp_ast) list
                    | StructAccess of exp_ast * string
                    | Adjacent of exp_ast list
@@ -136,6 +139,10 @@ structure CppAst :> CPP_AST = struct
     | renderExp (Deref e) = "*" ^ (renderExp e)
     | renderExp (AddressOf e) = "&" ^ (renderExp e)
     | renderExp (SizeOf t) = "sizeof(" ^ (renderType t) ^ ")"
+    | renderExp (CreateTuple exps) =
+      "std::make_tuple(" ^ (sepBy ", " (map renderExp exps)) ^ ")"
+    | renderExp (AccessTuple exp i) =
+      "std::get<" ^ (Int.toString i) ^ ">(" ^ (renderExp exp) ^ ")"
     | renderExp (StructInitializer (name, inits)) =
       "(("
       ^ (escapeIdent name)
