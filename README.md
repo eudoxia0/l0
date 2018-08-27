@@ -4,6 +4,16 @@
 
 A minimal Lisp with linear types. Not yet finished.
 
+Example:
+
+~~~bash
+$ make l0
+$ ./l0 examples/fib.lisp fib.c
+$ gcc fib.c
+$ ./a.out
+fib(30) = 832040
+~~~
+
 ## License
 
 Copyright 2018 Fernando Borretti.
