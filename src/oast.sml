@@ -53,6 +53,7 @@ structure OAST :> OAST = struct
     | augment (ARAST.Var n) = Var n
     | augment (ARAST.Cast (t, e)) = Cast (t, augment e)
     | augment (ARAST.Let (n, e, b)) = Let (n, augment e, augment b)
+    | augment (ARAST.Bind (binds, t, b)) = Bind (binds, augment t, augment b)
     | augment (ARAST.NullPtr t) = NullPtr t
     | augment (ARAST.Malloc (t, e)) = Malloc (t, augment e)
     | augment (ARAST.AddressOf n) = AddressOf n
