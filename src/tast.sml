@@ -184,9 +184,9 @@ structure TAST :> TAST = struct
                           raise Fail ("Cannot assign to variable '"
                                       ^ (Ident.identName var)
                                       ^ "': the type of the variable is "
-                                      ^ (tyToString ty)
+                                      ^ (toString ty)
                                       ^ ", while the type of the expression is "
-                                      ^ (tyToString (typeOf v')))
+                                      ^ (toString (typeOf v')))
                   else
                       raise Fail ("Cannot assign to immutable variable '"
                                   ^ (Ident.identName var)
@@ -308,14 +308,14 @@ structure TAST :> TAST = struct
                       raise Fail ("Both operands to "
                                   ^ (Binop.binopName oper)
                                   ^ " must be of the same type. Types: "
-                                  ^ (tyToString ta)
+                                  ^ (toString ta)
                                   ^ " and "
-                                  ^ (tyToString tb))
+                                  ^ (toString tb))
                   else
                       if isEquatable ta then
                           TBinop (oper, a', b', Bool)
                       else
-                          raise Fail ("Cannot compare objects of this type: " ^ (tyToString ta))
+                          raise Fail ("Cannot compare objects of this type: " ^ (toString ta))
               end
           end
     end
