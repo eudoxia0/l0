@@ -57,4 +57,6 @@ structure OrderedSet :> ORDERED_SET = struct
 
   fun fromList (x::xs) = add (fromList xs) x
     | fromList nil = empty
+
+  fun toList (Set l) = l
 end
