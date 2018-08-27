@@ -8,8 +8,8 @@ Example:
 
 ~~~bash
 $ make l0
-$ ./l0 examples/fib.lisp fib.c
-$ gcc fib.c
+$ ./l0 examples/fib.lisp fib.cpp
+$ g++ fib.cpp
 $ ./a.out
 fib(30) = 832040
 ~~~
