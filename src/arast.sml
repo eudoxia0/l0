@@ -98,6 +98,20 @@ structure ARAST :> ARAST = struct
               end
           end
       end
+    | rename (AST.Bind (binds, tup, body)) s =
+      let val (tup', s') = rename tup s
+      in
+        let val freshBinds = map (fn b => (b, freshVar b)) binds
+        in
+          let val s'' = Map.iaddList s' freshBinds
+          in
+            let val (body', s''') = rename body s''
+            in
+                (Bind (map (fn (_, f) => f) freshBinds, tup', body'), s''')
+            end
+          end
+        end
+      end
     | rename (AST.NullPtr t) s = (NullPtr t, s)
     | rename (AST.Malloc (t, e)) s =
       let val (e', s') = rename e s
