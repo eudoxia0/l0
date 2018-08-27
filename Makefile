@@ -30,13 +30,12 @@ $(BIN): $(SRC) $(PARSIMONY)
 .PHONY: test
 test: $(BIN)
 	./l0 examples/hello.lisp hello.c
-	clang hello.c -o hello
-	./hello
-	rm hello.c hello
 	./l0 examples/fib.lisp fib.c
+	clang hello.c -o hello
 	clang fib.c -o fib
+	./hello
 	./fib
-	rm fib.c fib
+	rm hello.c hello fib.c fib
 
 clean:
 	rm -rf $(VENDOR_DIR)
